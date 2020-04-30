@@ -1,0 +1,13 @@
+{
+  "name": "bicycle.comfort",
+  "description": "Gives a comfort factor, purely based on physical aspects of the road",
+  "unit": "[0, 2]",
+  "$default": 1,
+  "value": {
+    "$multiply": {
+      "cyclestreet": {
+        "yes": 1.5
+      }
+    }
+  }
+}

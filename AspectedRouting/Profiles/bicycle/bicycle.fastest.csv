@@ -1,0 +1,7 @@
+access,oneway,speed,weight,highway,bicycle
+0,0,0,0,,
+1,0,30,0.03333,cycleway,
+0,0,0,0,primary,
+1,0,15,0.06666,pedestrian,
+1,0,15,0.0666,pedestrian,yes
+1,0,30,0.033333,residential,
