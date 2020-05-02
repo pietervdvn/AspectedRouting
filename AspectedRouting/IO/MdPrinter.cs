@@ -64,7 +64,7 @@ namespace AspectedRouting.IO
 
         private static string ArgTableHorizontal(this Function f)
         {
-            var header = string.Join(" | ", f.ArgNames) + " |";
+            var header = string.Join(" | ", f.ArgNames) + " | returns |";
             var headerLine = string.Join(" | ", f.ArgNames.Select(_ => "---")) + " |";
 
             var types =

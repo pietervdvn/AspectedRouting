@@ -42,7 +42,7 @@
 
 #### eq
 
-a | b |
+a | b | returns |
 --- | --- |
 $a | $a | bool |
 $a | $a | string |
@@ -67,7 +67,7 @@ end
 
 #### notEq
 
-a | b |
+a | b | returns |
 --- | --- |
 $a | $a | bool |
 $a | $a | string |
@@ -96,7 +96,7 @@ end
 
 #### not
 
-a | b |
+a | b | returns |
 --- | --- |
 $a | $a | bool |
 $a | $a | string |
@@ -125,7 +125,7 @@ end
 
 #### inv
 
-d |
+d | returns |
 --- |
 pdouble | pdouble |
 double | double |
@@ -145,7 +145,7 @@ end
 
 #### default
 
-defaultValue | f |
+defaultValue | f | returns |
 --- | --- |
 $a | $b -> $a | $b | $a |
 
@@ -167,7 +167,7 @@ end
 
 #### parse
 
-s |
+s | returns |
 --- |
 string | double |
 string | pdouble |
@@ -211,7 +211,7 @@ end
 
 #### to_string
 
-obj |
+obj | returns |
 --- |
 $a | string |
 
@@ -230,7 +230,7 @@ end
 
 #### concat
 
-a | b |
+a | b | returns |
 --- | --- |
 string | string | string |
 
@@ -249,7 +249,7 @@ end
 
 #### containedIn
 
-list | a |
+list | a | returns |
 --- | --- |
 list ($a) | $a | bool |
 
@@ -274,7 +274,7 @@ end
 
 #### min
 
-list |
+list | returns |
 --- |
 list (nat) | nat |
 list (int) | int |
@@ -306,7 +306,7 @@ end
 
 #### and
 
-list |
+list | returns |
 --- |
 list (nat) | nat |
 list (int) | int |
@@ -338,7 +338,7 @@ end
 
 #### max
 
-list |
+list | returns |
 --- |
 list (nat) | nat |
 list (int) | int |
@@ -370,7 +370,7 @@ end
 
 #### or
 
-list |
+list | returns |
 --- |
 list (nat) | nat |
 list (int) | int |
@@ -402,7 +402,7 @@ end
 
 #### sum
 
-list |
+list | returns |
 --- |
 list (nat) | nat |
 list (int) | int |
@@ -432,7 +432,7 @@ end
 
 #### multiply
 
-list |
+list | returns |
 --- |
 list (nat) | nat |
 list (int) | int |
@@ -459,7 +459,7 @@ end
 
 #### firstMatchOf
 
-s |
+s | returns |
 --- |
 list (string) | tags -> list ($a) | tags | $a |
 
@@ -495,7 +495,7 @@ end
 
 #### mustMatch
 
-neededKeys (filled in by parser) | f |
+neededKeys (filled in by parser) | f | returns |
 --- | --- |
 list (string) | tags -> list (bool) | tags | bool |
 
@@ -550,7 +550,7 @@ end
 
 #### memberOf
 
-f | tags |
+f | tags | returns |
 --- | --- |
 tags -> bool | tags | bool |
 
@@ -588,7 +588,7 @@ end
 
 #### if_then_else
 
-condition | then | else |
+condition | then | else | returns |
 --- | --- | --- |
 bool | $a | $a | $a |
 bool | $a | $a |
@@ -612,7 +612,7 @@ end
 
 #### if
 
-condition | then | else |
+condition | then | else | returns |
 --- | --- | --- |
 bool | $a | $a | $a |
 bool | $a | $a |
@@ -636,7 +636,7 @@ end
 
 #### id
 
-a |
+a | returns |
 --- |
 $a | $a |
 
@@ -655,7 +655,7 @@ end
 
 #### const
 
-a | b |
+a | b | returns |
 --- | --- |
 $a | $b | $a |
 
@@ -674,7 +674,7 @@ end
 
 #### constRight
 
-a | b |
+a | b | returns |
 --- | --- |
 $a | $b | $b |
 
@@ -691,7 +691,7 @@ Lua implementation:
 
 #### dot
 
-f | g | a |
+f | g | a | returns |
 --- | --- | --- |
 $b -> $c | $a -> $b | $a | $c |
 
@@ -708,7 +708,7 @@ Lua implementation:
 
 #### listDot
 
-list | a |
+list | a | returns |
 --- | --- |
 list ($a -> $b) | $a | list ($b) |
 
@@ -726,7 +726,7 @@ Lua implementation:
 
 #### eitherFunc
 
-f | g | a |
+f | g | a | returns |
 --- | --- | --- |
 $a -> $b | $c -> $d | $a | $b |
 $a -> $b | $c -> $d | $c | $d |
@@ -748,7 +748,7 @@ Lua implementation:
 
 #### stringToTags
 
-f | tags |
+f | tags | returns |
 --- | --- |
 string -> string -> $a | tags | list ($a) |
 
