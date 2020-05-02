@@ -67,12 +67,12 @@ namespace AspectedRouting.IO
             try
             {
                 var args = f.ArgBreakdown();
-                var header = "Argument name |  ";
-                var line = "-------------- | - ";
+                var header = "Argument name | ";
+                var line = "--------------- |   ";
                 for (int i = 0; i < f.Types.Count(); i++)
                 {
-                    header += "|  ";
-                    line += "| - ";
+                    header += "  |";
+                    line += " -- | ";
                 }
 
                 var lines = "";

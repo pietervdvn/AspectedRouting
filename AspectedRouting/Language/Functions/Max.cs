@@ -23,6 +23,7 @@ namespace AspectedRouting.Language.Functions
             })
 
         {
+            Funcs.AddBuiltin(this, "or");
         }
 
         private Max(IEnumerable<Type> specializedTypes) : base("max", specializedTypes)

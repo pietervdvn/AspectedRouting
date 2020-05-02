@@ -19,7 +19,9 @@
 - concat
 - containedIn
 - min
+- and
 - max
+- or
 - sum
 - multiply
 - firstMatchOf
@@ -40,8 +42,8 @@
 
 #### eq
 
-Argument name |  |  |  
--------------- | - | - | - 
+Argument name |   |  |
+--------------- | -- |  -- | 
 **a** | $a	 | $a	 | 
 **b** | $a	 | $a	 | 
 _return type_ | bool	 | string	 | 
@@ -67,8 +69,8 @@ end
 
 #### notEq
 
-Argument name |  |  |  |  
--------------- | - | - | - | - 
+Argument name |   |  |  |
+--------------- |    -- |  -- |  -- | 
 **a** | $a	 | $a	 | bool	 | 
 **b** | $a	 | $a	 | _none_	 | 
 _return type_ | bool	 | string	 | bool	 | 
@@ -97,8 +99,8 @@ end
 
 #### not
 
-Argument name |  |  |  |  
--------------- | - | - | - | - 
+Argument name |   |  |  |
+--------------- |    -- |  -- |  -- | 
 **a** | $a	 | $a	 | bool	 | 
 **b** | $a	 | $a	 | _none_	 | 
 _return type_ | bool	 | string	 | bool	 | 
@@ -127,8 +129,8 @@ end
 
 #### inv
 
-Argument name |  |  |  
--------------- | - | - | - 
+Argument name |   |  |
+--------------- |    -- |  -- | 
 **d** | pdouble	 | double	 | 
 _return type_ | pdouble	 | double	 | 
 
@@ -148,8 +150,8 @@ end
 
 #### default
 
-Argument name |  |  
--------------- | - | - 
+Argument name |   |
+--------------- |    -- | 
 **defaultValue** | $a	 | 
 **f** | $b -> $a	 | 
 _return type_ | $b -> $a	 | 
@@ -173,8 +175,8 @@ end
 
 #### parse
 
-Argument name |  |  |  
--------------- | - | - | - 
+Argument name |   |  |
+--------------- |    -- |  -- | 
 **s** | string	 | string	 | 
 _return type_ | double	 | pdouble	 | 
 
@@ -218,8 +220,8 @@ end
 
 #### to_string
 
-Argument name |  |  
--------------- | - | - 
+Argument name |   |
+--------------- |    -- | 
 **obj** | $a	 | 
 _return type_ | string	 | 
 
@@ -239,8 +241,8 @@ end
 
 #### concat
 
-Argument name |  |  
--------------- | - | - 
+Argument name |   |
+--------------- |    -- | 
 **a** | string	 | 
 **b** | string	 | 
 _return type_ | string	 | 
@@ -261,8 +263,8 @@ end
 
 #### containedIn
 
-Argument name |  |  
--------------- | - | - 
+Argument name |   |
+--------------- |    -- | 
 **list** | list ($a)	 | 
 **a** | $a	 | 
 _return type_ | bool	 | 
@@ -289,8 +291,38 @@ end
 
 #### min
 
-Argument name |  |  |  |  |  |  
--------------- | - | - | - | - | - | - 
+Argument name |   |  |  |  |  |
+--------------- |    -- |  -- |  -- |  -- |  -- | 
+**list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
+_return type_ | nat	 | int	 | pdouble	 | double	 | bool	 | 
+
+
+Out of a list of values, gets the smallest value. IN case of a list of bools, this acts as `and`
+
+
+
+Lua implementation:
+
+````lua
+function min(list)
+    local min
+    for _, value in ipairs(list) do
+        if (min == nil) then
+            min = value
+        elseif (min > value) then
+            min = value
+        end
+    end
+
+    return min;
+end
+````
+
+
+#### and
+
+Argument name |   |  |  |  |  |
+--------------- |    -- |  -- |  -- |  -- |  -- | 
 **list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
 _return type_ | nat	 | int	 | pdouble	 | double	 | bool	 | 
 
@@ -319,8 +351,38 @@ end
 
 #### max
 
-Argument name |  |  |  |  |  |  
--------------- | - | - | - | - | - | - 
+Argument name |   |  |  |  |  |
+--------------- |    -- |  -- |  -- |  -- |  -- | 
+**list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
+_return type_ | nat	 | int	 | pdouble	 | double	 | bool	 | 
+
+
+Returns the biggest value in the list. For a list of booleans, this acts as 'or'
+
+
+
+Lua implementation:
+
+````lua
+function max(list)
+    local max
+    for _, value in ipairs(list) do
+        if (max == nil) then
+            max = value
+        elseif (max < value) then
+            max = value
+        end
+    end
+
+    return max;
+end
+````
+
+
+#### or
+
+Argument name |   |  |  |  |  |
+--------------- |    -- |  -- |  -- |  -- |  -- | 
 **list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
 _return type_ | nat	 | int	 | pdouble	 | double	 | bool	 | 
 
@@ -349,8 +411,8 @@ end
 
 #### sum
 
-Argument name |  |  |  |  |  |  
--------------- | - | - | - | - | - | - 
+Argument name |   |  |  |  |  |
+--------------- |    -- |  -- |  -- |  -- |  -- | 
 **list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
 _return type_ | nat	 | int	 | pdouble	 | double	 | int	 | 
 
@@ -377,8 +439,8 @@ end
 
 #### multiply
 
-Argument name |  |  |  |  |  |  
--------------- | - | - | - | - | - | - 
+Argument name |   |  |  |  |  |
+--------------- |    -- |  -- |  -- |  -- |  -- | 
 **list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
 _return type_ | nat	 | int	 | pdouble	 | double	 | bool	 | 
 
@@ -402,8 +464,8 @@ end
 
 #### firstMatchOf
 
-Argument name |  |  
--------------- | - | - 
+Argument name |   |
+--------------- |    -- | 
 **s** | list (string)	 | 
 _return type_ | (tags -> list ($a)) -> tags -> $a	 | 
 
@@ -440,8 +502,8 @@ end
 
 #### mustMatch
 
-Argument name |  |  
--------------- | - | - 
+Argument name |   |
+--------------- |    -- | 
 **neededKeys (filled in by parser)** | list (string)	 | 
 **f** | tags -> list (bool)	 | 
 _return type_ | tags -> bool	 | 
@@ -498,8 +560,8 @@ end
 
 #### memberOf
 
-Argument name |  |  
--------------- | - | - 
+Argument name |   |
+--------------- |    -- | 
 **f** | tags -> bool	 | 
 **tags** | tags	 | 
 _return type_ | bool	 | 
@@ -539,8 +601,8 @@ end
 
 #### if_then_else
 
-Argument name |  |  |  
--------------- | - | - | - 
+Argument name |   |  |
+--------------- |    -- |  -- | 
 **condition** | bool	 | bool	 | 
 **then** | $a	 | $a	 | 
 **else** | $a	 | _none_	 | 
@@ -566,8 +628,8 @@ end
 
 #### if
 
-Argument name |  |  |  
--------------- | - | - | - 
+Argument name |   |  |
+--------------- |    -- |  -- | 
 **condition** | bool	 | bool	 | 
 **then** | $a	 | $a	 | 
 **else** | $a	 | _none_	 | 
@@ -593,8 +655,8 @@ end
 
 #### id
 
-Argument name |  |  
--------------- | - | - 
+Argument name |   |
+--------------- |    -- | 
 **a** | $a	 | 
 _return type_ | $a	 | 
 
@@ -614,8 +676,8 @@ end
 
 #### const
 
-Argument name |  |  
--------------- | - | - 
+Argument name |   |
+--------------- |    -- | 
 **a** | $a	 | 
 **b** | $b	 | 
 _return type_ | $a	 | 
@@ -636,8 +698,8 @@ end
 
 #### constRight
 
-Argument name |  |  
--------------- | - | - 
+Argument name |   |
+--------------- |    -- | 
 **a** | $a	 | 
 **b** | $b	 | 
 _return type_ | $b	 | 
@@ -656,8 +718,8 @@ Lua implementation:
 
 #### dot
 
-Argument name |  |  
--------------- | - | - 
+Argument name |   |
+--------------- |    -- | 
 **f** | $b -> $c	 | 
 **g** | $a -> $b	 | 
 **a** | $a	 | 
@@ -677,8 +739,8 @@ Lua implementation:
 
 #### listDot
 
-Argument name |  |  
--------------- | - | - 
+Argument name |   |
+--------------- |    -- | 
 **list** | list ($a -> $b)	 | 
 **a** | $a	 | 
 _return type_ | list ($b)	 | 
@@ -698,8 +760,8 @@ Lua implementation:
 
 #### eitherFunc
 
-Argument name |  |  |  
--------------- | - | - | - 
+Argument name |   |  |
+--------------- |    -- |  -- | 
 **f** | $a -> $b	 | $a -> $b	 | 
 **g** | $c -> $d	 | $c -> $d	 | 
 **a** | $a	 | $c	 | 
@@ -723,8 +785,8 @@ Lua implementation:
 
 #### stringToTags
 
-Argument name |  |  
--------------- | - | - 
+Argument name |   |
+--------------- |    -- | 
 **f** | string -> string -> $a	 | 
 **tags** | tags	 | 
 _return type_ | list ($a)	 | 

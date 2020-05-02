@@ -22,6 +22,7 @@ namespace AspectedRouting.Language.Functions
                 new Curry(new ListType(Typs.Bool), Typs.Bool),
             })
         {
+            Funcs.AddBuiltin(this, "and");
         }
 
         private Min(IEnumerable<Type> specializedTypes) : base("min",
