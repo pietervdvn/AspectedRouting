@@ -43,7 +43,7 @@
 #### eq
 
 a | b | returns |
---- | --- |
+--- | --- | --- |
 $a | $a | bool |
 $a | $a | string |
 
@@ -68,7 +68,7 @@ end
 #### notEq
 
 a | b | returns |
---- | --- |
+--- | --- | --- |
 $a | $a | bool |
 $a | $a | string |
 bool | bool |
@@ -97,7 +97,7 @@ end
 #### not
 
 a | b | returns |
---- | --- |
+--- | --- | --- |
 $a | $a | bool |
 $a | $a | string |
 bool | bool |
@@ -126,7 +126,7 @@ end
 #### inv
 
 d | returns |
---- |
+--- | --- |
 pdouble | pdouble |
 double | double |
 
@@ -146,7 +146,7 @@ end
 #### default
 
 defaultValue | f | returns |
---- | --- |
+--- | --- | --- |
 $a | $b -> $a | $b | $a |
 
 Calculates function `f` for the given argument. If the result is `null`, the default value is returned instead
@@ -168,7 +168,7 @@ end
 #### parse
 
 s | returns |
---- |
+--- | --- |
 string | double |
 string | pdouble |
 
@@ -212,7 +212,7 @@ end
 #### to_string
 
 obj | returns |
---- |
+--- | --- |
 $a | string |
 
 Converts a value into a human readable string
@@ -231,7 +231,7 @@ end
 #### concat
 
 a | b | returns |
---- | --- |
+--- | --- | --- |
 string | string | string |
 
 Concatenates two strings
@@ -250,7 +250,7 @@ end
 #### containedIn
 
 list | a | returns |
---- | --- |
+--- | --- | --- |
 list ($a) | $a | bool |
 
 Given a list of values, checks if the argument is contained in the list.
@@ -275,7 +275,7 @@ end
 #### min
 
 list | returns |
---- |
+--- | --- |
 list (nat) | nat |
 list (int) | int |
 list (pdouble) | pdouble |
@@ -307,7 +307,7 @@ end
 #### and
 
 list | returns |
---- |
+--- | --- |
 list (nat) | nat |
 list (int) | int |
 list (pdouble) | pdouble |
@@ -339,7 +339,7 @@ end
 #### max
 
 list | returns |
---- |
+--- | --- |
 list (nat) | nat |
 list (int) | int |
 list (pdouble) | pdouble |
@@ -371,7 +371,7 @@ end
 #### or
 
 list | returns |
---- |
+--- | --- |
 list (nat) | nat |
 list (int) | int |
 list (pdouble) | pdouble |
@@ -403,7 +403,7 @@ end
 #### sum
 
 list | returns |
---- |
+--- | --- |
 list (nat) | nat |
 list (int) | int |
 list (pdouble) | pdouble |
@@ -433,7 +433,7 @@ end
 #### multiply
 
 list | returns |
---- |
+--- | --- |
 list (nat) | nat |
 list (int) | int |
 list (pdouble) | pdouble |
@@ -460,7 +460,7 @@ end
 #### firstMatchOf
 
 s | returns |
---- |
+--- | --- |
 list (string) | tags -> list ($a) | tags | $a |
 
 Parses a string into a numerical value
@@ -496,7 +496,7 @@ end
 #### mustMatch
 
 neededKeys (filled in by parser) | f | returns |
---- | --- |
+--- | --- | --- |
 list (string) | tags -> list (bool) | tags | bool |
 
 Every key that is used in the subfunction must be present.
@@ -551,7 +551,7 @@ end
 #### memberOf
 
 f | tags | returns |
---- | --- |
+--- | --- | --- |
 tags -> bool | tags | bool |
 
 This function returns true, if the way is member of a relation matching the specified function.
@@ -589,7 +589,7 @@ end
 #### if_then_else
 
 condition | then | else | returns |
---- | --- | --- |
+--- | --- | --- | --- |
 bool | $a | $a | $a |
 bool | $a | $a |
 
@@ -613,7 +613,7 @@ end
 #### if
 
 condition | then | else | returns |
---- | --- | --- |
+--- | --- | --- | --- |
 bool | $a | $a | $a |
 bool | $a | $a |
 
@@ -637,7 +637,7 @@ end
 #### id
 
 a | returns |
---- |
+--- | --- |
 $a | $a |
 
 Returns the argument unchanged - the identity function. Seems useless at first sight, but useful in parsing
@@ -656,7 +656,7 @@ end
 #### const
 
 a | b | returns |
---- | --- |
+--- | --- | --- |
 $a | $b | $a |
 
 Small utility function, which takes two arguments `a` and `b` and returns `a`. Used extensively to insert freedom
@@ -675,7 +675,7 @@ end
 #### constRight
 
 a | b | returns |
---- | --- |
+--- | --- | --- |
 $a | $b | $b |
 
 Small utility function, which takes two arguments `a` and `b` and returns `b`. Used extensively to insert freedom
@@ -692,7 +692,7 @@ Lua implementation:
 #### dot
 
 f | g | a | returns |
---- | --- | --- |
+--- | --- | --- | --- |
 $b -> $c | $a -> $b | $a | $c |
 
 Higher order function: converts `f (g a)` into `(dot f g) a`. In other words, this fuses `f` and `g` in a new function, which allows the argument to be lifted out of the expression 
@@ -709,7 +709,7 @@ Lua implementation:
 #### listDot
 
 list | a | returns |
---- | --- |
+--- | --- | --- |
 list ($a -> $b) | $a | list ($b) |
 
 Listdot takes a list of functions `[f, g, h]` and and an argument `a`. It applies the argument on every single function.It conveniently lifts the argument out of the list.
@@ -727,7 +727,7 @@ Lua implementation:
 #### eitherFunc
 
 f | g | a | returns |
---- | --- | --- |
+--- | --- | --- | --- |
 $a -> $b | $c -> $d | $a | $b |
 $a -> $b | $c -> $d | $c | $d |
 
@@ -749,7 +749,7 @@ Lua implementation:
 #### stringToTags
 
 f | tags | returns |
---- | --- |
+--- | --- | --- |
 string -> string -> $a | tags | list ($a) |
 
 stringToTags converts a function `string -> string -> a` into a function `tags -> [a]`
