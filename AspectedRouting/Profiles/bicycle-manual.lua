@@ -1,12 +1,7 @@
 ﻿-- The different profiles
 profiles = {
     
-    {
-        name = "comfort_safety_speed",
-        description = "A route which aims to be both safe and comfortable without sacrificing too much of speed",
-        function_name = "determine_weights_balanced",
-        metric = "custom"
-    },
+
 
     {
         name = "b2w",
@@ -72,150 +67,9 @@ profiles = {
 }
 
 
---[[
-What is a relative speedup/slowdown for each key?
-]]
-speed_bonuses = {
-    access = {
-        dismount = 0.2
-    },
-    highway = {
-    	path = 0.5, -- A small path through a forest is typically very slow to go through
-    	track = 0.7 -- an unmaintained track (in Belgium: tractor path) is slower as well
-    },
-    surface = {
-        paved = 0.99,
-        asphalt = 1, -- default speed is kept
-        concrete = 1,
-        metal = 1,
-        wood = 1,
-        ["concrete:lanes"] = 0.95,
-        ["concrete:plates"] = 1,
-        paving_stones = 1,
-        sett = 0.9, -- sett slows us down with 10%
-        unhewn_cobblestone = 0.75,
-        cobblestone = 0.8,
-        unpaved = 0.75,
-        compacted = 0.99,
-        fine_gravel = 0.99,
-        gravel = 0.9,
-        dirt = 0.6,
-        earth = 0.6,
-        grass = 0.6,
-        grass_paver = 0.9,
-        ground = 0.7,
-        sand = 0.5,
-        woodchips = 0.5,
-        snow = 0.5,
-        pebblestone = 0.5,
-        mud = 0.4
-    },
-    tracktype = {
-    	grade1 = 0.99,
-    	grade2 = 0.8,
-    	grade3 = 0.6,
-    	grade4 = 0.3,
-    	grade5 = 0.1
-    },
-    incline = {
-        up = 0.75,
-        down = 1.25,
-        [0] = 1,
-        ["0%"] = 1,
-        ["10%"] = 0.9,
-        ["-10%"] = 1.1,
-        ["20%"] = 0.8,
-        ["-20%"] = 1.2,
-        ["30%"] = 0.7,
-        ["-30%"] = 1.3,
-    }
-}
-
---[[
-Determine-speed determines the average speed for the given segment based on _physical properties_, 
-    such as surface, road incline, ...
-It is _not_ concerned with a legal (or socially accepted) speed - this is capped in the calling procedure
-]]
-function determine_speed(attributes, result)
-    local factor = calculate_factor(attributes, speed_bonuses, result)
-    result.speed = factor * attributes.settings.default_speed
-    return result.speed
-end
 
 
 
-
-
-
-
-
---[[
-How comfortable and nice is this road?
-Note: this is quite subjective as well!
-
-Takes a guess on how _comfortable_ this road is to travel.
-
-Here, aspects are:
-- road surface and smoothness
-- estimated greenery (abandoned=railway for the win)
-
-]]
-comfort_bonuses = {
-    highway = {
-        cycleway = 1.2,
-        primary = 0.3,
-        secondary = 0.4,
-        tertiary = 0.5,
-        unclassified = 0.8,
-        track = 0.95,
-        residential = 1.0,
-        living_street = 1.1,
-        footway = 0.95,
-        path = 0.5 
-    },
-    railway = {
-        abandoned = 2.0
-    },
-    cycleway = {
-        track = 1.2
-    },
-    access = {
-        designated = 1.2,
-        dismount = 0.5
-    },
-    cyclestreet = {
-        yes = 1.1
-    },
-
-
-    -- Quite, but not entirely the same as in speed
-    surface = {
-        paved = 0.99,
-        ["concrete:lanes"] = 0.8,
-        ["concrete:plates"] = 1,
-        sett = 0.9, -- sett slows us down with 10%
-        unhewn_cobblestone = 0.75,
-        cobblestone = 0.8,
-        unpaved = 0.75,
-        compacted = 1.1,
-        fine_gravel = 0.99,
-        gravel = 0.9,
-        dirt = 0.6,
-        earth = 0.6,
-        grass = 0.6,
-        grass_paver = 0.9,
-        ground = 0.7,
-        sand = 0.5,
-        woodchips = 0.5,
-        snow = 0.5,
-        pebblestone = 0.5,
-        mud = 0.4
-    },
-}
-
-function determine_comfort(attributes, result)
-    return calculate_factor(attributes, comfort_bonuses, result)
-end
 
 -- Returns 1 if no access restrictions, 0 if it is permissive
 function determine_permissive_score(attributes, result)
@@ -674,30 +528,6 @@ end
 function unit_tests()
 
  
-    -- Speed test are with default_speed = 100, in order to efficiently determine the factor
-    unit_test_speed({ highway = "residential" }, 100.0)
-    unit_test_speed({ highway = "residential", surface = "sett" }, 90.0)
-    unit_test_speed({ highway = "residential", incline = "up" }, 75.0)
-    unit_test_speed({ highway = "residential", incline = "up", surface = "mud" }, 30.0)
-    unit_test_speed({ highway = "residential", incline = "down" }, 125.0)
-    unit_test_speed({ highway = "residential", incline = "down", surface = "sett" }, 112.5)
-
-
-    unit_test_comfort({ highway = "residential" }, 1.0)
-    unit_test_comfort({ highway = "residential", cyclestreet = "yes" }, 1.1)
-    unit_test_comfort({ highway = "cycleway" }, 1.2)
-    unit_test_comfort({ highway = "cycleway", foot = "designated" }, 1.2)
-    unit_test_comfort({ highway = "path", bicycle = "designated", foot = "designated" }, 0.5)
-    unit_test_comfort({ highway = "path", bicycle = "designated" }, 0.5)
-    unit_test_comfort({ highway = "footway", foot = "designated" }, 0.95)
-    unit_test_comfort({ highway = "primary", cycleway = "no" }, 0.3)
-    unit_test_comfort({ highway = "primary", cycleway = "yes" }, 0.3)
-    unit_test_comfort({ highway = "primary", cycleway = "track" }, 0.36)
-
-    unit_test_comfort({ highway = "secondary", cycleway = "lane" }, 0.4)
-    unit_test_comfort({ ["cycleway:right"] = "lane", highway = "secondary", surface = "asphalt" }, 0.4)
-    unit_test_comfort({ highway = "residential", surface = "asphalt", cyclestreet = "yes" }, 1.1)
-
 
     unit_test_relation_tag_processor({ route = "bicycle", operator = "Stad Genk", color = "red", type = "route" },
         { StadGenk = "yes", cycle_network_colour = "red", cycle_network = "yes" });

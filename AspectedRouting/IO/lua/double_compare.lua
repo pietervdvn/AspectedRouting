@@ -1,4 +1,8 @@
 function double_compare(a, b)
+    if (b == nil) then
+        return false
+    end
+    
     if (type(a) ~= "number") then
         a = parse(a)
     end
@@ -6,5 +10,9 @@ function double_compare(a, b)
     if(type(b) ~= "number") then
         b = parse(b)
     end
-    return math.abs(a - b) > 0.001
+    if (a == b) then
+        return true
+    end
+
+    return math.abs(a - b) < 0.0001
 end

@@ -17,6 +17,7 @@
 - parse
 - to_string
 - concat
+- containedIn
 - min
 - max
 - sum
@@ -40,7 +41,7 @@
 #### eq
 
 Argument name |  |  |  
---------------| - | - | - 
+-------------- | - | - | - 
 **a** | $a	 | $a	 | 
 **b** | $a	 | $a	 | 
 _return type_ | bool	 | string	 | 
@@ -66,14 +67,14 @@ end
 
 #### notEq
 
-Argument name |  |  |  
---------------| - | - | - 
-**a** | $a	 | $a	 | 
-**b** | $a	 | $a	 | 
-_return type_ | bool	 | string	 | 
+Argument name |  |  |  |  
+-------------- | - | - | - | - 
+**a** | $a	 | $a	 | bool	 | 
+**b** | $a	 | $a	 | _none_	 | 
+_return type_ | bool	 | string	 | bool	 | 
 
 
-Returns 'yes' if the two passed in values are _not_ the same
+OVerloaded function, either boolean not or returns 'yes' if the two passed in values are _not_ the same;
 
 
 
@@ -81,6 +82,10 @@ Lua implementation:
 
 ````lua
 function notEq(a, b)
+    if (b == nil) then
+        b = "yes"
+    end
+    
     if (a ~= b) then
         return "yes"
     else
@@ -92,14 +97,14 @@ end
 
 #### not
 
-Argument name |  |  |  
---------------| - | - | - 
-**a** | $a	 | $a	 | 
-**b** | $a	 | $a	 | 
-_return type_ | bool	 | string	 | 
+Argument name |  |  |  |  
+-------------- | - | - | - | - 
+**a** | $a	 | $a	 | bool	 | 
+**b** | $a	 | $a	 | _none_	 | 
+_return type_ | bool	 | string	 | bool	 | 
 
 
-Returns 'yes' if the two passed in values are _not_ the same
+OVerloaded function, either boolean not or returns 'yes' if the two passed in values are _not_ the same;
 
 
 
@@ -107,6 +112,10 @@ Lua implementation:
 
 ````lua
 function notEq(a, b)
+    if (b == nil) then
+        b = "yes"
+    end
+    
     if (a ~= b) then
         return "yes"
     else
@@ -119,7 +128,7 @@ end
 #### inv
 
 Argument name |  |  |  
---------------| - | - | - 
+-------------- | - | - | - 
 **d** | pdouble	 | double	 | 
 _return type_ | pdouble	 | double	 | 
 
@@ -140,7 +149,7 @@ end
 #### default
 
 Argument name |  |  
---------------| - | - 
+-------------- | - | - 
 **defaultValue** | $a	 | 
 **f** | $b -> $a	 | 
 _return type_ | $b -> $a	 | 
@@ -164,10 +173,10 @@ end
 
 #### parse
 
-Argument name |  |  
---------------| - | - 
-**s** | string	 | 
-_return type_ | double	 | 
+Argument name |  |  |  
+-------------- | - | - | - 
+**s** | string	 | string	 | 
+_return type_ | double	 | pdouble	 | 
 
 
 Parses a string into a numerical value
@@ -210,7 +219,7 @@ end
 #### to_string
 
 Argument name |  |  
---------------| - | - 
+-------------- | - | - 
 **obj** | $a	 | 
 _return type_ | string	 | 
 
@@ -231,7 +240,7 @@ end
 #### concat
 
 Argument name |  |  
---------------| - | - 
+-------------- | - | - 
 **a** | string	 | 
 **b** | string	 | 
 _return type_ | string	 | 
@@ -250,10 +259,38 @@ end
 ````
 
 
+#### containedIn
+
+Argument name |  |  
+-------------- | - | - 
+**list** | list ($a)	 | 
+**a** | $a	 | 
+_return type_ | bool	 | 
+
+
+Given a list of values, checks if the argument is contained in the list.
+
+
+
+Lua implementation:
+
+````lua
+function containedIn(list, a)
+    for _, value in ipairs(list) do
+        if (value == a) then
+            return true
+        end
+    end
+
+    return false;
+end
+````
+
+
 #### min
 
 Argument name |  |  |  |  |  |  
---------------| - | - | - | - | - | - 
+-------------- | - | - | - | - | - | - 
 **list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
 _return type_ | nat	 | int	 | pdouble	 | double	 | bool	 | 
 
@@ -283,7 +320,7 @@ end
 #### max
 
 Argument name |  |  |  |  |  |  
---------------| - | - | - | - | - | - 
+-------------- | - | - | - | - | - | - 
 **list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
 _return type_ | nat	 | int	 | pdouble	 | double	 | bool	 | 
 
@@ -313,7 +350,7 @@ end
 #### sum
 
 Argument name |  |  |  |  |  |  
---------------| - | - | - | - | - | - 
+-------------- | - | - | - | - | - | - 
 **list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
 _return type_ | nat	 | int	 | pdouble	 | double	 | int	 | 
 
@@ -341,7 +378,7 @@ end
 #### multiply
 
 Argument name |  |  |  |  |  |  
---------------| - | - | - | - | - | - 
+-------------- | - | - | - | - | - | - 
 **list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
 _return type_ | nat	 | int	 | pdouble	 | double	 | bool	 | 
 
@@ -366,7 +403,7 @@ end
 #### firstMatchOf
 
 Argument name |  |  
---------------| - | - 
+-------------- | - | - 
 **s** | list (string)	 | 
 _return type_ | (tags -> list ($a)) -> tags -> $a	 | 
 
@@ -404,7 +441,7 @@ end
 #### mustMatch
 
 Argument name |  |  
---------------| - | - 
+-------------- | - | - 
 **neededKeys (filled in by parser)** | list (string)	 | 
 **f** | tags -> list (bool)	 | 
 _return type_ | tags -> bool	 | 
@@ -420,7 +457,6 @@ Lua implementation:
 
 ````lua
 function must_match(tags, result, needed_keys, table)
-    local result_list = {}
     for _, key in ipairs(needed_keys) do
         local v = tags[key]
         if (v == nil) then
@@ -430,18 +466,31 @@ function must_match(tags, result, needed_keys, table)
         local mapping = table[key]
         if (type(mapping) == "table") then
             local resultValue = mapping[v]
-            if (v == nil or v == false) then
+            if (resultValue == nil or
+                    resultValue == false or
+                    resultValue == "no" or
+                    resultValue == "false") then
                 return false
             end
-            if (v == "no" or v == "false") then
+        elseif (type(mapping) == "string") then
+            local bool = mapping
+            if (bool == "yes" or bool == "1") then
+                return true
+            elseif (bool == "no" or bool == "0") then
                 return false
             end
-
-            result.attributes_to_keep[key] = v
+            error("MustMatch got a string value it can't handle: " .. bool)
         else
-            error("The mapping is not a table. This is not supported")
+            error("The mapping is not a table. This is not supported. We got " .. mapping)
         end
     end
+
+        -- Now that we know for sure that every key matches, we add them all
+        for _, key in ipairs(needed_keys) do
+            local v = tags[key]
+            result.attributes_to_keep[key] = v
+        end
+
     return true;
 end
 ````
@@ -449,22 +498,41 @@ end
 
 #### memberOf
 
-- (tags -> $a) -> tags -> list ($a)
+Argument name |  |  
+-------------- | - | - 
+**f** | tags -> bool	 | 
+**tags** | tags	 | 
+_return type_ | bool	 | 
 
-This function uses memberships of relations to calculate values.
 
-Consider all the relations the scrutinized way is part of.The enclosed function is executed for every single relation which is part of it, generating a list of results.This list of results is in turn returned by 'memberOf'
-In itinero 1/lua, this is implemented by converting the matching relations and by adding the tags of the relations to the dictionary (or table) with the highway tags.The prefix is '_relation:n:key=value', where 'n' is a value between 0 and the number of matching relations (implying that all of these numbers are scanned).The matching relations can be extracted by the compiler for the preprocessing.
+This function returns true, if the way is member of a relation matching the specified function.
 
-For testing, the relation can be emulated by using e.g. '_relation:0:key=value'
+In order to use this for itinero 1.0, the membership _must_ be the top level expression.
+
+Conceptually, when the aspect is executed for a way, every relation will be used as argument in the subfunction `f`
+If this subfunction returns 'true', the entire aspect will return true.
+
+In the lua implementation for itinero 1.0, this is implemented slightly different: a flag `_relation:<aspect_name>="yes"` will be set if the aspect matches on every way for where this aspect matches.
+However, this plays poorly with parameters (e.g.: what if we want to cycle over a highway which is part of a certain cycling network with a certain `#network_name`?) Luckily, parameters can only be simple values. To work around this problem, an extra tag is introduced for _every single profile_:`_relation:<profile_name>:<aspect_name>=yes'. The subfunction is thus executed `countOr(relations) * countOf(profiles)` time, yielding `countOf(profiles)` tags. The profile function then picks the tags for himself and strips the `<profile_name>:` away from the key.
+
+
+
+In the test.csv, one can simply use `_relation:<aspect_name>=yes` to mimic relations in your tests
 
 
 
 Lua implementation:
 
 ````lua
-function member_of()
-    ???
+function member_of(calledIn, parameters, tags, result)
+    local k = "_relation:" .. calledIn
+    -- This tag is conventiently setup by all the preprocessors, which take the parameters into account
+    local doesMatch = tags[k]
+    if (doesMatch == "yes") then
+        result.attributes_to_keep[k] = "yes"
+        return true
+    end
+    return false
 end
 ````
 
@@ -472,7 +540,7 @@ end
 #### if_then_else
 
 Argument name |  |  |  
---------------| - | - | - 
+-------------- | - | - | - 
 **condition** | bool	 | bool	 | 
 **then** | $a	 | $a	 | 
 **else** | $a	 | _none_	 | 
@@ -499,7 +567,7 @@ end
 #### if
 
 Argument name |  |  |  
---------------| - | - | - 
+-------------- | - | - | - 
 **condition** | bool	 | bool	 | 
 **then** | $a	 | $a	 | 
 **else** | $a	 | _none_	 | 
@@ -526,7 +594,7 @@ end
 #### id
 
 Argument name |  |  
---------------| - | - 
+-------------- | - | - 
 **a** | $a	 | 
 _return type_ | $a	 | 
 
@@ -547,7 +615,7 @@ end
 #### const
 
 Argument name |  |  
---------------| - | - 
+-------------- | - | - 
 **a** | $a	 | 
 **b** | $b	 | 
 _return type_ | $a	 | 
@@ -560,14 +628,16 @@ Small utility function, which takes two arguments `a` and `b` and returns `a`. U
 Lua implementation:
 
 ````lua
-
+function const(a, b)
+    return a
+end
 ````
 
 
 #### constRight
 
 Argument name |  |  
---------------| - | - 
+-------------- | - | - 
 **a** | $a	 | 
 **b** | $b	 | 
 _return type_ | $b	 | 
@@ -587,11 +657,11 @@ Lua implementation:
 #### dot
 
 Argument name |  |  
---------------| - | - 
-**f** | $gType -> $arg	 | 
-**g** | $fType -> $gType	 | 
-**a** | $fType	 | 
-_return type_ | $arg	 | 
+-------------- | - | - 
+**f** | $b -> $c	 | 
+**g** | $a -> $b	 | 
+**a** | $a	 | 
+_return type_ | $c	 | 
 
 
 Higher order function: converts `f (g a)` into `(dot f g) a`. In other words, this fuses `f` and `g` in a new function, which allows the argument to be lifted out of the expression 
@@ -608,7 +678,7 @@ Lua implementation:
 #### listDot
 
 Argument name |  |  
---------------| - | - 
+-------------- | - | - 
 **list** | list ($a -> $b)	 | 
 **a** | $a	 | 
 _return type_ | list ($b)	 | 
@@ -628,10 +698,19 @@ Lua implementation:
 
 #### eitherFunc
 
-- ($a -> $b) -> ($c -> $d) -> $a -> $b
-- ($a -> $b) -> ($c -> $d) -> $c -> $d
+Argument name |  |  |  
+-------------- | - | - | - 
+**f** | $a -> $b	 | $a -> $b	 | 
+**g** | $c -> $d	 | $c -> $d	 | 
+**a** | $a	 | $c	 | 
+_return type_ | $b	 | $d	 | 
 
 
+EitherFunc is a small utility function, mostly used in the parser. It allows the compiler to choose a function, based on the types.
+
+Consider the mapping `{'someKey':'someValue'}`. Under normal circumstances, this acts as a pointwise-function, converting the string `someKey` into `someValue`, just like an ordinary dictionary would do. However, in the context of `mustMatch`, we would prefer this to act as a _check_, that the highway _has_ a key `someKey` which is `someValue`, thus acting as `{'someKey': {'$eq':'someValue'}}. Both behaviours are automatically supported in parsing, by parsing the string as `(eitherFunc id eq) 'someValue'`. The type system is then able to figure out which implementation is needed.
+
+Disclaimer: _you should never ever need this in your profiles_
 
 
 
@@ -644,9 +723,14 @@ Lua implementation:
 
 #### stringToTags
 
-- (string -> string -> $a) -> tags -> list ($a)
+Argument name |  |  
+-------------- | - | - 
+**f** | string -> string -> $a	 | 
+**tags** | tags	 | 
+_return type_ | list ($a)	 | 
 
 
+stringToTags converts a function `string -> string -> a` into a function `tags -> [a]`
 
 
 

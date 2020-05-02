@@ -16,25 +16,27 @@
     "network"
   ],
   "defaults": {
-    "#max_speed": 30,
     "#defaultSpeed": 15,
-    "#speed": 0,
+    "#maxspeed": 30,
+    "#timeNeeded": 0,
     "#distance": 0,
     "#comfort": 0,
     "#safety": 0,
-    "#withDirection": "yes",
-    "#againstDirection": "yes",
-    "network": 0
+    "#network": 0,
+    "#networkOperator": []
   },
-  "profiles": {
+  "behaviours": {
+    
     "fastest": {
       "description": "The fastest route to your destination",
-      "#time_needed": 1
+      "#timeNeeded": 1
     },
     "shortest": {
       "description": "The shortest route, independent of of speed",
       "#distance": 1
     },
+    
+    
     "safety": {
       "description": "A defensive route shying away from big roads with lots of cars",
       "#safety": 1
@@ -48,10 +50,12 @@
       "#comfort": 1,
       "#safety": 1
     },
-    "node_networks": {
-      "description": "A route which prefers cycling over cycling node networks. Non-network parts prefer some comfort and safety. The on-network-part is considered flat (meaning that only distance on the node network counts)",
+
+    
+    "brussels": {
+      "description": "A route preferring the cycling network by operator 'Brussels Mobility'",
       "#network": 20,
-      "#network-node-network-only":true, 
+      "#networkOperator": ["Brussels Mobility"], 
       "#comfort": 1,
       "#safety": 1
     }
@@ -61,16 +65,20 @@
   "speed": {
     "$min": [
       "$legal_maxspeed_be",
-      "#defaultSpeed"
+      "#maxspeed",
+      {
+        "$multiply": [
+          "#defaultSpeed",
+          "$bicycle.speed_factor"
+        ]
+      }
     ]
   },
-  "weight": {
+  "priority": {
     "#comfort": "$bicycle.comfort",
     "#safety": "$bicycle.safety",
-    "#network": "$bicycle.network_score",
-    "#time_needed": {
-      "$inv": "$speed"
-    },
+    "#network": "$bicycle.network_by_operator",
+    "#timeNeeded":  "$speed",
     "#distance": "$distance"
   }
 }

@@ -1,9 +1,12 @@
 {
   "name": "bicycle.network_score",
-  "description": "The 'bicycle.network_score' is a bit of a catch-all for bicycle networks and indicates wether or not the road is part of a matching cycling network.",
-  "$mustMatch": {
-    "type": "route",
-    "route": "bicycle"
+  "description": "The 'bicycle.network_score' returns true if the way is part of a cycling network",
+    "$memberOf": {
+      "$mustMatch": {
+        "type": "route",
+        "route": "bicycle",
+        "state": {"$notEq": "proposed"}
+      }
   }
 }
 

@@ -1,9 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AspectedRouting.Functions;
-using AspectedRouting.Typ;
+using AspectedRouting.Language;
+using AspectedRouting.Language.Expression;
+using AspectedRouting.Language.Typ;
 
 namespace AspectedRouting.IO
 {
@@ -32,7 +32,7 @@ namespace AspectedRouting.IO
             get
             {
                 var txt = "## Builtin functions\n\n";
-                foreach (var biFunc in Functions.Funcs.BuiltinNames)
+                foreach (var biFunc in Funcs.BuiltinNames)
                 {
                     txt += "- " + biFunc + "\n";
                 }
@@ -68,7 +68,7 @@ namespace AspectedRouting.IO
             {
                 var args = f.ArgBreakdown();
                 var header = "Argument name |  ";
-                var line = "--------------| - ";
+                var line = "-------------- | - ";
                 for (int i = 0; i < f.Types.Count(); i++)
                 {
                     header += "|  ";
