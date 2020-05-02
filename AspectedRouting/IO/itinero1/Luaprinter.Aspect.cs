@@ -20,8 +20,7 @@ namespace AspectedRouting.IO.itinero1
             _alreadyAddedFunctions.Add(meta.Name);
 
             var possibleTags = meta.PossibleTags() ?? new Dictionary<string, List<string>>();
-            var numberOfCombinations = 1;
-            numberOfCombinations = possibleTags.Values.Select(lst => 1 + lst.Count).Multiply();
+            var numberOfCombinations = possibleTags.Values.Select(lst => 1 + lst.Count).Multiply();
 
             var usedParams = meta.UsedParameters();
 

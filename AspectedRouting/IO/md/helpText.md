@@ -42,12 +42,10 @@
 
 #### eq
 
-Argument name |   |  |
---------------- | -- |  -- | 
-**a** | $a	 | $a	 | 
-**b** | $a	 | $a	 | 
-_return type_ | bool	 | string	 | 
-
+a | b |
+--- | --- |
+$a | $a | bool |
+$a | $a | string |
 
 Returns 'yes' if both values _are_ the same
 
@@ -69,12 +67,11 @@ end
 
 #### notEq
 
-Argument name |   |  |  |
---------------- |    -- |  -- |  -- | 
-**a** | $a	 | $a	 | bool	 | 
-**b** | $a	 | $a	 | _none_	 | 
-_return type_ | bool	 | string	 | bool	 | 
-
+a | b |
+--- | --- |
+$a | $a | bool |
+$a | $a | string |
+bool | bool |
 
 OVerloaded function, either boolean not or returns 'yes' if the two passed in values are _not_ the same;
 
@@ -99,12 +96,11 @@ end
 
 #### not
 
-Argument name |   |  |  |
---------------- |    -- |  -- |  -- | 
-**a** | $a	 | $a	 | bool	 | 
-**b** | $a	 | $a	 | _none_	 | 
-_return type_ | bool	 | string	 | bool	 | 
-
+a | b |
+--- | --- |
+$a | $a | bool |
+$a | $a | string |
+bool | bool |
 
 OVerloaded function, either boolean not or returns 'yes' if the two passed in values are _not_ the same;
 
@@ -129,11 +125,10 @@ end
 
 #### inv
 
-Argument name |   |  |
---------------- |    -- |  -- | 
-**d** | pdouble	 | double	 | 
-_return type_ | pdouble	 | double	 | 
-
+d |
+--- |
+pdouble | pdouble |
+double | double |
 
 Calculates `1/d`
 
@@ -150,12 +145,9 @@ end
 
 #### default
 
-Argument name |   |
---------------- |    -- | 
-**defaultValue** | $a	 | 
-**f** | $b -> $a	 | 
-_return type_ | $b -> $a	 | 
-
+defaultValue | f |
+--- | --- |
+$a | $b -> $a | $b | $a |
 
 Calculates function `f` for the given argument. If the result is `null`, the default value is returned instead
 
@@ -175,11 +167,10 @@ end
 
 #### parse
 
-Argument name |   |  |
---------------- |    -- |  -- | 
-**s** | string	 | string	 | 
-_return type_ | double	 | pdouble	 | 
-
+s |
+--- |
+string | double |
+string | pdouble |
 
 Parses a string into a numerical value
 
@@ -220,11 +211,9 @@ end
 
 #### to_string
 
-Argument name |   |
---------------- |    -- | 
-**obj** | $a	 | 
-_return type_ | string	 | 
-
+obj |
+--- |
+$a | string |
 
 Converts a value into a human readable string
 
@@ -241,12 +230,9 @@ end
 
 #### concat
 
-Argument name |   |
---------------- |    -- | 
-**a** | string	 | 
-**b** | string	 | 
-_return type_ | string	 | 
-
+a | b |
+--- | --- |
+string | string | string |
 
 Concatenates two strings
 
@@ -263,12 +249,9 @@ end
 
 #### containedIn
 
-Argument name |   |
---------------- |    -- | 
-**list** | list ($a)	 | 
-**a** | $a	 | 
-_return type_ | bool	 | 
-
+list | a |
+--- | --- |
+list ($a) | $a | bool |
 
 Given a list of values, checks if the argument is contained in the list.
 
@@ -291,11 +274,13 @@ end
 
 #### min
 
-Argument name |   |  |  |  |  |
---------------- |    -- |  -- |  -- |  -- |  -- | 
-**list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
-_return type_ | nat	 | int	 | pdouble	 | double	 | bool	 | 
-
+list |
+--- |
+list (nat) | nat |
+list (int) | int |
+list (pdouble) | pdouble |
+list (double) | double |
+list (bool) | bool |
 
 Out of a list of values, gets the smallest value. IN case of a list of bools, this acts as `and`
 
@@ -321,11 +306,13 @@ end
 
 #### and
 
-Argument name |   |  |  |  |  |
---------------- |    -- |  -- |  -- |  -- |  -- | 
-**list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
-_return type_ | nat	 | int	 | pdouble	 | double	 | bool	 | 
-
+list |
+--- |
+list (nat) | nat |
+list (int) | int |
+list (pdouble) | pdouble |
+list (double) | double |
+list (bool) | bool |
 
 Out of a list of values, gets the smallest value. IN case of a list of bools, this acts as `and`
 
@@ -351,11 +338,13 @@ end
 
 #### max
 
-Argument name |   |  |  |  |  |
---------------- |    -- |  -- |  -- |  -- |  -- | 
-**list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
-_return type_ | nat	 | int	 | pdouble	 | double	 | bool	 | 
-
+list |
+--- |
+list (nat) | nat |
+list (int) | int |
+list (pdouble) | pdouble |
+list (double) | double |
+list (bool) | bool |
 
 Returns the biggest value in the list. For a list of booleans, this acts as 'or'
 
@@ -381,11 +370,13 @@ end
 
 #### or
 
-Argument name |   |  |  |  |  |
---------------- |    -- |  -- |  -- |  -- |  -- | 
-**list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
-_return type_ | nat	 | int	 | pdouble	 | double	 | bool	 | 
-
+list |
+--- |
+list (nat) | nat |
+list (int) | int |
+list (pdouble) | pdouble |
+list (double) | double |
+list (bool) | bool |
 
 Returns the biggest value in the list. For a list of booleans, this acts as 'or'
 
@@ -411,11 +402,13 @@ end
 
 #### sum
 
-Argument name |   |  |  |  |  |
---------------- |    -- |  -- |  -- |  -- |  -- | 
-**list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
-_return type_ | nat	 | int	 | pdouble	 | double	 | int	 | 
-
+list |
+--- |
+list (nat) | nat |
+list (int) | int |
+list (pdouble) | pdouble |
+list (double) | double |
+list (bool) | int |
 
 Sums all the numbers in the given list. If the list contains bool, `yes` or `true` will be considered to equal `1`
 
@@ -439,11 +432,13 @@ end
 
 #### multiply
 
-Argument name |   |  |  |  |  |
---------------- |    -- |  -- |  -- |  -- |  -- | 
-**list** | list (nat)	 | list (int)	 | list (pdouble)	 | list (double)	 | list (bool)	 | 
-_return type_ | nat	 | int	 | pdouble	 | double	 | bool	 | 
-
+list |
+--- |
+list (nat) | nat |
+list (int) | int |
+list (pdouble) | pdouble |
+list (double) | double |
+list (bool) | bool |
 
 Multiplies all the values in a given list. On a list of booleans, this acts as 'and' or 'all'
 
@@ -464,11 +459,9 @@ end
 
 #### firstMatchOf
 
-Argument name |   |
---------------- |    -- | 
-**s** | list (string)	 | 
-_return type_ | (tags -> list ($a)) -> tags -> $a	 | 
-
+s |
+--- |
+list (string) | tags -> list ($a) | tags | $a |
 
 Parses a string into a numerical value
 
@@ -502,12 +495,9 @@ end
 
 #### mustMatch
 
-Argument name |   |
---------------- |    -- | 
-**neededKeys (filled in by parser)** | list (string)	 | 
-**f** | tags -> list (bool)	 | 
-_return type_ | tags -> bool	 | 
-
+neededKeys (filled in by parser) | f |
+--- | --- |
+list (string) | tags -> list (bool) | tags | bool |
 
 Every key that is used in the subfunction must be present.
 If, on top, a value is present with a mapping, every key/value will be executed and must return a value that is not 'no' or 'false'
@@ -560,12 +550,9 @@ end
 
 #### memberOf
 
-Argument name |   |
---------------- |    -- | 
-**f** | tags -> bool	 | 
-**tags** | tags	 | 
-_return type_ | bool	 | 
-
+f | tags |
+--- | --- |
+tags -> bool | tags | bool |
 
 This function returns true, if the way is member of a relation matching the specified function.
 
@@ -601,13 +588,10 @@ end
 
 #### if_then_else
 
-Argument name |   |  |
---------------- |    -- |  -- | 
-**condition** | bool	 | bool	 | 
-**then** | $a	 | $a	 | 
-**else** | $a	 | _none_	 | 
-_return type_ | $a	 | $a	 | 
-
+condition | then | else |
+--- | --- | --- |
+bool | $a | $a | $a |
+bool | $a | $a |
 
 Selects either one of the branches, depending on the condition.If the `else` branch is not set, `null` is returned in the condition is false.
 
@@ -628,13 +612,10 @@ end
 
 #### if
 
-Argument name |   |  |
---------------- |    -- |  -- | 
-**condition** | bool	 | bool	 | 
-**then** | $a	 | $a	 | 
-**else** | $a	 | _none_	 | 
-_return type_ | $a	 | $a	 | 
-
+condition | then | else |
+--- | --- | --- |
+bool | $a | $a | $a |
+bool | $a | $a |
 
 Selects either one of the branches, depending on the condition.If the `else` branch is not set, `null` is returned in the condition is false.
 
@@ -655,11 +636,9 @@ end
 
 #### id
 
-Argument name |   |
---------------- |    -- | 
-**a** | $a	 | 
-_return type_ | $a	 | 
-
+a |
+--- |
+$a | $a |
 
 Returns the argument unchanged - the identity function. Seems useless at first sight, but useful in parsing
 
@@ -676,12 +655,9 @@ end
 
 #### const
 
-Argument name |   |
---------------- |    -- | 
-**a** | $a	 | 
-**b** | $b	 | 
-_return type_ | $a	 | 
-
+a | b |
+--- | --- |
+$a | $b | $a |
 
 Small utility function, which takes two arguments `a` and `b` and returns `a`. Used extensively to insert freedom
 
@@ -698,12 +674,9 @@ end
 
 #### constRight
 
-Argument name |   |
---------------- |    -- | 
-**a** | $a	 | 
-**b** | $b	 | 
-_return type_ | $b	 | 
-
+a | b |
+--- | --- |
+$a | $b | $b |
 
 Small utility function, which takes two arguments `a` and `b` and returns `b`. Used extensively to insert freedom
 
@@ -718,13 +691,9 @@ Lua implementation:
 
 #### dot
 
-Argument name |   |
---------------- |    -- | 
-**f** | $b -> $c	 | 
-**g** | $a -> $b	 | 
-**a** | $a	 | 
-_return type_ | $c	 | 
-
+f | g | a |
+--- | --- | --- |
+$b -> $c | $a -> $b | $a | $c |
 
 Higher order function: converts `f (g a)` into `(dot f g) a`. In other words, this fuses `f` and `g` in a new function, which allows the argument to be lifted out of the expression 
 
@@ -739,12 +708,9 @@ Lua implementation:
 
 #### listDot
 
-Argument name |   |
---------------- |    -- | 
-**list** | list ($a -> $b)	 | 
-**a** | $a	 | 
-_return type_ | list ($b)	 | 
-
+list | a |
+--- | --- |
+list ($a -> $b) | $a | list ($b) |
 
 Listdot takes a list of functions `[f, g, h]` and and an argument `a`. It applies the argument on every single function.It conveniently lifts the argument out of the list.
 
@@ -760,13 +726,10 @@ Lua implementation:
 
 #### eitherFunc
 
-Argument name |   |  |
---------------- |    -- |  -- | 
-**f** | $a -> $b	 | $a -> $b	 | 
-**g** | $c -> $d	 | $c -> $d	 | 
-**a** | $a	 | $c	 | 
-_return type_ | $b	 | $d	 | 
-
+f | g | a |
+--- | --- | --- |
+$a -> $b | $c -> $d | $a | $b |
+$a -> $b | $c -> $d | $c | $d |
 
 EitherFunc is a small utility function, mostly used in the parser. It allows the compiler to choose a function, based on the types.
 
@@ -785,12 +748,9 @@ Lua implementation:
 
 #### stringToTags
 
-Argument name |   |
---------------- |    -- | 
-**f** | string -> string -> $a	 | 
-**tags** | tags	 | 
-_return type_ | list ($a)	 | 
-
+f | tags |
+--- | --- |
+string -> string -> $a | tags | list ($a) |
 
 stringToTags converts a function `string -> string -> a` into a function `tags -> [a]`
 

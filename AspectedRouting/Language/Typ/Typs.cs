@@ -270,5 +270,19 @@ namespace AspectedRouting.Language.Typ
 
             return toRename.Select(t => t.Substitute(subsTable));
         }
+
+
+        public static List<Type> Uncurry(this Type t)
+        {
+            var args = new List<Type>();
+            while (t is Curry c)
+            {
+                args.Add(c.ArgType);
+                t = c.ResultType;
+            }
+
+            args.Add(t);
+            return args;
+        }
     }
 }

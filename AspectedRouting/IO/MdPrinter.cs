@@ -43,7 +43,7 @@ namespace AspectedRouting.IO
                 foreach (var (name, func) in Funcs.Builtins)
                 {
                     txt += "#### " + name + "\n\n";
-                    txt += func.ArgTable();
+                    txt += func.ArgTableHorizontal();
 
                     txt += "\n\n" + func.Description + "\n\n";
                     try
@@ -62,7 +62,21 @@ namespace AspectedRouting.IO
             }
         }
 
-        private static string ArgTable(this Function f)
+        private static string ArgTableHorizontal(this Function f)
+        {
+            var header = string.Join(" | ", f.ArgNames) + " |";
+            var headerLine = string.Join(" | ", f.ArgNames.Select(_ => "---")) + " |";
+
+            var types =
+                string.Join("\n",
+                    f.Types.Select(t =>
+                        string.Join(" | ", t.Uncurry()) + " |"
+                    ));
+
+            return string.Join("\n", header, headerLine, types);
+        }
+
+        private static string ArgTableVerticalTypes(this Function f)
         {
             try
             {
