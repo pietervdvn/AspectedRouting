@@ -30,24 +30,24 @@ function unit_test_profile(profile_function, profile_name, index, expected, tags
     end
 
 
-    local actualOneway = result.oneway;
-    if (result.oneway == 0) then
+    local actualOneway = result.direction;
+    if (result.direction == 0) then
         actualOneway = "both"
-    elseif (result.oneway == 1) then
+    elseif (result.direction == 1) then
         actualOneway = "with"
-    elseif (result.oneway == 2) then
+    elseif (result.direction == 2) then
         actualOneway = "against"
     end
 
     if (expected.oneway ~= actualOneway) then
-        print("Test " .. tostring(index) .. " failed for " .. profile_name .. ".oneway: expected " .. expected.oneway .. " but got " .. actualOneway)
+        print("Test " .. tostring(index) .. " failed for " .. profile_name .. ".oneway: expected " .. expected.direction .. " but got " .. actualOneway)
         failed_profile_tests = true
         profile_failed = true
     end
 
 
-    if (not double_compare(result.factor, expected.weight)) then
-        print("Test " .. tostring(index) .. " failed for " .. profile_name .. ".factor: expected " .. expected.weight .. " but got " .. result.factor)
+    if (not double_compare(result.factor, 1/expected.weight)) then
+        print("Test " .. tostring(index) .. " failed for " .. profile_name .. ".factor: expected " .. expected.weight .. " but got " .. 1/result.factor)
         failed_profile_tests = true
         profile_failed = true
     end

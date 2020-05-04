@@ -58,15 +58,19 @@ namespace AspectedRouting.IO.itinero1
 
             code.Add("\n\n----------------------------- PROFILE ---------------------------");
             var keys = _neededKeys.Select(key => "\"" + key + "\"");
-            code.Add("\n\nprofile_whitelist = {" + string.Join(", ", keys) + "}");
+            code.Add("\n\nprofile_whitelist = {\n    " + string.Join("\n    , ", keys) + "}");
 
             code.AddRange(_code);
 
             code.Add("\n\n ------------------------------- TESTS -------------------------");
 
-            code.AddRange(_tests);
+            code.Add("function test_all()");
+            code.Add(string.Join("\n",_tests).Indent());
+            code.Add("end");
 
             var compatibility = string.Join("\n",
+                
+                
                 "",
                 "if (itinero == nil) then",
                 "    itinero = {}",
@@ -80,6 +84,7 @@ namespace AspectedRouting.IO.itinero1
                 "    print = itinero.log",
                 "end",
                 "",
+                "test_all()",
                 "if (not failed_tests and not failed_profile_tests) then",
                 "    print(\"Tests OK\")",
                 "end"

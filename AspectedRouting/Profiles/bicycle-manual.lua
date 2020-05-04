@@ -21,18 +21,7 @@ profiles = {
         function_name = "determine_weights_networks_node_network",
         metric = "custom"
     },
-    {
-        name = "genk",
-        description = "[Custom] A route following the Genk cycle network",
-        function_name = "determine_weights_genk",
-        metric = "custom"
-    },
-    {
-        name = "brussels",
-        description = "[Custom] A route following the Brussels cycle network",
-        function_name = "determine_weights_brussels",
-        metric = "custom"
-    },
+
     {
         name = "cycle_highway",
         description = "A functional route, preferring cycle_highways or the Brussels Mobility network. If none are availale, will favour speed",
@@ -303,49 +292,6 @@ function determine_weights_networks_node_network(attributes, result)
     determine_weights(attributes, result)
 end
 
-function determine_weights_genk(attributes, result)
-
-    -- we add a 'settings' element to attributes, they can be used by other profiles
-    if (attributes.settings == nil) then
-        attributes.settings = {}
-        attributes.settings.default_speed = 15
-        attributes.settings.min_speed = 3
-        attributes.settings.max_speed = 30
-
-        attributes.settings.safety_weight = 1
-        attributes.settings.time_weight = 0
-        attributes.settings.comfort_weight = 0
-        attributes.settings.network_weight = 3
-        attributes.settings.clear_restrictions_preference = 1
-    
-        attributes.cycle_network = "yes"
-        attributes.settings.cycle_network_operator = "Stad Genk"
-    end
-
-    determine_weights(attributes, result)
-end
-
-function determine_weights_brussels(attributes, result)
-
-
-    -- we add a 'settings' element to attributes, they can be used by other profiles
-    if (attributes.settings == nil) then
-        attributes.settings = {}
-        attributes.settings.default_speed = 15
-        attributes.settings.min_speed = 3
-        attributes.settings.max_speed = 30
-
-        attributes.settings.safety_weight = 1
-        attributes.settings.time_weight = 0
-        attributes.settings.comfort_weight = 1
-        attributes.settings.network_weight = 5
-        attributes.settings.clear_restrictions_preference = 1;
-
-        attributes.settings.cycle_network_operator = "Brussels Mobility"
-    end
-
-    determine_weights(attributes, result)
-end
 
 
 function determine_weights_anyways_network(attributes, result)

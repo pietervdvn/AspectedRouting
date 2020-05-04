@@ -53,6 +53,12 @@ namespace AspectedRouting.IO.jsonParser
 
         private static ProfileMetaData ParseProfile(this JsonElement e, Context context, FileInfo filepath)
         {
+            if (!e.TryGetProperty("priority",out _))
+            {
+                // not a profile
+                return null;
+            }
+            
             var name = e.Get("name");
             var author = e.TryGet("author");
             if (filepath != null && !(name + ".json").ToLower().Equals(filepath.Name.ToLower()))

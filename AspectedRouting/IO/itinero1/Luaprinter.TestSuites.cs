@@ -92,6 +92,7 @@ namespace AspectedRouting.IO.itinero1
             }
 
             AddDep("unitTest");
+            AddDep("debug_table");
             var funcName = functionToApplyName.Replace(" ", "_").Replace(".", "_");
             return
                 $"unit_test({funcName}, \"{functionToApplyName}\", {index}, \"{expected}\", {parameters.ToLuaTable()}, {tags.ToLuaTable()})";

@@ -5,7 +5,7 @@
     "$mustMatch": {
       "type": "route",
       "route": "bicycle",
-      "state": {"$notEq": "proposed"},
+      "state": {"$not": "proposed"},
       "operator": {"$containedIn": "#networkOperator"}
     }
   }

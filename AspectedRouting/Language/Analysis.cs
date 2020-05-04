@@ -131,6 +131,7 @@ namespace AspectedRouting.Language
         {
             var parameters = new Dictionary<string, (List<Type> Types, string inFunction)>();
 
+
             void AddParams(IExpression e, string inFunction)
             {
                 var parms = e.UsedParameters();
@@ -167,10 +168,14 @@ namespace AspectedRouting.Language
                 AddParams(expr, profile.Name + ".priority");
             }
 
-            foreach (var (name, expr) in context.DefinedFunctions)
+            var calledFunctions = profile.CalledFunctionsRecursive(context).Values
+                .SelectMany(ls => ls).ToHashSet();
+            foreach (var calledFunction in calledFunctions)
             {
-                AddParams(expr, name);
+                var func = context.GetFunction(calledFunction);
+                AddParams(func, calledFunction);
             }
+
 
             return parameters;
         }
@@ -191,6 +196,54 @@ namespace AspectedRouting.Language
             return result;
         }
 
+
+        public static Dictionary<string, List<string>> CalledFunctionsRecursive(this ProfileMetaData profile,
+            Context c)
+        {
+            // Read as: this function calls the value-function
+            var result = new Dictionary<string, List<string>>();
+            var calledFunctions = new Queue<string>();
+
+            void ScanExpression(IExpression e, string inFunction)
+            {
+                result.Add(inFunction, new List<string>());
+
+                e.Visit(x =>
+                {
+                    if (x is FunctionCall fc)
+                    {
+                        result[inFunction].Add(fc.CalledFunctionName);
+                        if (!result.ContainsKey(fc.CalledFunctionName))
+                        {
+                            calledFunctions.Enqueue(fc.CalledFunctionName);
+                        }
+                    }
+
+                    return true;
+                });
+            }
+
+
+            ScanExpression(profile.Access, profile.Name + ".access");
+            ScanExpression(profile.Oneway, profile.Name + ".oneway");
+            ScanExpression(profile.Speed, profile.Name + ".speed");
+
+            foreach (var (key, expr) in profile.Priority)
+            {
+                ScanExpression(new Parameter(key), $"{profile.Name}.priority.{key}.lefthand");
+                ScanExpression(expr, $"{profile.Name}.priority.{key}");
+            }
+
+            while (calledFunctions.TryDequeue(out var calledFunction))
+            {
+                var func = c.GetFunction(calledFunction);
+                ScanExpression(func, calledFunction);
+            }
+
+
+            return result;
+        }
+
         public static string TypeBreakdown(this IExpression e)
         {
             var text = "";
@@ -206,12 +259,28 @@ namespace AspectedRouting.Language
         {
             var defaultParameters = pmd.DefaultParameters.Keys;
 
-            var usedParameters = pmd.UsedParameters(context).Keys.Select(key => key.TrimStart('#'));
+
+            var usedMetadata = pmd.UsedParameters(context);
+
+            string MetaList(IEnumerable<string> paramNames)
+            {
+                var metaInfo = "";
+                foreach (var paramName in paramNames)
+                {
+                    var _ = usedMetadata.TryGetValue(paramName, out var inFunction) ||
+                            usedMetadata.TryGetValue('#' + paramName, out inFunction);
+                    metaInfo += $"\n - {paramName} (used in {inFunction.inFunction})";
+                }
+
+                return metaInfo;
+            }
+
+            var usedParameters = usedMetadata.Keys.Select(key => key.TrimStart('#'));
 
             var diff = usedParameters.ToHashSet().Except(defaultParameters).ToList();
             if (diff.Any())
             {
-                throw new ArgumentException("No default value set for parameter " + string.Join(", ", diff));
+                throw new ArgumentException("No default value set for parameter: " + MetaList(diff));
             }
 
             var unused = defaultParameters.Except(usedParameters);
@@ -221,19 +290,21 @@ namespace AspectedRouting.Language
                                             string.Join(", ", unused));
             }
 
+            var paramsUsedInBehaviour = new HashSet<string>();
+
             foreach (var (behaviourName, behaviourParams) in pmd.Behaviours)
             {
                 var sum = 0.0;
                 var explanation = "";
                 foreach (var (paramName, _) in pmd.Priority)
                 {
-
+                    paramsUsedInBehaviour.Add(paramName);
                     if (!pmd.DefaultParameters.ContainsKey(paramName))
                     {
                         throw new ArgumentException(
                             $"The behaviour {behaviourName} uses a parameter for which no default is set: {paramName}");
                     }
-                    
+
                     if (!behaviourParams.TryGetValue(paramName, out var weight))
                     {
                         explanation += $"\n - {paramName} = default (not set)";
@@ -244,7 +315,8 @@ namespace AspectedRouting.Language
 
                     if (!(weightObj is double d))
                     {
-                        throw new ArgumentException($"The parameter {paramName} is not a numeric value");
+                        throw new ArgumentException(
+                            $"The parameter {paramName} is not a numeric value in profile {behaviourName}");
                     }
 
                     sum += Math.Abs(d);
@@ -257,6 +329,14 @@ namespace AspectedRouting.Language
                                                 ": the summed parameters to calculate the weight are zero or very low:" +
                                                 explanation);
                 }
+            }
+
+
+            var defaultOnly = defaultParameters.Except(paramsUsedInBehaviour).ToList();
+            if (defaultOnly.Any())
+            {
+                Console.WriteLine(
+                    $"[{pmd.Name}] WARNING: Some parameters only have a default value: {string.Join(", ", defaultOnly)}");
             }
         }
 

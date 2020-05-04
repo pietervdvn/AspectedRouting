@@ -42,8 +42,16 @@ namespace AspectedRouting
             ProfileMetaData profile, List<ProfileTestSuite> profileTests)
         {
             var luaPrinter = new LuaPrinter(context);
+
+            var usedFunctions = profile.CalledFunctionsRecursive(context).Values.SelectMany(v => v).ToHashSet();
+            
             foreach (var (aspect, tests) in aspects)
             {
+                if (!usedFunctions.Contains(aspect.Name))
+                {
+                    continue;
+                }
+                
                 luaPrinter.AddFunction(aspect);
                 if (tests != null)
                 {
@@ -52,8 +60,6 @@ namespace AspectedRouting
             }
 
             luaPrinter.AddProfile(profile);
-
-
             foreach (var testSuite in profileTests)
             {
                 luaPrinter.AddTestSuite(testSuite);
@@ -63,29 +69,54 @@ namespace AspectedRouting
             return luaPrinter;
         }
 
-        private static (ProfileMetaData profile, List<ProfileTestSuite> profileTests) ParseProfile(string profilePath,
-            Context context)
+        private static List<(ProfileMetaData profile, List<ProfileTestSuite> profileTests)> ParseProfiles(
+            IEnumerable<string> jsonFiles, Context context)
         {
-            var profile = JsonParser.ProfileFromJson(context, File.ReadAllText(profilePath), new FileInfo(profilePath));
-            profile.SanityCheckProfile(context);
-
-            var profileFi = new FileInfo(profilePath);
-            var profileTests = new List<ProfileTestSuite>();
-            foreach (var behaviourName in profile.Behaviours.Keys)
+            var result = new List<(ProfileMetaData profile, List<ProfileTestSuite> profileTests)>();
+            foreach (var jsonFile in jsonFiles)
             {
-                var testPath = profileFi.DirectoryName + "/" + profile.Name + "." + behaviourName + ".csv";
-                if (File.Exists(testPath))
+                try
                 {
-                    var test = ProfileTestSuite.FromString(context, profile, behaviourName, File.ReadAllText(testPath));
-                    profileTests.Add(test);
+                    var profile =
+                        JsonParser.ProfileFromJson(context, File.ReadAllText(jsonFile), new FileInfo(jsonFile));
+                    if (profile == null)
+                    {
+                        continue;
+                    }
+
+                    profile.SanityCheckProfile(context);
+
+                    var profileFi = new FileInfo(jsonFile);
+                    var profileTests = new List<ProfileTestSuite>();
+                    foreach (var behaviourName in profile.Behaviours.Keys)
+                    {
+                        var path = profileFi.DirectoryName + "/" + profile.Name + "." + behaviourName + ".csv";
+                        if (File.Exists(path))
+                        {
+                            var test = ProfileTestSuite.FromString(context, profile, behaviourName,
+                                File.ReadAllText(path));
+                            profileTests.Add(test);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"[{profile.Name}] WARNING: no test found for behaviour {behaviourName}");
+                        }
+                    }
+
+                    result.Add((profile, profileTests));
                 }
-                else
+                catch (Exception e)
                 {
-                    Console.WriteLine($"[{behaviourName}] WARNING: no test found for behaviour");
+                    PrintError(jsonFile, e);
                 }
             }
 
-            return (profile, profileTests);
+            return result;
+        }
+
+        private static void PrintError(string file, Exception exception)
+        {
+            Console.WriteLine($"Error in the file {file}:\n    {exception.Message}");
         }
 
         public static void Main(string[] args)
@@ -101,6 +132,15 @@ namespace AspectedRouting
 
             var aspects = ParseAspects(files, context);
 
+            foreach (var (aspect, _) in aspects)
+            {
+                context.AddFunction(aspect.Name, aspect);
+            }
+
+            var profiles = ParseProfiles(files, context);
+
+
+            // With everything parsed and typechecked, time for tests
             foreach (var (aspect, t) in aspects)
             {
                 if (t == null)
@@ -111,23 +151,18 @@ namespace AspectedRouting
                 {
                     t.Run();
                 }
-
-                context.AddFunction(aspect.Name, aspect);
             }
 
-
-            var profilePath = "Profiles/bicycle/bicycle.json";
-            var (profile, profileTests) = ParseProfile(profilePath, context);
-
-            foreach (var test in profileTests)
+            foreach (var (profile, profileTests) in profiles)
             {
-                test.Run(context);
+                foreach (var test in profileTests)
+                {
+                    test.Run(context);
+                }
+
+                var luaPrinter = GenerateLua(context, aspects, profile, profileTests);
+                File.WriteAllText(profile.Name + ".lua", luaPrinter.ToLua());
             }
-
-
-            var luaPrinter = GenerateLua(context, aspects, profile, profileTests);
-
-            File.WriteAllText("output.lua", luaPrinter.ToLua());
         }
     }
 }

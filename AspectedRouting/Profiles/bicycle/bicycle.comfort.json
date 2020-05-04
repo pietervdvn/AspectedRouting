@@ -31,7 +31,7 @@
       },
       "access": {
         "designated": 1.2,
-        "dismount": 0.5
+        "dismount": 0.01
       },
       "surface": {
         "#": "The surface mapping heavily resembles the one in speed_factor, but it is not entirely the same",

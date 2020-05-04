@@ -1,0 +1,37 @@
+{
+  "name": "small",
+  "description": "A minimal example, to start designing a profile or to debug",
+  "vehicletypes": [
+    "vehicle",
+    "bicycle"
+  ],
+  "metadata": [
+    "name"
+  ],
+  "defaults": {
+    "#defaultSpeed": 15,
+    "#distance": 0,
+    "#cycleHighwayNetworkScore": 0
+  },
+  "behaviours": {
+    "shortest": {
+      "description": "The shortest route, independent of of speed",
+      "#distance": 1
+    },
+    "fastest": {
+      "description": "The shortest route, independent of of speed",
+      "#distance": 1
+    },
+    "commute": {
+      "description": "The shortest route, independent of of speed",
+      "#cycleHighwayNetworkScore": 3
+    }
+  },
+  "access": "$bicycle.legal_access",
+  "oneway": "$bicycle.oneway",
+  "speed": "#defaultSpeed",
+  "priority": {
+    "#distance": "$distance",
+    "#cycleHighwayNetworkScore": "$bicycle.network_is_cyclehighway"
+  }
+}

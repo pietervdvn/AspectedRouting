@@ -6,9 +6,11 @@
   "value": {
     "$multiply": {
       "access": {
-        "no": 1.1
+        "#": "access=no implies no access for cars too!",
+        "no": 1.1,
+        "dismount": 0.01
       },
-      "motor": {
+      "motor_vehicle": {
         "no": 1.5
       },
       "foot": {

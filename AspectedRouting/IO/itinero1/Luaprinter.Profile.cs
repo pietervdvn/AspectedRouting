@@ -15,7 +15,7 @@ namespace AspectedRouting.IO.itinero1
         {
             _context = context;
         }
-        
+
         private void CreateMembershipPreprocessor(ProfileMetaData profile)
         {
             var memberships = Analysis.MembershipMappingsFor(profile, _context);
@@ -47,32 +47,67 @@ namespace AspectedRouting.IO.itinero1
                 "    result.attributes_to_keep = {}"
             };
 
-            foreach (var (calledInFunction, _) in memberships)
+            foreach (var (calledInFunction, expr) in memberships)
             {
+
+                func.Add($"\n\n  -- {calledInFunction} ---");
+                
+                var usedParameters = expr.UsedParameters().Select(param => param.ParamName.TrimStart('#')).ToHashSet();
+
+                // First, we calculate the value for the default parameters
+                var preProcName = "relation_preprocessing_for_" + calledInFunction.FunctionName();
+                func.Add("");
+                func.Add("");
+                func.Add("    subresult.attributes_to_keep = {}");
+                func.Add("    parameters = default_parameters()");
+                func.Add($"    matched = {preProcName}(parameters, relation_tags, subresult)");
+                func.Add("    if (matched) then");
+                var tagKey = "_relation:" + calledInFunction.FunctionName();
+                _neededKeys.Add(tagKey);
+                func.Add(
+                    "    -- " + tagKey +" is the default value, which will be overwritten in 'remove_relation_prefix' for behaviours having a different parameter settign");
+                func.Add($"        result.attributes_to_keep[\"{tagKey}\"] = \"yes\"");
+                func.Add("    end");
+
+
+                if (usedParameters.Count() == 0)
+                {
+                    // Every behaviour uses the default parameters for this one
+                    func.Add("    -- No parameter dependence for aspect " + calledInFunction);
+                    continue;
+                }
+                
                 foreach (var (behaviourName, parameters) in profile.Behaviours)
                 {
-                    var preProcName = "relation_preprocessing_for_" + calledInFunction.FunctionName();
+                    if (usedParameters.Except(parameters.Keys.ToHashSet()).Any())
+                    {
+                        // The parameters where the membership depends on, are not used here
+                        // This is thus the same as the default. We don't have to calculate it
+                        continue;
+                    }
 
                     func.Add("");
                     func.Add("");
                     func.Add("    subresult.attributes_to_keep = {}");
                     func.Add("    parameters = default_parameters()");
-                    func.Add(ParametersToLua(parameters));
+                    func.Add(ParametersToLua(parameters.Where(kv => usedParameters.Contains(kv.Key))
+                        .ToDictionary(kv => kv.Key, kv => kv.Value)));
                     func.Add($"    matched = {preProcName}(parameters, relation_tags, subresult)");
                     func.Add("    if (matched) then");
-                    var tagKey = "_relation:" + behaviourName.FunctionName() + ":" + calledInFunction.FunctionName();
-                    _neededKeys.Add("_relation:"+calledInFunction.FunctionName()); // Slightly different then tagkey!
+                    tagKey = "_relation:" + behaviourName.FunctionName() + ":" + calledInFunction.FunctionName();
+                    _neededKeys.Add("_relation:" + calledInFunction.FunctionName()); // Slightly different then tagkey!
                     func.Add($"        result.attributes_to_keep[\"{tagKey}\"] = \"yes\"");
                     func.Add("    end");
                 }
+
+
             }
 
             func.Add("end");
-            
+
 
             _code.Add(string.Join("\n", func));
         }
-
 
 
         /// <summary>
@@ -96,7 +131,8 @@ namespace AspectedRouting.IO.itinero1
                 $"name = \"{profile.Name}\"",
                 "normalize = false",
                 "vehicle_type = {" + string.Join(", ", profile.VehicleTyps.Select(s => "\"" + s + "\"")) + "}",
-                "meta_whitelist = {" + string.Join(", ", profile.Metadata.Select(s => "\"" + s + "\"")) + "}",
+                "meta_whitelist = {\n    " + string.Join("\n    , ", profile.Metadata.Select(s => "\"" + s + "\"")) +
+                "}",
                 "",
                 "",
                 "",
@@ -132,28 +168,31 @@ namespace AspectedRouting.IO.itinero1
                 "");
 
             impl +=
-                "\n    local priority = \n        ";
+                "\n    local priority = 0\n        ";
 
-            var weightParts = new List<string>();
             foreach (var (parameterName, expression) in profile.Priority)
             {
-                var priorityPart = ToLua(new Parameter(parameterName)) + " * ";
+                var paramInLua = ToLua(new Parameter(parameterName));
+                
 
+                var exprInLua = ToLua(expression);
                 var subs = new Curry(Typs.Tags, new Var(("a"))).UnificationTable(expression.Types.First());
                 if (subs != null && subs.TryGetValue("$a", out var resultType) &&
                     (resultType.Equals(Typs.Bool) || resultType.Equals(Typs.String)))
                 {
-                    priorityPart += "parse(" + ToLua(expression) + ")";
-                }
-                else
-                {
-                    priorityPart += ToLua(expression);
+                    AddDep("parse");
+                    exprInLua = "parse(" + exprInLua + ")";
                 }
 
-                weightParts.Add(priorityPart);
+                impl += "\n    "+string.Join("\n    ",
+                    $"if({paramInLua} ~= 0) then",
+                    $"    priority = priority + {paramInLua} * {exprInLua}",
+                    "end"
+                );
+
+
             }
 
-            impl += string.Join(" + \n        ", weightParts);
 
             impl += string.Join("\n",
                 "",
@@ -162,14 +201,16 @@ namespace AspectedRouting.IO.itinero1
                 "    -- put all the values into the result-table, as needed for itinero",
                 "    result.access = 1",
                 "    result.speed = speed",
-                "    result.factor = priority",
+                "    result.factor = 1 / priority",
                 "",
                 "    if (oneway == \"both\") then",
-                "        result.oneway = 0",
+                "        result.direction = 0",
                 "    elseif (oneway == \"with\") then",
-                "        result.oneway = 1",
+                "        result.direction = 1",
+                "    elseif (oneway == \"against\") then",
+                "         result.direction = 2",
                 "    else",
-                "         result.oneway = 2",
+                "        error(\"Unexpected value for oneway: \"..oneway)",
                 "    end",
                 "",
                 "end",
@@ -239,7 +280,6 @@ namespace AspectedRouting.IO.itinero1
         /// <returns></returns>
         private string ParametersToLua(Dictionary<string, IExpression> subParams)
         {
-            
             var impl = "";
             foreach (var (paramName, value) in subParams)
             {
@@ -247,6 +287,7 @@ namespace AspectedRouting.IO.itinero1
                 {
                     continue;
                 }
+
                 impl += $"    parameters.{paramName.TrimStart('#').FunctionName()} = {ToLua(value)}\n";
             }
 
