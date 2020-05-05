@@ -40,7 +40,9 @@ namespace AspectedRouting.Language.Functions
             }
             catch (Exception e)
             {
-                throw new Exception($"While creating a list with members {string.Join(", ", exprs.Select(e => e.Optimize()))} {e.Message}", e);
+                throw new Exception($"While creating a list with members "+
+                        string.Join(", ", exprs.Select(x => x.Optimize()))+
+                      $" {e.Message}", e);
             }
         }
 

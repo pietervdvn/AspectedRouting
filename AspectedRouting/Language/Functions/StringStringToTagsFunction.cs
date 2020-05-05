@@ -4,23 +4,20 @@ using AspectedRouting.Language.Typ;
 
 namespace AspectedRouting.Language.Functions
 {
-    /// <summary>
-    /// Converts a function 'string -> string -> a' onto a function 'tags -> [a]'
-    /// </summary>
     public class StringStringToTagsFunction : Function
     {
         public override string Description { get; } =
             "stringToTags converts a function `string -> string -> a` into a function `tags -> [a]`";
         public override List<string> ArgNames { get; } = new List<string>{"f","tags"};
 
-        private static Type baseFunction =
+        private static readonly Type _baseFunction =
             Curry.ConstructFrom(new Var("a"), Typs.String, Typs.String);
 
 
         public StringStringToTagsFunction() : base("stringToTags", true,
             new[]
             {
-                new Curry(baseFunction, 
+                new Curry(_baseFunction, 
                     new Curry(Typs.Tags, new ListType(new Var("a"))))
             }
         )

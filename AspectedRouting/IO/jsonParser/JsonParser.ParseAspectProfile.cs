@@ -51,14 +51,15 @@ namespace AspectedRouting.IO.jsonParser
             }
         }
 
+
         private static ProfileMetaData ParseProfile(this JsonElement e, Context context, FileInfo filepath)
         {
-            if (!e.TryGetProperty("priority",out _))
+            if (!e.TryGetProperty("speed", out _))
             {
                 // not a profile
                 return null;
             }
-            
+
             var name = e.Get("name");
             var author = e.TryGet("author");
             if (filepath != null && !(name + ".json").ToLower().Equals(filepath.Name.ToLower()))
@@ -67,9 +68,20 @@ namespace AspectedRouting.IO.jsonParser
                                             $"filename is {filepath.Name}, declared name is {name}");
             }
 
-            var vehicleTypes = e.GetProperty("vehicletypes").EnumerateArray().Select(
+            JsonElement GetTopProperty(string name)
+            {
+                if (e.TryGetProperty(name, out var p))
+                {
+                    return p;
+                }
+
+                throw new ArgumentException(
+                    filepath + " is not a valid profile; it does not contain the obligated parameter " + name);
+            }
+
+            var vehicleTypes = GetTopProperty("vehicletypes").EnumerateArray().Select(
                 el => el.GetString()).ToList();
-            var metadata = e.GetProperty("metadata").EnumerateArray().Select(
+            var metadata = GetTopProperty("metadata").EnumerateArray().Select(
                 el => el.GetString()).ToList();
 
 
@@ -111,7 +123,7 @@ namespace AspectedRouting.IO.jsonParser
 
             var profiles = new Dictionary<string, Dictionary<string, IExpression>>();
 
-            foreach (var profile in e.GetProperty("behaviours").EnumerateObject())
+            foreach (var profile in GetTopProperty("behaviours").EnumerateObject())
             {
                 profiles[profile.Name] = ParseParameters(profile.Value);
             }
@@ -169,7 +181,18 @@ namespace AspectedRouting.IO.jsonParser
             try
             {
                 var simpleMapping = new Mapping(keys, exprs);
-                return new Apply(_mappingWrapper, simpleMapping);
+
+                var wrapped = (IExpression) new Apply(_mappingWrapper, simpleMapping);
+                if (keys.Count == 1)
+                {
+                    // We can interpret this directly without going through a list
+                    
+                    wrapped = Funcs.Either(Funcs.Id, 
+                        new Apply(Funcs.Dot, Funcs.Head), 
+                            wrapped);
+                }
+
+                return wrapped;
             }
             catch (Exception e)
             {
@@ -446,7 +469,7 @@ namespace AspectedRouting.IO.jsonParser
                 throw new ArgumentException($"Filename does not match the defined name: " +
                                             $"filename is {filepath}, declared name is {name}");
             }
-           
+
             var keys = (IEnumerable<string>) expr.PossibleTags()?.Keys ?? new List<string>();
             foreach (var key in keys)
             {

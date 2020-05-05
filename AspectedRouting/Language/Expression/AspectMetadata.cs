@@ -32,12 +32,7 @@ namespace AspectedRouting.Language.Expression
 
         public object Evaluate(Context c, params IExpression[] arguments)
         {
-            if (ProfileInternal && arguments.Length > 0)
-            {
-                var tags = (Dictionary<string, string>) arguments[0].Evaluate(c);
-                
-            }
-            
+          
             return ExpressionImplementation.Evaluate(c, arguments);
         }
 

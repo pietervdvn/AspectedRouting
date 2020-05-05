@@ -129,7 +129,7 @@ namespace AspectedRouting.Language
         public static Dictionary<string, (List<Type> Types, string inFunction)> UsedParameters(
             this ProfileMetaData profile, Context context)
         {
-            var parameters = new Dictionary<string, (List<Type> Types, string inFunction)>();
+            var parameters = new Dictionary<string, (List<Type> Types, string usageLocation)>();
 
 
             void AddParams(IExpression e, string inFunction)
@@ -145,8 +145,8 @@ namespace AspectedRouting.Language
                         {
                             throw new ArgumentException("Inconsistent parameter usage: the paremeter " +
                                                         param.ParamName + " is used\n" +
-                                                        $"   in function {oldUsage} as {string.Join(",", types)}\n" +
-                                                        $"   in function {inFunction} as {string.Join(",", param.Types)}\n" +
+                                                        $"   in {oldUsage} as {string.Join(",", types)}\n" +
+                                                        $"   in {inFunction} as {string.Join(",", param.Types)}\n" +
                                                         $"which can not be unified");
                         }
                     }
@@ -158,9 +158,9 @@ namespace AspectedRouting.Language
             }
 
 
-            AddParams(profile.Access, profile.Name + ".access");
-            AddParams(profile.Oneway, profile.Name + ".oneway");
-            AddParams(profile.Speed, profile.Name + ".speed");
+            AddParams(profile.Access, "profile definition for " + profile.Name + ".access");
+            AddParams(profile.Oneway, "profile definition for " + profile.Name + ".oneway");
+            AddParams(profile.Speed, "profile definition for " + profile.Name + ".speed");
 
             foreach (var (key, expr) in profile.Priority)
             {
@@ -173,7 +173,12 @@ namespace AspectedRouting.Language
             foreach (var calledFunction in calledFunctions)
             {
                 var func = context.GetFunction(calledFunction);
-                AddParams(func, calledFunction);
+                if (func is AspectMetadata meta && meta.ProfileInternal)
+                {
+                    continue;
+                }
+
+                AddParams(func, "function " + calledFunction);
             }
 
 
@@ -257,7 +262,7 @@ namespace AspectedRouting.Language
 
         public static void SanityCheckProfile(this ProfileMetaData pmd, Context context)
         {
-            var defaultParameters = pmd.DefaultParameters.Keys;
+            var defaultParameters = pmd.DefaultParameters.Keys.Select(k => k.TrimStart('#'));
 
 
             var usedMetadata = pmd.UsedParameters(context);
@@ -275,7 +280,7 @@ namespace AspectedRouting.Language
                 return metaInfo;
             }
 
-            var usedParameters = usedMetadata.Keys.Select(key => key.TrimStart('#'));
+            var usedParameters = usedMetadata.Keys.Select(key => key.TrimStart('#')).ToList();
 
             var diff = usedParameters.ToHashSet().Except(defaultParameters).ToList();
             if (diff.Any())
@@ -296,9 +301,9 @@ namespace AspectedRouting.Language
             {
                 var sum = 0.0;
                 var explanation = "";
+                paramsUsedInBehaviour.UnionWith(behaviourParams.Keys.Select(k => k.Trim('#')));
                 foreach (var (paramName, _) in pmd.Priority)
                 {
-                    paramsUsedInBehaviour.Add(paramName);
                     if (!pmd.DefaultParameters.ContainsKey(paramName))
                     {
                         throw new ArgumentException(

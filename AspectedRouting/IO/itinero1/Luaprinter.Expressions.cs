@@ -232,7 +232,7 @@ namespace AspectedRouting.IO.itinero1
                 case ValueTuple<string, string> unpack:
                     return unpack.Item1 + "[" + unpack.Item2 + "]";
                 case IEnumerable<object> ls:
-                    var t = (c.Types.First() as ListType).InnerType;
+                    var t = ((ListType) c.Types.First()).InnerType;
                     return "{" + string.Join(", ", ls.Select(obj =>
                     {
                         var objInConstant = new Constant(t, obj);

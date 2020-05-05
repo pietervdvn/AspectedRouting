@@ -148,11 +148,11 @@ namespace AspectedRouting.Tests
         {
             c = new Context(c);
             tags = new Dictionary<string, string>(tags);
-            
+
             void Err(string message, object exp, object act)
             {
                 Console.WriteLine(
-                    $"[{Profile.Name}.{BehaviourName}]: Test {i} failed: {message}; expected {exp} but got {act}\n    {{{tags.Pretty()}}}");
+                    $"[{Profile.Name}.{BehaviourName}]: Test on line {i + 1} failed: {message}; expected {exp} but got {act}\n    {{{tags.Pretty()}}}");
             }
 
             var success = true;
@@ -183,12 +183,13 @@ namespace AspectedRouting.Tests
             var speed = (double) Profile.Speed.Run(c, tags);
             tags["speed"] = "" + speed;
 
-            c.AddFunction("speed", new AspectMetadata(new Constant(Typs.Double, speed), 
-                "speed", "Actual speed of this function", "NA","NA","NA", true));
-            c.AddFunction("oneway", new AspectMetadata(new Constant(Typs.String, oneway), 
-                "oneway", "Actual direction of this function", "NA","NA","NA", true));
-            c.AddFunction("access", new AspectMetadata(new Constant(Typs.String, canAccess), 
-                "access", "Actual access of this function", "NA","NA","NA", true));
+
+            c.AddFunction("speed", new AspectMetadata(new Constant(Typs.Double, speed),
+                "speed", "Actual speed of this function", "NA", "NA", "NA", true));
+            c.AddFunction("oneway", new AspectMetadata(new Constant(Typs.String, oneway),
+                "oneway", "Actual direction of this function", "NA", "NA", "NA", true));
+            c.AddFunction("access", new AspectMetadata(new Constant(Typs.String, canAccess),
+                "access", "Actual access of this function", "NA", "NA", "NA", true));
 
             if (Math.Abs(speed - expected.Speed) > 0.0001)
             {
@@ -198,6 +199,7 @@ namespace AspectedRouting.Tests
 
 
             var priority = 0.0;
+            var weightExplanation = new List<string>();
             foreach (var (paramName, expression) in Profile.Priority)
             {
                 var aspectInfluence = (double) c.Parameters[paramName].Evaluate(c);
@@ -210,7 +212,7 @@ namespace AspectedRouting.Tests
 
                 var aspectWeightObj = new Apply(
                     Funcs.EitherFunc.Apply(Funcs.Id, Funcs.Const, expression)
-                    , new Constant((tags))).Evaluate(c);
+                    , new Constant(tags)).Evaluate(c);
 
                 double aspectWeight;
                 switch (aspectWeightObj)
@@ -241,13 +243,20 @@ namespace AspectedRouting.Tests
                         throw new Exception($"Invalid value as result for {paramName}: got object {aspectWeightObj}");
                 }
 
+                weightExplanation.Add($"({paramName} = {aspectInfluence}) * {aspectWeight}");
                 priority += aspectInfluence * aspectWeight;
             }
 
             if (Math.Abs(priority - expected.Weight) > 0.0001)
             {
-                Err("weight incorrect", expected.Weight, priority);
+                Err($"weight incorrect. Calculation is {string.Join(" + ", weightExplanation)}", expected.Weight,
+                    priority);
                 success = false;
+            }
+
+            if (!success)
+            {
+                Console.WriteLine();
             }
 
             return success;
@@ -292,7 +301,7 @@ namespace AspectedRouting.Tests
             }
             else
             {
-                Console.WriteLine($"[{BehaviourName}] {Tests.Count()} tests successful");
+                Console.WriteLine($"[{Profile.Name}] {Tests.Count()} tests successful for behaviour {BehaviourName}");
             }
         }
     }

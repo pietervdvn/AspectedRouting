@@ -13,21 +13,22 @@ namespace AspectedRouting
 {
     static class Program
     {
-        public static List<(AspectMetadata aspect, FunctionTestSuite tests)> ParseAspects(
-            this List<string> jsonFileNames, Context context)
+        public static IEnumerable<(AspectMetadata aspect, AspectTestSuite tests)> ParseAspects(
+            this IEnumerable<string> jsonFileNames, Context context)
         {
-            var aspects = new List<(AspectMetadata aspect, FunctionTestSuite tests)>();
+            var aspects = new List<(AspectMetadata aspect, AspectTestSuite tests)>();
             foreach (var file in jsonFileNames)
             {
                 var fi = new FileInfo(file);
+                Console.WriteLine("Parsing " + file);
                 var aspect = JsonParser.AspectFromJson(context, File.ReadAllText(file), fi.Name);
                 if (aspect != null)
                 {
                     var testPath = fi.DirectoryName + "/" + aspect.Name + ".test.csv";
-                    FunctionTestSuite tests = null;
+                    AspectTestSuite tests = null;
                     if (File.Exists(testPath))
                     {
-                        tests = FunctionTestSuite.FromString(aspect, File.ReadAllText(testPath));
+                        tests = AspectTestSuite.FromString(aspect, File.ReadAllText(testPath));
                     }
 
                     aspects.Add((aspect, tests));
@@ -38,7 +39,7 @@ namespace AspectedRouting
         }
 
         private static LuaPrinter GenerateLua(Context context,
-            List<(AspectMetadata aspect, FunctionTestSuite tests)> aspects,
+            IEnumerable<(AspectMetadata aspect, AspectTestSuite tests)> aspects,
             ProfileMetaData profile, List<ProfileTestSuite> profileTests)
         {
             var luaPrinter = new LuaPrinter(context);
@@ -69,7 +70,7 @@ namespace AspectedRouting
             return luaPrinter;
         }
 
-        private static List<(ProfileMetaData profile, List<ProfileTestSuite> profileTests)> ParseProfiles(
+        private static IEnumerable<(ProfileMetaData profile, List<ProfileTestSuite> profileTests)> ParseProfiles(
             IEnumerable<string> jsonFiles, Context context)
         {
             var result = new List<(ProfileMetaData profile, List<ProfileTestSuite> profileTests)>();
@@ -90,7 +91,7 @@ namespace AspectedRouting
                     var profileTests = new List<ProfileTestSuite>();
                     foreach (var behaviourName in profile.Behaviours.Keys)
                     {
-                        var path = profileFi.DirectoryName + "/" + profile.Name + "." + behaviourName + ".csv";
+                        var path = profileFi.DirectoryName + "/" + profile.Name + "." + behaviourName + ".behaviour_test.csv";
                         if (File.Exists(path))
                         {
                             var test = ProfileTestSuite.FromString(context, profile, behaviourName,
@@ -107,7 +108,8 @@ namespace AspectedRouting
                 }
                 catch (Exception e)
                 {
-                    PrintError(jsonFile, e);
+                    // PrintError(jsonFile, e);
+                    throw new Exception("In the file " + jsonFile, e);
                 }
             }
 
@@ -116,18 +118,35 @@ namespace AspectedRouting
 
         private static void PrintError(string file, Exception exception)
         {
-            Console.WriteLine($"Error in the file {file}:\n    {exception.Message}");
+            var msg = exception.Message;
+            while (exception.InnerException != null)
+            {
+                exception = exception.InnerException;
+                msg += "\n    " + exception.Message;
+            }
+
+            Console.WriteLine($"Error in the file {file}:\n    {msg}");
         }
 
         public static void Main(string[] args)
         {
-            MdPrinter.GenerateHelpText("IO/md/helpText.md");
+
+            if (args.Length < 2)
+            {
+                Console.WriteLine("Usage: <directory where all aspects and profiles can be found> <outputdirectory>");
+                return;
+            }
+
+            var inputDir = args[0];
+            var outputDir = args[1];
+            
+            
+            MdPrinter.GenerateHelpText(outputDir + "helpText.md");
 
 
-            var files = Directory.EnumerateFiles("Profiles", "*.json", SearchOption.AllDirectories)
+            var files = Directory.EnumerateFiles(inputDir, "*.json", SearchOption.AllDirectories)
                 .ToList();
-
-
+            
             var context = new Context();
 
             var aspects = ParseAspects(files, context);
@@ -161,7 +180,7 @@ namespace AspectedRouting
                 }
 
                 var luaPrinter = GenerateLua(context, aspects, profile, profileTests);
-                File.WriteAllText(profile.Name + ".lua", luaPrinter.ToLua());
+                File.WriteAllText(outputDir + "/" + profile.Name + ".lua", luaPrinter.ToLua());
             }
         }
     }

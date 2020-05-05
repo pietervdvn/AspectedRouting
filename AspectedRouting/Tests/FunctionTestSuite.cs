@@ -7,12 +7,12 @@ using AspectedRouting.Language.Functions;
 
 namespace AspectedRouting.Tests
 {
-    public class FunctionTestSuite
+    public class AspectTestSuite
     {
         public readonly AspectMetadata FunctionToApply;
         public readonly IEnumerable<(string expected, Dictionary<string, string> tags)> Tests;
 
-        public static FunctionTestSuite FromString(AspectMetadata function, string csvContents)
+        public static AspectTestSuite FromString(AspectMetadata function, string csvContents)
         {
             var all = csvContents.Split("\n").ToList();
             var keys = all[0].Split(",").ToList();
@@ -42,10 +42,10 @@ namespace AspectedRouting.Tests
                 tests.Add((expected, tags));
             }
 
-            return new FunctionTestSuite(function, tests);
+            return new AspectTestSuite(function, tests);
         }
 
-        public FunctionTestSuite(
+        public AspectTestSuite(
             AspectMetadata functionToApply,
             IEnumerable<(string expected, Dictionary<string, string> tags)> tests)
         {
@@ -84,7 +84,7 @@ namespace AspectedRouting.Tests
                 {
                     failed = true;
                     Console.WriteLine(
-                        $"[{FunctionToApply.Name}] Testcase {testCase} failed:\n   Expected: {test.expected}\n   actual: {actual}\n   tags: {test.tags.Pretty()}");
+                        $"[{FunctionToApply.Name}] Line {testCase+1} failed:\n   Expected: {test.expected}\n   actual: {actual}\n   tags: {test.tags.Pretty()}\n");
                 }
             }
 

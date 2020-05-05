@@ -20,6 +20,9 @@ namespace AspectedRouting.Language.Functions
                 new Curry(new ListType(Typs.Bool), Typs.Int), 
             })
         {
+            Funcs.AddBuiltin(this, "plus");
+            Funcs.AddBuiltin(this, "add");
+
         }
 
 

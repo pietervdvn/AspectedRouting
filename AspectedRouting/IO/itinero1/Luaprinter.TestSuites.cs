@@ -46,7 +46,7 @@ namespace AspectedRouting.IO.itinero1
             }
             // function unit_test_profile(profile_function, profile_name, index, expected, tags)
 
-            return $"unit_test_profile(profile_bicycle_{testSuite.BehaviourName.FunctionName()}, " +
+            return $"unit_test_profile(behaviour_{testSuite.Profile.Name.FunctionName()}_{testSuite.BehaviourName.FunctionName()}, " +
                    $"\"{testSuite.BehaviourName}\", " +
                    $"{index}, " +
                    $"{{access = \"{D(expected.Access)}\", speed = {expected.Speed}, oneway = \"{D(expected.Oneway)}\", weight = {expected.Weight} }}, " +
@@ -65,7 +65,7 @@ namespace AspectedRouting.IO.itinero1
         }
 
 
-        public void AddTestSuite(FunctionTestSuite testSuite)
+        public void AddTestSuite(AspectTestSuite testSuite)
         {
             var fName = testSuite.FunctionToApply.Name;
             var tests = string.Join("\n",

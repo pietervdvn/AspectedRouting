@@ -1,7 +1,0 @@
-access,oneway,speed,priority,highway,bicycle
-no,both,0,0,,
-designated,both,15,15,cycleway,
-no,both,0,0,primary,
-dismount,both,2.25,2.25,pedestrian,
-yes,both,15,15,pedestrian,yes
-yes,both,15,15,residential,

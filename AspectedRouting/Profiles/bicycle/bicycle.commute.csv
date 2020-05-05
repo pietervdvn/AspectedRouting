@@ -1,6 +1,0 @@
-access,oneway,speed,priority,highway,_relation:bicycle.network_by_operator,_relation:bicycle.network_is_cyclehighway
-no,,,,,,
-yes,both,15,1.9,residential,,
-yes,both,15,6.9,residential,yes,
-yes,both,15,6.9,residential,,yes
-yes,both,15,11.9,residential,yes,yes

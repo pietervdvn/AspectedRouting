@@ -11,7 +11,6 @@ namespace AspectedRouting.Language.Functions
     {
         public readonly Dictionary<string, IExpression> StringToResultFunctions;
 
-
         public Mapping(IReadOnlyList<string> keys, IEnumerable<IExpression> expressions) :
             base(
                 $"mapping ({MappingToString(keys, expressions.SpecializeToCommonTypes(out var specializedTypes, out var specializedExpressions))})",
@@ -69,11 +68,13 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
+            
             var s = arguments[0].Evaluate(c);
             while (s is Constant constant)
             {
                 s = constant.Evaluate(c);
             }
+            
 
             var key = (string) s;
             var otherARgs = arguments.ToList().GetRange(1, arguments.Length - 1);

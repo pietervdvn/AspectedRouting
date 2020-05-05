@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text.Json;
 using AspectedRouting.Language;
-using AspectedRouting.Language.Expression;
 using AspectedRouting.Language.Functions;
 using AspectedRouting.Language.Typ;
 
@@ -14,9 +12,14 @@ namespace AspectedRouting.IO.jsonParser
     {
         private static IExpression ParseProfileProperty(JsonElement e, Context c, string property)
         {
+
+            if (!e.TryGetProperty(property, out var prop))
+            {
+                throw new ArgumentException("Not a valid profile: the declaration expression for '" + property +
+                                            "' is missing");
+            }
             try
             {
-                var prop = e.GetProperty(property);
                 return ParseExpression(prop, c)
                     .Specialize(new Curry(Typs.Tags, new Var("a")))
                     .Optimize();
@@ -57,7 +60,7 @@ namespace AspectedRouting.IO.jsonParser
                         ps[nm] = new Constant(Typs.Bool, "yes");
                         break;
                     case JsonValueKind.Array:
-                        var list = obj.Value.EnumerateArray().Select(e => e.ToString()).ToList();
+                        var list = obj.Value.EnumerateArray().Select(x => x.ToString()).ToList();
                         ps[nm] = new Constant(new ListType(Typs.String),list);
                         break;
                     default:

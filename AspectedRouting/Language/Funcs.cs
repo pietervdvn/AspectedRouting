@@ -49,6 +49,7 @@ namespace AspectedRouting.Language
         public static readonly Function EitherFunc = new EitherFunc();
 
         public static readonly Function StringStringToTags = new StringStringToTagsFunction();
+        public static readonly Function Head = new HeadFunction();
 
         public static void AddBuiltin(Function f, string name = null)
         {

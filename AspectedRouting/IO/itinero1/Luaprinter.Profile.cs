@@ -49,9 +49,8 @@ namespace AspectedRouting.IO.itinero1
 
             foreach (var (calledInFunction, expr) in memberships)
             {
-
                 func.Add($"\n\n  -- {calledInFunction} ---");
-                
+
                 var usedParameters = expr.UsedParameters().Select(param => param.ParamName.TrimStart('#')).ToHashSet();
 
                 // First, we calculate the value for the default parameters
@@ -65,7 +64,8 @@ namespace AspectedRouting.IO.itinero1
                 var tagKey = "_relation:" + calledInFunction.FunctionName();
                 _neededKeys.Add(tagKey);
                 func.Add(
-                    "    -- " + tagKey +" is the default value, which will be overwritten in 'remove_relation_prefix' for behaviours having a different parameter settign");
+                    "    -- " + tagKey +
+                    " is the default value, which will be overwritten in 'remove_relation_prefix' for behaviours having a different parameter settign");
                 func.Add($"        result.attributes_to_keep[\"{tagKey}\"] = \"yes\"");
                 func.Add("    end");
 
@@ -76,7 +76,7 @@ namespace AspectedRouting.IO.itinero1
                     func.Add("    -- No parameter dependence for aspect " + calledInFunction);
                     continue;
                 }
-                
+
                 foreach (var (behaviourName, parameters) in profile.Behaviours)
                 {
                     if (usedParameters.Except(parameters.Keys.ToHashSet()).Any())
@@ -99,8 +99,6 @@ namespace AspectedRouting.IO.itinero1
                     func.Add($"        result.attributes_to_keep[\"{tagKey}\"] = \"yes\"");
                     func.Add("    end");
                 }
-
-
             }
 
             func.Add("end");
@@ -173,7 +171,7 @@ namespace AspectedRouting.IO.itinero1
             foreach (var (parameterName, expression) in profile.Priority)
             {
                 var paramInLua = ToLua(new Parameter(parameterName));
-                
+
 
                 var exprInLua = ToLua(expression);
                 var subs = new Curry(Typs.Tags, new Var(("a"))).UnificationTable(expression.Types.First());
@@ -184,21 +182,22 @@ namespace AspectedRouting.IO.itinero1
                     exprInLua = "parse(" + exprInLua + ")";
                 }
 
-                impl += "\n    "+string.Join("\n    ",
-                    $"if({paramInLua} ~= 0) then",
-                    $"    priority = priority + {paramInLua} * {exprInLua}",
-                    "end"
-                );
-
-
+                impl += "\n    " + string.Join("\n    ",
+                            $"if({paramInLua} ~= 0) then",
+                            $"    priority = priority + {paramInLua} * {exprInLua}",
+                            "end"
+                        );
             }
 
 
             impl += string.Join("\n",
                 "",
                 "",
+                "    if (priority <= 0) then",
+                "        result.access = 0",
+                "        return",
+                "    end",
                 "",
-                "    -- put all the values into the result-table, as needed for itinero",
                 "    result.access = 1",
                 "    result.speed = speed",
                 "    result.factor = 1 / priority",
@@ -248,8 +247,8 @@ namespace AspectedRouting.IO.itinero1
             subParams.TryGetValue("description", out var description);
             profiles.Add(
                 string.Join(",\n    ",
-                    $"    name = \"{name}\"",
-                    "    function_name = \"profile_" + functionName + "\"",
+                    $"    name = \"{name.FunctionName()}\"",
+                    "    function_name = \"behaviour_" + functionName.FunctionName() + "\"",
                     "    metric = \"custom\""
                 )
             );
@@ -260,9 +259,10 @@ namespace AspectedRouting.IO.itinero1
                 "--[[",
                 description,
                 "]]",
-                "function profile_" + functionName + "(tags, result)",
+                "function behaviour_" + functionName.FunctionName() + "(tags, result)",
                 $"    tags = remove_relation_prefix(tags, \"{name.FunctionName()}\")",
                 "    local parameters = default_parameters()",
+                "    parameters.name = \"" + functionName + "\"",
                 ""
             );
 
