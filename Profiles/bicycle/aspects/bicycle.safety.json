@@ -1,0 +1,76 @@
+{
+  "name": "bicycle.safety",
+  "description": "Determines how safe a cyclist feels on a certain road, mostly based on car pressure. This is a relatively ",
+  "unit": "safety",
+  "$default": 1,
+  "value": {
+    "$multiply": {
+      "access": {
+        "#": "access=no and access 'destination' implies this access for cars too and is a bonus!",
+        "no": 1.5,
+        "destination": 1.4,
+        "dismount": 0.01,
+        "designated": 1.5
+      },
+      "motor_vehicle": {
+        "no": 1.5,
+        "destination": 1.4
+      },
+      "foot": {
+        "designated": 0.95
+      },
+      "bicycle": {
+        "designated": 1.5
+      },
+      "cyclestreet": {
+        "yes": 1.5
+      },
+      "towpath": {
+        "yes": 1.1
+      },
+      "designation": {
+        "towpath": 1.5
+      },
+      "highway": {
+        "cycleway": 1.0,
+        "primary": 0.3,
+        "secondary": 0.4,
+        "tertiary": 0.5,
+        "unclassified": 0.8,
+        "track": 0.95,
+        "residential": 0.9,
+        "living_street": 0.95,
+        "footway": 0.95,
+        "path": 0.9
+      },
+      "cycleway": {
+        "yes": 0.95,
+        "#": "TODO: the implied value for quite a bit of roads (residential, unclassified) is 'no', so this is a bit weird",
+        "no": 0.5,
+        "lane": 1,
+        "shared": 0.8,
+        "shared_lane": 0.8,
+        "share_busway": 0.9,
+        "track": 1.5
+      },
+      "cycleway:left": {
+        "yes": 0.95,
+        "no": 0.5,
+        "lane": 1,
+        "shared": 0.8,
+        "shared_lane": 0.8,
+        "share_busway": 0.9,
+        "track": 1.5
+      },
+      "cycleway:right": {
+        "yes": 0.95,
+        "no": 0.5,
+        "lane": 1,
+        "shared": 0.8,
+        "shared_lane": 0.8,
+        "share_busway": 0.9,
+        "track": 1.5
+      }
+    }
+  }
+}

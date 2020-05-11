@@ -1,0 +1,38 @@
+{
+  "name": "rollerskate.comfort",
+  "description": "How smooth is this road, on a factor 0 (horrible) to 1 (excellent)?",
+  "$default": 0.3,
+  "value": {
+    "$firstMatchOf": [
+      "highway",
+      "smoothness",
+      "surface",
+      "sidewalk:surface"
+    ],
+    "value": {
+      "highway": {
+        "primary": 0.2,
+        "secondary": 0.2
+      },
+      "smoothness": {
+        "excellent": 1,
+        "very_good": 0.95,
+        "good": 0.75,
+        "intermediate": 0.5,
+        "bad": 0.1
+      },
+      "surface": {
+        "asphalt": 0.7,
+        "concrete": 0.7,
+        "paving_stones": 0.65,
+        "sett": 0.01
+      },
+      "sidewalk:surface": {
+        "asphalt": 0.7,
+        "concrete": 0.7,
+        "paving_stones": 0.65,
+        "sett": 0.01
+      }
+    }
+  }
+}

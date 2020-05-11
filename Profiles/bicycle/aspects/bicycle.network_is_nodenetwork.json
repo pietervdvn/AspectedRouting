@@ -1,0 +1,13 @@
+{
+  "name": "bicycle.network_is_nodenetwork",
+  "description": "Returns true if the highway is part of a [cycle node network](https://wiki.openstreetmap.org/wiki/Cycle_Node_Network_Tagging)",
+  "$memberOf": {
+    "$mustMatch": {
+      "type": "route",
+      "route": "bicycle",
+      "state": {"$not": "proposed"},
+      "network:type": "node_network"
+    }
+  }
+}
+

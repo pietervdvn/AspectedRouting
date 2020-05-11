@@ -13,7 +13,7 @@ namespace AspectedRouting.IO.itinero1
             _tests.Add(tests);
         }
 
-        private string ToLua(ProfileTestSuite testSuite, int index, Expected expected, Dictionary<string, string> tags)
+        private string ToLua(ProfileTestSuite testSuite, int index, ProfileResult expected, Dictionary<string, string> tags)
         {
             AddDep("debug_table");
             var parameters = new Dictionary<string, string>();
@@ -49,7 +49,7 @@ namespace AspectedRouting.IO.itinero1
             return $"unit_test_profile(behaviour_{testSuite.Profile.Name.FunctionName()}_{testSuite.BehaviourName.FunctionName()}, " +
                    $"\"{testSuite.BehaviourName}\", " +
                    $"{index}, " +
-                   $"{{access = \"{D(expected.Access)}\", speed = {expected.Speed}, oneway = \"{D(expected.Oneway)}\", weight = {expected.Weight} }}, " +
+                   $"{{access = \"{D(expected.Access)}\", speed = {expected.Speed}, oneway = \"{D(expected.Oneway)}\", weight = {expected.Priority} }}, " +
                    tags.ToLuaTable() +
                    ")";
         }

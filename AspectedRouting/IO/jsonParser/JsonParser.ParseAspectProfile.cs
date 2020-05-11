@@ -113,7 +113,8 @@ namespace AspectedRouting.IO.jsonParser
 
 
             var weights = new Dictionary<string, IExpression>();
-            var weightProperty = e.GetProperty("priority");
+            
+            var weightProperty = GetTopProperty("priority");
             foreach (var prop in weightProperty.EnumerateObject())
             {
                 var parameter = prop.Name.TrimStart('#');
@@ -123,7 +124,8 @@ namespace AspectedRouting.IO.jsonParser
 
             var profiles = new Dictionary<string, Dictionary<string, IExpression>>();
 
-            foreach (var profile in GetTopProperty("behaviours").EnumerateObject())
+            var behaviours = GetTopProperty("behaviours");
+            foreach (var profile in behaviours.EnumerateObject())
             {
                 profiles[profile.Name] = ParseParameters(profile.Value);
             }

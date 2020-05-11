@@ -1,0 +1,41 @@
+{
+	"name":"speedPedelec",
+	"description":"A vehicle specifically for speed pedelec (aka Moped P) with Belgian legislation in mind. A speed pedelec is a kind of electrical bike with a maxspeed of 45km/h. Due to the high speed, this is considered a kind of moped or motorcycle for belgian law. Sources for more information are [speedpedelecVlaanderen.be](https://speedpedelecvlaanderen.be/infrastructuur-en-regelgeving/wegcode/relevante-verkeersborden/), [Fietsersbond](https://www.fietsersbond.be/speedpedelec)",
+	"defaults":{
+		"#defaultSpeed": 25,
+		"#maxspeed":45,
+		"#distance":0
+	},
+	"vehicletypes":["vehicle","motor_vehicle","moped_p"],
+	"metadata": [
+		"name",
+		"bridge",
+		"tunnel",
+		"colour",
+		"cycle_network_colour",
+		"ref",
+		"status",
+		"network"
+  	],
+	"behaviours":{
+		"shortest":{
+			"description":"The shortest path",
+			"#distance":1
+		}
+	
+	},
+	"speed":{
+		"$min":
+		[
+		{"$multiply":["#defaultSpeed", "$bicycle.speed_factor"]}, 
+		"$legal_maxspeed_be",
+		"#maxspeed"
+		]
+	},
+	"access":"$speedPedelec.access_be",
+	"oneway":"$bicycle.oneway",
+	"priority":{
+		"#distance": 1
+	}
+
+} 

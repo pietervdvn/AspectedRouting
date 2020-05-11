@@ -211,7 +211,10 @@ namespace AspectedRouting.Language
 
             void ScanExpression(IExpression e, string inFunction)
             {
-                result.Add(inFunction, new List<string>());
+                if (!result.ContainsKey(inFunction))
+                {
+                    result.Add(inFunction, new List<string>());
+                }
 
                 e.Visit(x =>
                 {

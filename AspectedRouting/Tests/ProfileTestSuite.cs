@@ -8,27 +8,11 @@ using AspectedRouting.Language.Typ;
 
 namespace AspectedRouting.Tests
 {
-    public struct Expected
-    {
-        public readonly string Access;
-        public readonly string Oneway;
-        public readonly double Speed;
-        public readonly double Weight;
-
-        public Expected(string access, string oneway, double speed, double weight)
-        {
-            Access = access;
-            Oneway = oneway;
-            Speed = speed;
-            Weight = weight;
-        }
-    }
-
     public class ProfileTestSuite
     {
         public readonly ProfileMetaData Profile;
         public readonly string BehaviourName;
-        public readonly IEnumerable<(Expected, Dictionary<string, string> tags)> Tests;
+        public readonly IEnumerable<(ProfileResult, Dictionary<string, string> tags)> Tests;
 
         public static ProfileTestSuite FromString(Context c, ProfileMetaData function, string profileName,
             string csvContents)
@@ -66,7 +50,7 @@ namespace AspectedRouting.Tests
                 }
 
 
-                var tests = new List<(Expected, Dictionary<string, string>)>();
+                var tests = new List<(ProfileResult, Dictionary<string, string>)>();
 
                 var line = 1;
                 foreach (var test in all.GetRange(1, all.Count - 1))
@@ -93,7 +77,7 @@ namespace AspectedRouting.Tests
                             weight = double.Parse(testData[3]);
                         }
 
-                        var expected = new Expected(
+                        var expected = new ProfileResult(
                             testData[0],
                             testData[1],
                             speed,
@@ -128,7 +112,7 @@ namespace AspectedRouting.Tests
         public ProfileTestSuite(
             ProfileMetaData profile,
             string profileName,
-            IEnumerable<(Expected, Dictionary<string, string> tags)> tests)
+            IEnumerable<(ProfileResult, Dictionary<string, string> tags)> tests)
         {
             Profile = profile;
             BehaviourName = profileName;
@@ -144,24 +128,21 @@ namespace AspectedRouting.Tests
             return o is string s && s.Equals("yes");
         }
 
-        public bool RunTest(Context c, int i, Expected expected, Dictionary<string, string> tags)
-        {
-            c = new Context(c);
-            tags = new Dictionary<string, string>(tags);
 
+        public bool RunTest(Context c, int i, ProfileResult expected, Dictionary<string, string> tags)
+        {
             void Err(string message, object exp, object act)
             {
                 Console.WriteLine(
                     $"[{Profile.Name}.{BehaviourName}]: Test on line {i + 1} failed: {message}; expected {exp} but got {act}\n    {{{tags.Pretty()}}}");
             }
 
-            var success = true;
-            var canAccess = Profile.Access.Run(c, tags);
-            tags["access"] = "" + canAccess;
+            var actual = Profile.Run(c, BehaviourName, tags);
 
-            if (!expected.Access.Equals(canAccess))
+            var success = true;
+            if (!expected.Access.Equals(actual.Access))
             {
-                Err("access value incorrect", expected.Access, canAccess);
+                Err("access value incorrect", expected.Access, actual.Access);
                 success = false;
             }
 
@@ -171,88 +152,29 @@ namespace AspectedRouting.Tests
                 return success;
             }
 
-            var oneway = Profile.Oneway.Run(c, tags);
-            tags["oneway"] = "" + oneway;
 
-            if (!Eq(c, expected.Oneway, oneway))
+            if (!Eq(c, expected.Oneway, actual.Oneway))
             {
-                Err("oneway value incorrect", expected.Oneway, oneway);
-                success = false;
-            }
-
-            var speed = (double) Profile.Speed.Run(c, tags);
-            tags["speed"] = "" + speed;
-
-
-            c.AddFunction("speed", new AspectMetadata(new Constant(Typs.Double, speed),
-                "speed", "Actual speed of this function", "NA", "NA", "NA", true));
-            c.AddFunction("oneway", new AspectMetadata(new Constant(Typs.String, oneway),
-                "oneway", "Actual direction of this function", "NA", "NA", "NA", true));
-            c.AddFunction("access", new AspectMetadata(new Constant(Typs.String, canAccess),
-                "access", "Actual access of this function", "NA", "NA", "NA", true));
-
-            if (Math.Abs(speed - expected.Speed) > 0.0001)
-            {
-                Err("speed value incorrect", expected.Speed, speed);
+                Err("oneway value incorrect", expected.Oneway, actual.Oneway);
                 success = false;
             }
 
 
-            var priority = 0.0;
-            var weightExplanation = new List<string>();
-            foreach (var (paramName, expression) in Profile.Priority)
+            if (Math.Abs(actual.Speed - expected.Speed) > 0.0001)
             {
-                var aspectInfluence = (double) c.Parameters[paramName].Evaluate(c);
-                // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if (aspectInfluence == 0)
-                {
-                    continue;
-                }
-
-
-                var aspectWeightObj = new Apply(
-                    Funcs.EitherFunc.Apply(Funcs.Id, Funcs.Const, expression)
-                    , new Constant(tags)).Evaluate(c);
-
-                double aspectWeight;
-                switch (aspectWeightObj)
-                {
-                    case bool b:
-                        aspectWeight = b ? 1.0 : 0.0;
-                        break;
-                    case double d:
-                        aspectWeight = d;
-                        break;
-                    case int j:
-                        aspectWeight = j;
-                        break;
-                    case string s:
-                        if (s.Equals("yes"))
-                        {
-                            aspectWeight = 1.0;
-                            break;
-                        }
-                        else if (s.Equals("no"))
-                        {
-                            aspectWeight = 0.0;
-                            break;
-                        }
-
-                        throw new Exception($"Invalid value as result for {paramName}: got string {s}");
-                    default:
-                        throw new Exception($"Invalid value as result for {paramName}: got object {aspectWeightObj}");
-                }
-
-                weightExplanation.Add($"({paramName} = {aspectInfluence}) * {aspectWeight}");
-                priority += aspectInfluence * aspectWeight;
-            }
-
-            if (Math.Abs(priority - expected.Weight) > 0.0001)
-            {
-                Err($"weight incorrect. Calculation is {string.Join(" + ", weightExplanation)}", expected.Weight,
-                    priority);
+                Err("speed value incorrect", expected.Speed, actual.Speed);
                 success = false;
             }
+
+
+            if (Math.Abs(actual.Priority - expected.Priority) > 0.0001)
+            {
+                Err($"weight incorrect. Calculation is {string.Join(" + ", actual.PriorityExplanation)}",
+                    expected.Priority,
+                    actual.Priority);
+                success = false;
+            }
+
 
             if (!success)
             {
@@ -265,19 +187,7 @@ namespace AspectedRouting.Tests
         public void Run(Context c)
 
         {
-            var parameters = new Dictionary<string, IExpression>();
-
-            foreach (var (k, v) in Profile.DefaultParameters)
-            {
-                parameters[k] = v;
-            }
-
-            foreach (var (k, v) in Profile.Behaviours[BehaviourName])
-            {
-                parameters[k] = v;
-            }
-
-            c = c.WithParameters(parameters);
+        
 
             var allOk = true;
             var i = 1;

@@ -1,0 +1,4 @@
+access,oneway,speed,priority,highway,surface
+no,both,0,0,,
+designated,both,15,1,cycleway,
+yes,both,5.25,1,path,ground

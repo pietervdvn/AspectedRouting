@@ -45,14 +45,14 @@ namespace AspectedRouting
             var luaPrinter = new LuaPrinter(context);
 
             var usedFunctions = profile.CalledFunctionsRecursive(context).Values.SelectMany(v => v).ToHashSet();
-            
+
             foreach (var (aspect, tests) in aspects)
             {
                 if (!usedFunctions.Contains(aspect.Name))
                 {
                     continue;
                 }
-                
+
                 luaPrinter.AddFunction(aspect);
                 if (tests != null)
                 {
@@ -91,7 +91,8 @@ namespace AspectedRouting
                     var profileTests = new List<ProfileTestSuite>();
                     foreach (var behaviourName in profile.Behaviours.Keys)
                     {
-                        var path = profileFi.DirectoryName + "/" + profile.Name + "." + behaviourName + ".behaviour_test.csv";
+                        var path = profileFi.DirectoryName + "/" + profile.Name + "." + behaviourName +
+                                   ".behaviour_test.csv";
                         if (File.Exists(path))
                         {
                             var test = ProfileTestSuite.FromString(context, profile, behaviourName,
@@ -116,6 +117,61 @@ namespace AspectedRouting
             return result;
         }
 
+        private static void Repl(Context c, ProfileMetaData profile)
+        {
+            var behaviour = profile.Behaviours.Keys.First();
+            do
+            {
+                Console.Write(behaviour + " > ");
+                var read = Console.ReadLine();
+                if (read == null)
+                {
+                    return; // End of stream has been reached
+                }
+                if (read.Equals("quit"))
+                {
+                    return;
+                }
+
+                if (read.StartsWith("select"))
+                {
+                    var beh = read.Substring("select".Length + 1).Trim();
+                    if (profile.Behaviours.ContainsKey(beh))
+                    {
+                        behaviour = beh;
+                        Console.WriteLine("Switched to " + beh);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Behaviour not found. Known behaviours are:\n   "+string.Join("\n   ", profile.Behaviours.Keys));
+                    }
+                    
+                    
+                    continue;
+                }
+
+                var tagsRaw = read.Split(";").Select(s => s.Trim());
+                var tags = new Dictionary<string, string>();
+                foreach (var str in tagsRaw)
+                {
+                    var strSplit = str.Split("=");
+                    var k = strSplit[0].Trim();
+                    var v = strSplit[1].Trim();
+                    tags[k] = v;
+                }
+
+                try
+                {
+                    var result = profile.Run(c, behaviour, tags);
+                    Console.WriteLine(result);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            } while (true);
+        }
+
         private static void PrintError(string file, Exception exception)
         {
             var msg = exception.Message;
@@ -130,7 +186,6 @@ namespace AspectedRouting
 
         public static void Main(string[] args)
         {
-
             if (args.Length < 2)
             {
                 Console.WriteLine("Usage: <directory where all aspects and profiles can be found> <outputdirectory>");
@@ -139,14 +194,14 @@ namespace AspectedRouting
 
             var inputDir = args[0];
             var outputDir = args[1];
-            
-            
+
+
             MdPrinter.GenerateHelpText(outputDir + "helpText.md");
 
 
             var files = Directory.EnumerateFiles(inputDir, "*.json", SearchOption.AllDirectories)
                 .ToList();
-            
+
             var context = new Context();
 
             var aspects = ParseAspects(files, context);
@@ -182,6 +237,10 @@ namespace AspectedRouting
                 var luaPrinter = GenerateLua(context, aspects, profile, profileTests);
                 File.WriteAllText(outputDir + "/" + profile.Name + ".lua", luaPrinter.ToLua());
             }
+
+            Repl(context, 
+                profiles.First(p => p.profile.Name.Equals("rollerskate")).profile);
+
         }
     }
 }

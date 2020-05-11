@@ -1,0 +1,4 @@
+access,oneway,speed,priority,highway,_relation:bicycle.network_score
+no,,,,,
+designated,both,15,2,cycleway,
+designated,both,15,22,cycleway,yes

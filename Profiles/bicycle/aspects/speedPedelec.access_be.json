@@ -1,0 +1,18 @@
+{
+	"name":"speedPedelec.access_be",
+	"description": "Describes where a speedpedelec (moped_p) can and can not go. This is quite different from a normal bike",
+	"$default":"no",
+	"value":{
+		"$firstMatchOf":["access","speed_pedelec"],
+		"mapping":{
+			"access":{
+				"no":"no"
+				},
+			"speed_pedelec":{
+				"no":"no",
+				"yes":"yes",
+				"designated":"designated"
+			}
+		}
+	}
+ }

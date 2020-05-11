@@ -1,0 +1,80 @@
+{
+  "name": "bicycle.legal_access",
+  "description": "Gives, for each type of highway, whether or not a normal bicycle can enter legally.\nNote that legal access is a bit 'grey' in the case of roads marked private and permissive, in which case these values are returned ",
+  "unit": "'designated': Access is allowed and even specifically for bicycles\n'yes': bicycles are allowed here\n'permissive': bicycles are allowed here, but this might be a private road or service where usage is allowed, but could be retracted one day by the owner\n'dismount': cycling here is not allowed, but walking with the bicycle is\n'destination': cycling is allowed here, but only if truly necessary to reach the destination\n'private': this is a private road, only go here if the destination is here\n'no': do not cycle here",
+  "$default": "no",
+  "value": {
+    "$firstMatchOf": [
+      "anyways:bicycle",
+      "anyways:access",
+      "anyways:construction",
+      "bicycle",
+      "access",
+      "cycleway:right",
+      "cycleway:left",
+      "cycleway",
+      "highway"
+    ],
+    "value": {
+      "access": {
+        "no": "no",
+        "customers": "private",
+        "private": "private",
+        "#": "Note that we leave out 'yes', as it is meaningless - the default assumption is that everything on OSM is accessible! This forces to fall through to the road type, in order to force `highway=motorway; access=yes` as not to trigger access for bicycles",
+        "permissive": "permissive",
+        "destination": "destination",
+        "delivery": "destination",
+        "service": "destination"
+      },
+      "highway": {
+        "cycleway": "designated",
+        "residential": "yes",
+        "living_street": "yes",
+        "service": "yes",
+        "services": "yes",
+        "track": "yes",
+        "crossing": "dismount",
+        "footway": "dismount",
+        "pedestrian": "dismount",
+        "corridor": "dismount",
+        "path": "yes",
+        "primary": "no",
+        "primary_link": "no",
+        "secondary": "yes",
+        "secondary_link": "yes",
+        "tertiary": "yes",
+        "tertiary_link": "yes",
+        "unclassified": "yes",
+        "road": "yes"
+      },
+      "bicycle": {
+        "yes": "yes",
+        "no": "no",
+        "use_sidepath": "no",
+        "designated": "designated",
+        "permissive": "permissive",
+        "private": "private",
+        "official": "designated",
+        "dismount": "dismount"
+      },
+      "cycleway:right": {
+        "$not": "no"
+      },
+      "cycleway:left": {
+        "$not": "no"
+      },
+      "cycleway": {
+        "$not": "no"
+      },
+      "anyways:bicycle": "$id",
+      "anyways:access": {
+        "no": "no",
+        "destination": "destination",
+        "yes": "yes"
+      },
+      "anyways:construction": {
+        "yes": "no"
+      }
+    }
+  }
+}

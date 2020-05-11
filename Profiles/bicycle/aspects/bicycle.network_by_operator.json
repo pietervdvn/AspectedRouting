@@ -1,0 +1,15 @@
+{
+  "name": "bicycle.network_by_operator",
+  "description": "The 'bicycle.network_score' returns true if the way is part of a cycling network of a certain (group of) operators",
+  "$memberOf": {
+    "$mustMatch": {
+      "type": "route",
+      "route": "bicycle",
+      "#": {
+        "note": "This block is commented out. A lot of networks we want to perform route planning on, are still proposed",
+        "state": {"$not": "proposed"}},
+      "operator": {"$containedIn": "#networkOperator"}
+    }
+  }
+}
+

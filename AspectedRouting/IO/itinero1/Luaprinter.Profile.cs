@@ -95,7 +95,7 @@ namespace AspectedRouting.IO.itinero1
                     func.Add($"    matched = {preProcName}(parameters, relation_tags, subresult)");
                     func.Add("    if (matched) then");
                     tagKey = "_relation:" + behaviourName.FunctionName() + ":" + calledInFunction.FunctionName();
-                    _neededKeys.Add("_relation:" + calledInFunction.FunctionName()); // Slightly different then tagkey!
+                    _neededKeys.Add(tagKey);
                     func.Add($"        result.attributes_to_keep[\"{tagKey}\"] = \"yes\"");
                     func.Add("    end");
                 }

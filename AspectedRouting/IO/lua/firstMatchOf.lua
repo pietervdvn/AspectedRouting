@@ -6,7 +6,7 @@ function first_match_of(tags, result, order_of_keys, table)
             local mapping = table[key]
             if (type(mapping) == "table") then
                 local resultValue = mapping[v]
-                if (v ~= nil) then
+                if (resultValue ~= nil) then
                     result.attributes_to_keep[key] = v
                     return resultValue
                 end

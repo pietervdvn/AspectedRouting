@@ -8,9 +8,9 @@ function remove_relation_prefix(tags, name)
 
     local new_tags = {}
     for k, v in pairs(tags) do
-        local prefix = "_relation:" .. name;
+        local prefix = "_relation:" .. name .. ":";
         if (string.start(prefix, k)) then
-            local new_key = "_relation:" .. string.sub(k, string.len(prefix))
+            local new_key = "_relation:" .. string.sub(k, string.len(prefix) + 1) -- plus 1: sub uses one-based indexing to select the start
             new_tags[new_key] = v
         else
             new_tags[k] = v

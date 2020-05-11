@@ -20,9 +20,17 @@ namespace AspectedRouting.IO.jsonParser
             }
             try
             {
-                return ParseExpression(prop, c)
-                    .Specialize(new Curry(Typs.Tags, new Var("a")))
-                    .Optimize();
+                var expr = ParseExpression(prop, c).Optimize();
+                expr = Funcs.Either(Funcs.Id, Funcs.Const, expr);
+                
+                var specialized = expr.Specialize(new Curry(Typs.Tags, new Var("a")));
+                if (specialized == null)
+                {
+                    throw new ArgumentException("The expression for " + property +
+                                                " hasn't the right type of 'Tags -> a'; it has types " +
+                                                string.Join(",", expr.Types) + "\n" + expr.TypeBreakdown());
+                }
+                return specialized.Optimize();
             }
             catch (Exception exc)
             {
