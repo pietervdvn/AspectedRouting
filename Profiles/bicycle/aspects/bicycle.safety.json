@@ -1,6 +1,6 @@
 {
   "name": "bicycle.safety",
-  "description": "Determines how safe a cyclist feels on a certain road, mostly based on car pressure. This is a relatively ",
+  "description": "Determines how safe a cyclist feels on a certain road, mostly based on car pressure. This is quite a subjective measurem",
   "unit": "safety",
   "$default": 1,
   "value": {

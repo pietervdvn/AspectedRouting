@@ -13,6 +13,7 @@
       "cycleway:right",
       "cycleway:left",
       "cycleway",
+      "service",
       "highway"
     ],
     "value": {
@@ -46,6 +47,12 @@
         "tertiary_link": "yes",
         "unclassified": "yes",
         "road": "yes"
+      },
+      "service": {
+        "parking_aisle": "permissive",
+        "driveway": "private",
+        "alley": "yes",
+        "bus": "no"
       },
       "bicycle": {
         "yes": "yes",

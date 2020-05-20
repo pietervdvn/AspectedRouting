@@ -3,7 +3,7 @@
 	"description": "Describes where a speedpedelec (moped_p) can and can not go. This is quite different from a normal bike",
 	"$default":"no",
 	"value":{
-		"$firstMatchOf":["access","speed_pedelec"],
+		"$firstMatchOf":["access","speed_pedelec","designation"],
 		"mapping":{
 			"access":{
 				"no":"no"
@@ -12,6 +12,9 @@
 				"no":"no",
 				"yes":"yes",
 				"designated":"designated"
+			},
+			"designation":{
+				"towpath":"no"
 			}
 		}
 	}

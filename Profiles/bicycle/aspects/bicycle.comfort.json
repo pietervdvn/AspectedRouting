@@ -42,8 +42,8 @@
         "unhewn_cobblestone": 0.75,
         "cobblestone": 0.8,
         "unpaved": 0.75,
-        "compacted": 1.1,
-        "fine_gravel": 0.99,
+        "compacted": 0.95,
+        "fine_gravel": 0.7,
         "gravel": 0.9,
         "dirt": 0.6,
         "earth": 0.6,
@@ -55,6 +55,10 @@
         "snow": 0.5,
         "pebblestone": 0.5,
         "mud": 0.4
+      },
+      "route": {
+        "#": "Discourage ferries",
+        "ferry": 0.01
       }
     }
   }

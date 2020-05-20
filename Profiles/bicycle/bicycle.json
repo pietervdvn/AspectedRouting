@@ -102,13 +102,12 @@
       "#networkOperator": [
         "Stad Genk"
       ],
-      "#comfort": 0,
       "#safety": 1
     },
     "cycle_highway": {
-      "description": "A route preferring the 'cycle-highways' ",
+      "description": "A route preferring the 'cycle-highways'. On non-cycleways, fastest is used (with a very low factor) in order to make sure the behaviour there is defined ",
       "#cycleHighwayNetworkScore": 20,
-      "#safety": 0
+      "#timeNeeded": 0.1
     },
     "node_network": {
       "description": "A route following the recreational node network. Might make detours",
