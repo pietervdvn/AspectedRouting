@@ -26,7 +26,7 @@ namespace AspectedRouting.Tests
                 "oneway "+Oneway,
                 "speed "+Speed,
                 "priority "+Priority,
-                "because "+PriorityExplanation
+                "because \n  "+PriorityExplanation
                 );
         }
     }

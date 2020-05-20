@@ -17,7 +17,7 @@ namespace AspectedRouting.IO.itinero1
         /// A dictionary containing the implementation of basic functions
         /// </summary>
         /// <returns></returns>
-        private static IEnumerable<string> LoadFunctions(List<string> names)
+        private static IEnumerable<string> LoadFunctions(IEnumerable<string> names)
         {
             var imps = new List<string>();
 
@@ -49,6 +49,7 @@ namespace AspectedRouting.IO.itinero1
             deps.Add("unitTestProfile");
             deps.Add("inv");
             deps.Add("double_compare");
+            deps.Add("spoken_instructions");
 
             var code = new List<string>();
 

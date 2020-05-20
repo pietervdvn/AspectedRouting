@@ -14,7 +14,7 @@ namespace AspectedRouting
     static class Program
     {
         public static IEnumerable<(AspectMetadata aspect, AspectTestSuite tests)> ParseAspects(
-            this IEnumerable<string> jsonFileNames, Context context)
+            this IEnumerable<string> jsonFileNames, List<string> testFileNames, Context context)
         {
             var aspects = new List<(AspectMetadata aspect, AspectTestSuite tests)>();
             foreach (var file in jsonFileNames)
@@ -22,20 +22,37 @@ namespace AspectedRouting
                 var fi = new FileInfo(file);
                 Console.WriteLine("Parsing " + file);
                 var aspect = JsonParser.AspectFromJson(context, File.ReadAllText(file), fi.Name);
-                if (aspect != null)
-                {
-                    var testPath = fi.DirectoryName + "/" + aspect.Name + ".test.csv";
-                    AspectTestSuite tests = null;
-                    if (File.Exists(testPath))
-                    {
-                        tests = AspectTestSuite.FromString(aspect, File.ReadAllText(testPath));
-                    }
+                if (aspect == null) continue;
 
-                    aspects.Add((aspect, tests));
+
+                var testName = aspect.Name + ".test.csv";
+                var testPath = testFileNames.FindTest(testName);
+                AspectTestSuite tests = null;
+                if (!string.IsNullOrEmpty(testPath) && File.Exists(testPath))
+                {
+                    tests = AspectTestSuite.FromString(aspect, File.ReadAllText(testPath));
                 }
+
+                aspects.Add((aspect, tests));
             }
 
             return aspects;
+        }
+
+        private static string FindTest(this IEnumerable<string> testFileNames, string testName)
+        {
+            var testPaths = testFileNames.Where(nm => nm.EndsWith(testName)).ToList();
+            if (testPaths.Count > 1)
+            {
+                Console.WriteLine("[WARNING] Multiple tests found for " + testName + ", using only one arbitrarily");
+            }
+
+            if (testPaths.Count > 0)
+            {
+                return testPaths.First();
+            }
+
+            return null;
         }
 
         private static LuaPrinter GenerateLua(Context context,
@@ -71,7 +88,7 @@ namespace AspectedRouting
         }
 
         private static IEnumerable<(ProfileMetaData profile, List<ProfileTestSuite> profileTests)> ParseProfiles(
-            IEnumerable<string> jsonFiles, Context context)
+            IEnumerable<string> jsonFiles, IReadOnlyCollection<string> testFiles, Context context)
         {
             var result = new List<(ProfileMetaData profile, List<ProfileTestSuite> profileTests)>();
             foreach (var jsonFile in jsonFiles)
@@ -87,13 +104,11 @@ namespace AspectedRouting
 
                     profile.SanityCheckProfile(context);
 
-                    var profileFi = new FileInfo(jsonFile);
                     var profileTests = new List<ProfileTestSuite>();
                     foreach (var behaviourName in profile.Behaviours.Keys)
                     {
-                        var path = profileFi.DirectoryName + "/" + profile.Name + "." + behaviourName +
-                                   ".behaviour_test.csv";
-                        if (File.Exists(path))
+                        var path = testFiles.FindTest($"{profile.Name}.{behaviourName}.behaviour_test.csv");
+                        if (path != null && File.Exists(path))
                         {
                             var test = ProfileTestSuite.FromString(context, profile, behaviourName,
                                 File.ReadAllText(path));
@@ -122,12 +137,13 @@ namespace AspectedRouting
             var behaviour = profile.Behaviours.Keys.First();
             do
             {
-                Console.Write(behaviour + " > ");
+                Console.Write(profile.Name + "." + behaviour + " > ");
                 var read = Console.ReadLine();
                 if (read == null)
                 {
                     return; // End of stream has been reached
                 }
+
                 if (read.Equals("quit"))
                 {
                     return;
@@ -143,10 +159,11 @@ namespace AspectedRouting
                     }
                     else
                     {
-                        Console.WriteLine("Behaviour not found. Known behaviours are:\n   "+string.Join("\n   ", profile.Behaviours.Keys));
+                        Console.WriteLine("Behaviour not found. Known behaviours are:\n   " +
+                                          string.Join("\n   ", profile.Behaviours.Keys));
                     }
-                    
-                    
+
+
                     continue;
                 }
 
@@ -202,16 +219,19 @@ namespace AspectedRouting
             var files = Directory.EnumerateFiles(inputDir, "*.json", SearchOption.AllDirectories)
                 .ToList();
 
+            var tests = Directory.EnumerateFiles(inputDir, "*test.csv", SearchOption.AllDirectories)
+                .ToList();
+
             var context = new Context();
 
-            var aspects = ParseAspects(files, context);
+            var aspects = ParseAspects(files, tests, context);
 
             foreach (var (aspect, _) in aspects)
             {
                 context.AddFunction(aspect.Name, aspect);
             }
 
-            var profiles = ParseProfiles(files, context);
+            var profiles = ParseProfiles(files, tests, context);
 
 
             // With everything parsed and typechecked, time for tests
@@ -238,9 +258,8 @@ namespace AspectedRouting
                 File.WriteAllText(outputDir + "/" + profile.Name + ".lua", luaPrinter.ToLua());
             }
 
-            Repl(context, 
-                profiles.First(p => p.profile.Name.Equals("rollerskate")).profile);
-
+            Repl(context,
+                profiles.First(p => p.profile.Name.Equals("bicycle")).profile);
         }
     }
 }

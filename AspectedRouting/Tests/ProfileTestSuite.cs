@@ -77,12 +77,20 @@ namespace AspectedRouting.Tests
                             weight = double.Parse(testData[3]);
                         }
 
+                        
+                        
                         var expected = new ProfileResult(
                             testData[0],
                             testData[1],
                             speed,
                             weight
                         );
+
+                        if (expected.Priority == 0 && expected.Access != "no")
+                        {
+                            throw new ArgumentException("A priority of zero is interpreted as 'no access' - don't use it");
+                        }
+                        
                         var vals = testData.GetRange(4, testData.Count - 4);
                         var tags = new Dictionary<string, string>();
                         for (int i = 0; i < keys.Count; i++)

@@ -422,7 +422,6 @@ namespace AspectedRouting.IO.jsonParser
         {
             var expr = GetTopLevelExpression(e, context);
 
-
             var targetTypes = new List<Type>();
             foreach (var t in expr.Types)
             {
