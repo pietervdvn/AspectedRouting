@@ -254,7 +254,24 @@ namespace AspectedRouting
                     test.Run(context);
                 }
 
+
+                Console.WriteLine("\n\n\n---------- " + profile.Name + " --------------");
+                foreach (var (key, values) in profile.AllExpressions(context).PossibleTags())
+                {
+                    var vs = "*";
+                    if (values.Any())
+                    {
+                        vs = string.Join(", ", values);
+                    }
+
+                    Console.WriteLine(key + ": " + vs);
+                }
+                    
+                Console.WriteLine("\n\n\n------------------------");
+
                 var luaPrinter = GenerateLua(context, aspects, profile, profileTests);
+                
+                
                 File.WriteAllText(outputDir + "/" + profile.Name + ".lua", luaPrinter.ToLua());
             }
 

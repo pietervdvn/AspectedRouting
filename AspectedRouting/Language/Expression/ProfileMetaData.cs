@@ -44,6 +44,32 @@ namespace AspectedRouting.Language.Expression
             Behaviours = behaviours;
         }
 
+        public List<IExpression> AllExpressions(Context ctx)
+        {
+            var l = new List<IExpression> {Access, Oneway, Speed};
+            l.AddRange(DefaultParameters.Values);
+            l.AddRange(Behaviours.Values.SelectMany(b => b.Values));
+            l.AddRange(Priority.Values);
+
+
+            var allExpr = new List<IExpression>();
+            allExpr.AddRange(l);
+            foreach (var e in l)
+            {
+                e.Visit(expression =>
+                {
+                    if (expression is FunctionCall fc)
+                    {
+                        var called = ctx.GetFunction(fc.CalledFunctionName);
+                        allExpr.Add(called);
+                    }
+                    return true;
+                });
+            }
+
+            return allExpr;
+        }
+
 
         public ProfileResult Run(Context c, string behaviour, Dictionary<string, string> tags)
         {
@@ -52,6 +78,7 @@ namespace AspectedRouting.Language.Expression
                 throw new ArgumentException(
                     $"Profile {Name} does not contain the behaviour {behaviour}\nTry one of {string.Join(",", Behaviours.Keys)}");
             }
+
             var parameters = new Dictionary<string, IExpression>();
 
             foreach (var (k, v) in DefaultParameters)
@@ -65,7 +92,7 @@ namespace AspectedRouting.Language.Expression
             }
 
             c = c.WithParameters(parameters);
-            
+
             tags = new Dictionary<string, string>(tags);
             var canAccess = Access.Run(c, tags);
             tags["access"] = "" + canAccess;

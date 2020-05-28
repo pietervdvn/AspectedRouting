@@ -8,7 +8,8 @@ namespace AspectedRouting.Language.Functions
 {
     public class FirstMatchOf : Function
     {
-        public override string Description { get; } = "Parses a string into a numerical value";
+        public override string Description { get; } = "This higherorder function takes a list of keys, a mapping (function over tags) and a collection of tags. It will try the function for the first key (and it's respective value). If the function fails (it gives null), it'll try the next key.\n\n" +
+                                                      "E.g. `$firstMatchOf ['maxspeed','highway'] {'maxspeed' --> $parse, 'highway' --> {residential --> 30, tertiary --> 50}}` applied on `{maxspeed=70, highway=tertiary}` will yield `70` as that is the first key in the list; `{highway=residential}` will yield `30`.";
         public override List<string> ArgNames { get; } = new List<string> {"s"};
 
         public FirstMatchOf() : base("firstMatchOf", true,

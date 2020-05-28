@@ -398,6 +398,36 @@ namespace AspectedRouting.Language
             });
         }
 
+
+        public static Dictionary<string, HashSet<string>> PossibleTags(this IEnumerable<IExpression> exprs)
+        {
+            var usedTags = new Dictionary<string, HashSet<string>>();
+            foreach (var expr in exprs)
+            {
+
+                var possible = expr.PossibleTags();
+                if (possible == null)
+                {
+                    continue;
+                }
+                foreach (var (key, values) in possible)
+                {
+                    if (!usedTags.TryGetValue(key, out var collection))
+                    {
+                        collection = new HashSet<string>();
+                        usedTags[key] = collection;
+                    }
+
+                    foreach (var v in values)
+                    {
+                        collection.Add(v);
+                    }
+                }
+            }
+
+            return usedTags;
+        }
+
         /// <summary>
         /// Returns which tags are used in this calculation
         /// 
@@ -406,7 +436,6 @@ namespace AspectedRouting.Language
         /// <returns>A dictionary containing all possible values. An entry with an empty list indicates a wildcard</returns>
         public static Dictionary<string, List<string>> PossibleTags(this IExpression e)
         {
-            var result = new Dictionary<string, List<string>>();
             var mappings = new List<Mapping>();
             e.Visit(x =>
             {
@@ -437,6 +466,7 @@ namespace AspectedRouting.Language
 
             // Visit will have the main mapping at the first position
             var rootMapping = mappings[0];
+            var result = new Dictionary<string, List<string>>();
 
             foreach (var (key, expr) in rootMapping.StringToResultFunctions)
             {
