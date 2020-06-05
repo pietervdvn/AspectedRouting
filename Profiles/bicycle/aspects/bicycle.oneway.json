@@ -39,12 +39,15 @@
       },
       "cycleway:left": {
         "no": "with",
+        "none": "with",
         "yes": "both",
         "lane": "both",
         "track": "both",
         "shared_lane": "both",
         "share_busway": "both",
-        "opposite_lane": "both"
+        "opposite_lane": "both",
+        "opposite_track": "both",
+        "opposite": "both",
       }
     }
   }
