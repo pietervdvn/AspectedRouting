@@ -43,7 +43,8 @@
         "lane": "both",
         "track": "both",
         "shared_lane": "both",
-        "share_busway": "both"
+        "share_busway": "both",
+        "opposite_lane": "both"
       }
     }
   }
