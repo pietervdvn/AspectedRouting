@@ -323,14 +323,16 @@ namespace AspectedRouting.IO.jsonParser
             var allExprs = allArgs
                 .Where(kv => !kv.NameEquals("#")) // Leave out comments
                 .ToDictionary(kv => kv.Name, kv => kv.Value.ParseExpression(context));
-
+            
 
             if (allExprs.Count > 1)
             {
                 if (func.ArgNames == null || func.ArgNames.Count < 2)
                     throw new ArgumentException("{funcName} does not specify argument names");
 
-                foreach (var argName in func.ArgNames)
+                
+                foreach (var argName in func.ArgNames.GetRange(1, func.ArgNames.Count - 2))
+                    // We skip the first argument, that one is already added
                 {
                     args.Add(allExprs[argName]);
                 }
@@ -411,6 +413,11 @@ namespace AspectedRouting.IO.jsonParser
 
                 // We apply the builtin function through a dot
                 return eithered;
+            }
+
+            if (mapping != null)
+            {
+                return mapping;
             }
 
 

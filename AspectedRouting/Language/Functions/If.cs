@@ -7,7 +7,8 @@ namespace AspectedRouting.Language.Functions
     public class If : Function
     {
         private static Var a = new Var("a");
-        
+        private static Var b = new Var("b");
+
         public override string Description { get; } = "Selects either one of the branches, depending on the condition." +
                                                       "If the `else` branch is not set, `null` is returned in the condition is false.";
         public override List<string> ArgNames { get; } = new List<string> {"condition", "then", "else"};
@@ -16,7 +17,13 @@ namespace AspectedRouting.Language.Functions
             new[]
             {
                 Curry.ConstructFrom(a, Typs.Bool, a, a),
-                Curry.ConstructFrom(a, Typs.Bool, a)
+                Curry.ConstructFrom(a, Typs.Bool, a),
+                
+                Curry.ConstructFrom(a, 
+                    new Curry(b, Typs.Bool),
+                    new Curry(b, a),
+                    new Curry(b, a),
+                    b)
             }
         )
         {
