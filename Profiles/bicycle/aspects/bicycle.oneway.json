@@ -47,7 +47,7 @@
         "share_busway": "both",
         "opposite_lane": "both",
         "opposite_track": "both",
-        "opposite": "both",
+        "opposite": "both"
       }
     }
   }
