@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using AspectedRouting.IO.itinero1;
+using AspectedRouting.IO.LuaSkeleton;
 using AspectedRouting.Language;
 using AspectedRouting.Language.Functions;
 using Xunit;
@@ -21,7 +22,7 @@ namespace AspectedRouting.Test
                 }
             );
 
-            var luaPrinter = new LuaPrinter(new Context());
+            var luaPrinter = new LuaSkeleton(new Context());
             var result = luaPrinter.MappingToLua(mapping);
 
             Assert.Equal(
@@ -44,7 +45,7 @@ namespace AspectedRouting.Test
                     )
                 }
             );
-            var luaPrinter = new LuaPrinter(new Context());
+            var luaPrinter = new LuaSkeleton(new Context());
             var result = luaPrinter.MappingToLua(mapping);
             Assert.Equal("{\n    a = {\n        b = 42\n    }\n}", result);
         }

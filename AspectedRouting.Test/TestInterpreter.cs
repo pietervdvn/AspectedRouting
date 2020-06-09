@@ -25,7 +25,7 @@ namespace AspectedRouting.Test
                 {"ferry", "yes"}
             };
 
-            Assert.Equal("tags -> double", string.Join(", ", aspect.Types));
+            Assert.Equal("tags -> pdouble", string.Join(", ", aspect.Types));
             Assert.Equal(42d, new Apply(aspect, new Constant(tags)).Evaluate(null));
         }
 
