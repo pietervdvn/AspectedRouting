@@ -9,6 +9,16 @@ namespace AspectedRouting
             return s.Replace("\n", "\n    ");
         }
 
+        public static List<T> InList<T>(this T t)
+        {
+            return new List<T> {t};
+        }
+
+        public static string Lined(this IEnumerable<string> lines)
+        {
+            return string.Join("\n", lines);
+        }
+        
         public static int Multiply(this IEnumerable<int> ints)
         {
             var factor = 1;

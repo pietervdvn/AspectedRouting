@@ -23,7 +23,7 @@ namespace AspectedRouting.IO.itinero1
             return "{" + string.Join(", ", contents) + "}";
         }
 
-        public static string FunctionName(this string s)
+        public static string AsLuaIdentifier(this string s)
         {
             return s.Replace("$", "")
                 .Replace("#", "")

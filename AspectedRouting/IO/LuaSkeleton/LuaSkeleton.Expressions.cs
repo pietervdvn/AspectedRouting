@@ -2,18 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AspectedRouting.IO.itinero1;
 using AspectedRouting.Language;
 using AspectedRouting.Language.Expression;
 using AspectedRouting.Language.Functions;
 using AspectedRouting.Language.Typ;
 using static AspectedRouting.Language.Deconstruct;
 
-namespace AspectedRouting.IO.itinero1
+namespace AspectedRouting.IO.LuaSkeleton
 {
-    public partial class LuaPrinter
+    public partial class LuaSkeleton
     {
-        private string ToLua(IExpression bare, string key = "nil")
+        internal string ToLua(IExpression bare, string key = "nil")
         {
+            
             var collectedMapping = new List<IExpression>();
             var order = new List<IExpression>();
 
@@ -63,6 +65,9 @@ namespace AspectedRouting.IO.itinero1
             var func = new List<IExpression>();
 
 
+
+            
+            
             if (
                 UnApply(
                     UnApply(IsFunc(Funcs.Dot), Assign(func)),
@@ -155,7 +160,7 @@ namespace AspectedRouting.IO.itinero1
                     }
 
                     AddFunction(called);
-                    return $"{fc.CalledFunctionName.FunctionName()}(parameters, tags, result)";
+                    return $"{fc.CalledFunctionName.AsLuaIdentifier()}(parameters, tags, result)";
                 case Constant c:
                     return ConstantToLua(c);
                 case Mapping m:
@@ -184,7 +189,7 @@ namespace AspectedRouting.IO.itinero1
                     return ToLua(collected.First(), key);
 
                 case Parameter p:
-                    return $"parameters[\"{p.ParamName.FunctionName()}\"]";
+                    return $"parameters[\"{p.ParamName.AsLuaIdentifier()}\"]";
                 default:
                     throw new Exception("Could not convert " + bare + " to a lua expression");
             }

@@ -8,6 +8,7 @@ namespace AspectedRouting.Language
     public class Context
     {
         public readonly Dictionary<string, IExpression> Parameters = new Dictionary<string, IExpression>();
+
         public readonly Dictionary<string, AspectMetadata> DefinedFunctions = new Dictionary<string, AspectMetadata>();
 
         public readonly string AspectName;
@@ -46,6 +47,23 @@ namespace AspectedRouting.Language
             }
 
             DefinedFunctions[name] = function;
+        }
+
+        public AspectMetadata GetAspect(string name)
+        {
+            if (name.StartsWith("$"))
+            {
+                name = name.Substring(1);
+            }
+
+            if (DefinedFunctions.ContainsKey(name))
+            {
+                return DefinedFunctions[name];
+            }
+
+            throw new ArgumentException(
+                $"The aspect {name} is not a defined function. Known functions are " +
+                string.Join(", ", DefinedFunctions.Keys));
         }
 
         public IExpression GetFunction(string name)

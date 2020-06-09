@@ -35,9 +35,9 @@ namespace AspectedRouting.Language.Expression
             Author = author;
             Filename = filename;
             VehicleTyps = vehicleTyps;
-            Access = access;
-            Oneway = oneway;
-            Speed = speed;
+            Access = access.Optimize();
+            Oneway = oneway.Optimize();
+            Speed = speed.Optimize();
             Priority = priority;
             Metadata = metadata;
             DefaultParameters = defaultParameters;

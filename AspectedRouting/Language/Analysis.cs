@@ -207,6 +207,8 @@ namespace AspectedRouting.Language
         {
             // Read as: this function calls the value-function
             var result = new Dictionary<string, List<string>>();
+
+
             var calledFunctions = new Queue<string>();
 
             void ScanExpression(IExpression e, string inFunction)
@@ -250,6 +252,62 @@ namespace AspectedRouting.Language
 
 
             return result;
+        }
+
+        public static (HashSet<string> parameterName, HashSet<string> calledFunctionNames) DirectlyAndInderectlyCalled(
+            this List<IExpression> exprs, Context ctx)
+        {
+            var parameters = new HashSet<string>();
+            var dependencies = new HashSet<string>();
+
+            var queue = new Queue<IExpression>();
+            exprs.ForEach(queue.Enqueue);
+
+            while (queue.TryDequeue(out var next))
+            {
+                var (p, deps) = next.DirectlyCalled();
+                parameters.UnionWith(p);
+                var toCheck = deps.Except(dependencies);
+                dependencies.UnionWith(deps);
+
+                foreach (var fName in toCheck)
+                {
+                   queue.Enqueue(ctx.GetFunction(fName));
+                }
+            }
+
+            return (parameters, dependencies);
+        }
+
+
+        /// <summary>
+        ///  Generates an overview of the dependencies of the expression, both which parameters it needs and what other functions (builtin or defined) it needs.
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <returns></returns>
+        public static (HashSet<string> parameterName, HashSet<string> calledFunctionNames) DirectlyCalled(
+            this IExpression expr)
+        {
+            var parameters = new HashSet<string>();
+            var dependencies = new HashSet<string>();
+
+            expr.Visit(e =>
+            {
+                if (e is FunctionCall fc)
+                {
+                    dependencies.Add(fc.CalledFunctionName);
+                }
+
+                if (e is Parameter p)
+                {
+                    parameters.Add(p.ParamName);
+                }
+
+                return true;
+            });
+
+
+            return (parameters, dependencies);
         }
 
         public static string TypeBreakdown(this IExpression e)
@@ -404,12 +462,12 @@ namespace AspectedRouting.Language
             var usedTags = new Dictionary<string, HashSet<string>>();
             foreach (var expr in exprs)
             {
-
                 var possible = expr.PossibleTags();
                 if (possible == null)
                 {
                     continue;
                 }
+
                 foreach (var (key, values) in possible)
                 {
                     if (!usedTags.TryGetValue(key, out var collection))

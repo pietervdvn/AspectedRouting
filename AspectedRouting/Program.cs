@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using AspectedRouting.IO;
 using AspectedRouting.IO.itinero1;
+using AspectedRouting.IO.itinero2;
 using AspectedRouting.IO.jsonParser;
 using AspectedRouting.Language;
 using AspectedRouting.Language.Expression;
@@ -13,7 +14,7 @@ namespace AspectedRouting
 {
     static class Program
     {
-        public static IEnumerable<(AspectMetadata aspect, AspectTestSuite tests)> ParseAspects(
+        public static List<(AspectMetadata aspect, AspectTestSuite tests)> ParseAspects(
             this IEnumerable<string> jsonFileNames, List<string> testFileNames, Context context)
         {
             var aspects = new List<(AspectMetadata aspect, AspectTestSuite tests)>();
@@ -55,42 +56,11 @@ namespace AspectedRouting
             return null;
         }
 
-        private static LuaPrinter GenerateLua(Context context,
-            IEnumerable<(AspectMetadata aspect, AspectTestSuite tests)> aspects,
-            ProfileMetaData profile, List<ProfileTestSuite> profileTests)
-        {
-            var luaPrinter = new LuaPrinter(context);
 
-            var usedFunctions = profile.CalledFunctionsRecursive(context).Values.SelectMany(v => v).ToHashSet();
-
-            foreach (var (aspect, tests) in aspects)
-            {
-                if (!usedFunctions.Contains(aspect.Name))
-                {
-                    continue;
-                }
-
-                luaPrinter.AddFunction(aspect);
-                if (tests != null)
-                {
-                    luaPrinter.AddTestSuite(tests);
-                }
-            }
-
-            luaPrinter.AddProfile(profile);
-            foreach (var testSuite in profileTests)
-            {
-                luaPrinter.AddTestSuite(testSuite);
-            }
-
-
-            return luaPrinter;
-        }
-
-        private static IEnumerable<(ProfileMetaData profile, List<ProfileTestSuite> profileTests)> ParseProfiles(
+        private static List<(ProfileMetaData profile, List<BehaviourTestSuite> profileTests)> ParseProfiles(
             IEnumerable<string> jsonFiles, IReadOnlyCollection<string> testFiles, Context context)
         {
-            var result = new List<(ProfileMetaData profile, List<ProfileTestSuite> profileTests)>();
+            var result = new List<(ProfileMetaData profile, List<BehaviourTestSuite> profileTests)>();
             foreach (var jsonFile in jsonFiles)
             {
                 try
@@ -104,13 +74,13 @@ namespace AspectedRouting
 
                     profile.SanityCheckProfile(context);
 
-                    var profileTests = new List<ProfileTestSuite>();
+                    var profileTests = new List<BehaviourTestSuite>();
                     foreach (var behaviourName in profile.Behaviours.Keys)
                     {
                         var path = testFiles.FindTest($"{profile.Name}.{behaviourName}.behaviour_test.csv");
                         if (path != null && File.Exists(path))
                         {
-                            var test = ProfileTestSuite.FromString(context, profile, behaviourName,
+                            var test = BehaviourTestSuite.FromString(context, profile, behaviourName,
                                 File.ReadAllText(path));
                             profileTests.Add(test);
                         }
@@ -201,6 +171,23 @@ namespace AspectedRouting
             Console.WriteLine($"Error in the file {file}:\n    {msg}");
         }
 
+        private static void PrintUsedTags(ProfileMetaData profile, Context context)
+        {
+            Console.WriteLine("\n\n\n---------- " + profile.Name + " --------------");
+            foreach (var (key, values) in profile.AllExpressions(context).PossibleTags())
+            {
+                var vs = "*";
+                if (values.Any())
+                {
+                    vs = string.Join(", ", values);
+                }
+
+                Console.WriteLine(key + ": " + vs);
+            }
+
+            Console.WriteLine("\n\n\n------------------------");
+        }
+
         public static void Main(string[] args)
         {
             if (args.Length < 2)
@@ -255,24 +242,26 @@ namespace AspectedRouting
                 }
 
 
-                Console.WriteLine("\n\n\n---------- " + profile.Name + " --------------");
-                foreach (var (key, values) in profile.AllExpressions(context).PossibleTags())
+                PrintUsedTags(profile, context);
+
+                var aspectTests = aspects.Select(a => a.tests).ToList();
+                var luaProfile = new LuaPrinter1(profile, context,
+                    aspectTests,
+                    profileTests
+                ).ToLua();
+                File.WriteAllText(outputDir + "/" + profile.Name + ".lua", luaProfile);
+
+                foreach (var (behaviourName, behaviourParameters) in profile.Behaviours)
                 {
-                    var vs = "*";
-                    if (values.Any())
-                    {
-                        vs = string.Join(", ", values);
-                    }
-
-                    Console.WriteLine(key + ": " + vs);
+                    var lua2behaviour = new LuaPrinter2(
+                        profile,
+                        behaviourName,
+                        context,
+                        aspectTests,
+                        profileTests.Where(testsSuite => testsSuite.BehaviourName == behaviourName)
+                    ).ToLua();
+                    File.WriteAllText($"{outputDir}/itinero2/{profile.Name}.{behaviourName}.lua", lua2behaviour);
                 }
-                    
-                Console.WriteLine("\n\n\n------------------------");
-
-                var luaPrinter = GenerateLua(context, aspects, profile, profileTests);
-                
-                
-                File.WriteAllText(outputDir + "/" + profile.Name + ".lua", luaPrinter.ToLua());
             }
 
             Repl(context,

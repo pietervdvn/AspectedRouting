@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
+using AspectedRouting.IO.itinero1;
 using AspectedRouting.Language;
 using AspectedRouting.Language.Expression;
 
-namespace AspectedRouting.IO.itinero1
+namespace AspectedRouting.IO.LuaSkeleton
 {
-    public partial class LuaPrinter
+    public partial class LuaSkeleton
     {
-        private readonly HashSet<string> _alreadyAddedFunctions = new HashSet<string>();
 
         public void AddFunction(AspectMetadata meta)
         {
@@ -31,7 +31,7 @@ namespace AspectedRouting.IO.itinero1
             {
                 if (e is Function f && f.Name.Equals(Funcs.MemberOf.Name))
                 {
-                    funcNameDeclaration = $"\n    local funcName = \"{meta.Name.FunctionName()}\"";
+                    funcNameDeclaration = $"\n    local funcName = \"{meta.Name.AsLuaIdentifier()}\"";
                 }
 
                 return true;
@@ -49,16 +49,12 @@ namespace AspectedRouting.IO.itinero1
                 "Number of combintations: " + numberOfCombinations,
                 "Returns values: ",
                 "]]",
-                "function " + meta.Name.FunctionName() + "(parameters, tags, result)" + funcNameDeclaration,
+                "function " + meta.Name.AsLuaIdentifier() + "(parameters, tags, result)" + funcNameDeclaration,
                 "    return " + ToLua(meta.ExpressionImplementation),
                 "end"
             );
 
-            _code.Add(impl);
-            foreach (var k in possibleTags.Keys)
-            {
-                _neededKeys.Add(k); // To generate a whitelist of OSM-keys that should be kept
-            }
+            _functionImplementations.Add(impl);
         }
     }
 }

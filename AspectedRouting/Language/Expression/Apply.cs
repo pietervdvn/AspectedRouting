@@ -185,6 +185,8 @@ namespace AspectedRouting.Language.Expression
                 return Funcs.Id;
             }
 
+           
+
 
             if (Types.Count() > 1)
             {
@@ -197,6 +199,18 @@ namespace AspectedRouting.Language.Expression
                 }
 
                 return new Apply(_debugInfo, optimized);
+            }
+            
+            {
+                var arg = new List<IExpression>();
+                if (
+                    Deconstruct.UnApplyAny(
+                        Deconstruct.IsFunc(Funcs.Id),
+                        Deconstruct.Assign(arg)
+                    ).Invoke(this))
+                {
+                    return arg.First();
+                }
             }
 
             {
@@ -274,6 +288,7 @@ namespace AspectedRouting.Language.Expression
             {
                 return;
             }
+
             foreach (var (_, (f, a)) in FunctionApplications)
             {
                 f.Visit(visitor);

@@ -1,20 +1,20 @@
 failed_profile_tests = false
 --[[
-expected should be a table containing 'access', 'speed' and 'weight'
+expected should be a table containing 'access', 'speed' and 'priority'
 ]]
 function unit_test_profile(profile_function, profile_name, index, expected, tags)
     local result = { attributes_to_keep = {} }
     local profile_failed = false
     profile_function(tags, result)
 
-    local accessCorrect = (result.access == 0 and (expected.access == "no" or expected.weight <= 0)) or result.access == 1
+    local accessCorrect = (result.access == 0 and (expected.access == "no" or expected.priority <= 0)) or result.access == 1
     if (not accessCorrect) then
         print("Test " .. tostring(index) .. " failed for " .. profile_name .. ".access: expected " .. expected.access .. " but got " .. result.access)
         profile_failed = true
         failed_profile_tests = true
     end
 
-    if (expected.access == "no" or expected.weight <= 0) then
+    if (expected.access == "no" or expected.priority <= 0) then
         -- we cannot access this road, the other results are irrelevant
         if (profile_failed) then
             print("The used tags for test " .. tostring(index) .. " are:")
@@ -46,8 +46,8 @@ function unit_test_profile(profile_function, profile_name, index, expected, tags
     end
 
 
-    if (not double_compare(result.factor, 1/expected.weight)) then
-        print("Test " .. tostring(index) .. " failed for " .. profile_name .. ".factor: expected " .. expected.weight .. " but got " .. 1/result.factor)
+    if (not double_compare(result.factor, 1/expected.priority)) then
+        print("Test " .. tostring(index) .. " failed for " .. profile_name .. ".factor: expected " .. expected.priority .. " but got " .. 1/result.factor)
         failed_profile_tests = true
         profile_failed = true
     end

@@ -8,13 +8,13 @@ using AspectedRouting.Language.Typ;
 
 namespace AspectedRouting.Tests
 {
-    public class ProfileTestSuite
+    public class BehaviourTestSuite
     {
         public readonly ProfileMetaData Profile;
         public readonly string BehaviourName;
         public readonly IEnumerable<(ProfileResult, Dictionary<string, string> tags)> Tests;
 
-        public static ProfileTestSuite FromString(Context c, ProfileMetaData function, string profileName,
+        public static BehaviourTestSuite FromString(Context c, ProfileMetaData function, string behaviourName,
             string csvContents)
         {
             try
@@ -109,21 +109,21 @@ namespace AspectedRouting.Tests
                     }
                 }
 
-                return new ProfileTestSuite(function, profileName, tests);
+                return new BehaviourTestSuite(function, behaviourName, tests);
             }
             catch (Exception e)
             {
-                throw new Exception("In the profile test file for " + profileName, e);
+                throw new Exception("In the profile test file for " + behaviourName, e);
             }
         }
 
-        public ProfileTestSuite(
+        public BehaviourTestSuite(
             ProfileMetaData profile,
-            string profileName,
+            string behaviourName,
             IEnumerable<(ProfileResult, Dictionary<string, string> tags)> tests)
         {
             Profile = profile;
-            BehaviourName = profileName;
+            BehaviourName = behaviourName;
             Tests = tests;
         }
 
