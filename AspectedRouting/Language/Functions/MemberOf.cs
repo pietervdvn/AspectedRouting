@@ -46,8 +46,6 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-          //  var subFunction = arguments[0];
-            
             var tags =(Dictionary<string, string>) arguments[1].Evaluate(c);
             var name = c.AspectName.TrimStart('$');
             

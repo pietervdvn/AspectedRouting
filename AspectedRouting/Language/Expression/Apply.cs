@@ -38,8 +38,7 @@ namespace AspectedRouting.Language.Expression
 
             FunctionApplications = new Dictionary<Type, (IExpression f, IExpression a)>();
 
-            var argTypesCleaned = argument.Types.RenameVars(f.Types);
-            var typesCleaned = argTypesCleaned.ToList();
+            var typesCleaned = argument.Types.RenameVars(f.Types).ToList();
             foreach (var funcType in f.Types)
             {
                 if (!(funcType is Curry c))
@@ -133,19 +132,24 @@ namespace AspectedRouting.Language.Expression
             {
                 foreach (var (resultType, (funExpr, argExpr)) in FunctionApplications)
                 {
-                    var substitutions = resultType.UnificationTable(allowedType);
+                    var substitutions = resultType.UnificationTable(allowedType, true);
                     if (substitutions == null)
                     {
                         continue;
                     }
 
-                    var actualResultType = resultType.Substitute(substitutions);
+                    var actualResultType = allowedType.Substitute(substitutions);
+
+                    // f : a -> b
+                    // actualResultType = b (b which was retrieved after a reverse substitution)
+
                     var actualFunction = funExpr.Specialize(substitutions);
                     var actualArgument = argExpr.Specialize(substitutions);
 
                     if (actualFunction == null || actualArgument == null)
                     {
-                        continue;
+                        // One of the subexpressions can't be optimized
+                        return null;
                     }
 
                     newArgs[actualResultType] = (actualFunction, actualArgument);
@@ -162,6 +166,11 @@ namespace AspectedRouting.Language.Expression
 
         public IExpression Optimize()
         {
+            if (Types.Count() == 0)
+            {
+                throw new ArgumentException("This application contain no valid types, so cannot be optimized" + this);
+            }
+
             // (eitherfunc dot id) id
             // => (const dot _) id => dot id => id
             // or => (constRight _ id) id => id id => id 
@@ -185,8 +194,6 @@ namespace AspectedRouting.Language.Expression
                 return Funcs.Id;
             }
 
-           
-
 
             if (Types.Count() > 1)
             {
@@ -200,7 +207,7 @@ namespace AspectedRouting.Language.Expression
 
                 return new Apply(_debugInfo, optimized);
             }
-            
+
             {
                 var arg = new List<IExpression>();
                 if (
@@ -231,8 +238,8 @@ namespace AspectedRouting.Language.Expression
             IExpression a)
         {
             f = f.Optimize();
-            a = a.Optimize();
 
+            a = a.Optimize();
 
             switch (f)
             {
@@ -309,7 +316,13 @@ namespace AspectedRouting.Language.Expression
                 return arg.ToString();
             }
 
-            return $"({f} {arg.ToString().Indent()})";
+            var extra = "";
+            if (FunctionApplications.Count() > 1)
+            {
+                extra = " [" + FunctionApplications.Count + " IMPLEMENTATIONS]";
+            }
+
+            return $"({f} {arg.ToString().Indent()})" + extra;
         }
     }
 }

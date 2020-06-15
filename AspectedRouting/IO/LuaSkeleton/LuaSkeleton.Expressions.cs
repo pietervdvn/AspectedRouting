@@ -143,6 +143,14 @@ namespace AspectedRouting.IO.LuaSkeleton
             {
                 var (f, args) = fArgs.Value;
                 var baseFunc = (Function) f;
+
+                if (baseFunc.Name.Equals(Funcs.Id.Name) ||
+                    baseFunc.Name.Equals(Funcs.Dot.Name))
+                {
+                    // This is an ugly hack
+                    return ToLua(args.First());
+                }
+                
                 AddDep(baseFunc.Name);
 
                 return baseFunc.Name + "(" + string.Join(", ", args.Select(arg => ToLua(arg, key))) + ")";
@@ -152,6 +160,8 @@ namespace AspectedRouting.IO.LuaSkeleton
             var collected = new List<IExpression>();
             switch (bare)
             {
+                case LuaLiteral lua:
+                    return lua.Lua;
                 case FunctionCall fc:
                     var called = _context.DefinedFunctions[fc.CalledFunctionName];
                     if (called.ProfileInternal)
@@ -226,6 +236,8 @@ namespace AspectedRouting.IO.LuaSkeleton
             var o = c.Evaluate(_context);
             switch (o)
             {
+                case LuaLiteral lua:
+                    return lua.Lua;
                 case IExpression e:
                     return ConstantToLua(new Constant(e.Types.First(), e.Evaluate(null)));
                 case int i:

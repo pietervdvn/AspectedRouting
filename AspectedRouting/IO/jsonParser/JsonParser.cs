@@ -12,17 +12,23 @@ namespace AspectedRouting.IO.jsonParser
     {
         private static IExpression ParseProfileProperty(JsonElement e, Context c, string property)
         {
-
             if (!e.TryGetProperty(property, out var prop))
             {
                 throw new ArgumentException("Not a valid profile: the declaration expression for '" + property +
                                             "' is missing");
             }
+
             try
             {
-                var expr = ParseExpression(prop, c).Optimize();
+                var expr = ParseExpression(prop, c);
+                if (expr.Types.Count() == 0)
+                {
+                    throw new Exception($"Could not parse field {property}, no valid typing for expression found");
+                }
+
+                expr = expr.Optimize();
                 expr = Funcs.Either(Funcs.Id, Funcs.Const, expr);
-                
+
                 var specialized = expr.Specialize(new Curry(Typs.Tags, new Var("a")));
                 if (specialized == null)
                 {
@@ -30,6 +36,7 @@ namespace AspectedRouting.IO.jsonParser
                                                 " hasn't the right type of 'Tags -> a'; it has types " +
                                                 string.Join(",", expr.Types) + "\n" + expr.TypeBreakdown());
                 }
+
                 return specialized.Optimize();
             }
             catch (Exception exc)
@@ -69,7 +76,7 @@ namespace AspectedRouting.IO.jsonParser
                         break;
                     case JsonValueKind.Array:
                         var list = obj.Value.EnumerateArray().Select(x => x.ToString()).ToList();
-                        ps[nm] = new Constant(new ListType(Typs.String),list);
+                        ps[nm] = new Constant(new ListType(Typs.String), list);
                         break;
                     default:
                         throw new ArgumentException(
@@ -80,8 +87,6 @@ namespace AspectedRouting.IO.jsonParser
 
             return ps;
         }
-
-      
 
 
         private static string Get(this JsonElement json, string key)

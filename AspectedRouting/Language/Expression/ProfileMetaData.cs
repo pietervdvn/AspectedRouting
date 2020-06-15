@@ -91,8 +91,8 @@ namespace AspectedRouting.Language.Expression
                 parameters[k.TrimStart('#')] = v;
             }
 
-            c = c.WithParameters(parameters);
-
+            c = c.WithParameters(parameters)
+                .WithAspectName(this.Name);
             tags = new Dictionary<string, string>(tags);
             var canAccess = Access.Run(c, tags);
             tags["access"] = "" + canAccess;

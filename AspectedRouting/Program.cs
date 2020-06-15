@@ -21,7 +21,7 @@ namespace AspectedRouting
             foreach (var file in jsonFileNames)
             {
                 var fi = new FileInfo(file);
-                Console.WriteLine("Parsing " + file);
+                
                 var aspect = JsonParser.AspectFromJson(context, File.ReadAllText(file), fi.Name);
                 if (aspect == null) continue;
 
@@ -63,6 +63,11 @@ namespace AspectedRouting
             var result = new List<(ProfileMetaData profile, List<BehaviourTestSuite> profileTests)>();
             foreach (var jsonFile in jsonFiles)
             {
+                if (!jsonFile.Contains("bicycle"))
+                {
+                    continue;
+                }
+                
                 try
                 {
                     var profile =
@@ -251,7 +256,7 @@ namespace AspectedRouting
                 ).ToLua();
                 File.WriteAllText(outputDir + "/" + profile.Name + ".lua", luaProfile);
 
-                foreach (var (behaviourName, behaviourParameters) in profile.Behaviours)
+                foreach (var (behaviourName, _) in profile.Behaviours)
                 {
                     var lua2behaviour = new LuaPrinter2(
                         profile,

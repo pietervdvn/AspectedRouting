@@ -10,121 +10,6 @@ namespace AspectedRouting.Language
 {
     public static class Analysis
     {
-        public static string GenerateFullOutputCsv(Context c, IExpression e)
-        {
-            var possibleTags = e.PossibleTags();
-
-            var defaultValues = new List<string>
-            {
-                "0",
-                "30",
-                "50",
-                "yes",
-                "no",
-                "SomeName"
-            };
-
-            Console.WriteLine(e);
-            var keys = e.PossibleTags().Keys.ToList();
-
-
-            var results = possibleTags.OnAllCombinations(
-                tags =>
-                {
-                    Console.WriteLine(tags.Pretty());
-                    return (new Apply(e, new Constant(tags)).Evaluate(c), tags);
-                }, defaultValues).ToList();
-
-            var csv = "result, " + string.Join(", ", keys) + "\n";
-
-            foreach (var (result, tags) in results)
-            {
-                csv += result + ", " +
-                       string.Join(", ",
-                           keys.Select(key =>
-                           {
-                               if (tags.ContainsKey(key))
-                               {
-                                   return tags[key];
-                               }
-                               else
-                               {
-                                   return "";
-                               }
-                           }));
-                csv += "\n";
-            }
-
-            return csv;
-        }
-
-        public static IEnumerable<T> OnAllCombinations<T>(this Dictionary<string, List<string>> possibleTags,
-            Func<Dictionary<string, string>, T> f, List<string> defaultValues)
-        {
-            var newDict = new Dictionary<string, List<string>>();
-            foreach (var (key, value) in possibleTags)
-            {
-                if (value.Count == 0)
-                {
-                    // This value is a list of possible values, e.g. a double
-                    // We replace them with various other
-                    newDict[key] = defaultValues;
-                }
-                else
-                {
-                    newDict[key] = value;
-                }
-            }
-
-            possibleTags = newDict;
-
-            var keys = possibleTags.Keys.ToList();
-            var currentKeyIndex = new int[possibleTags.Count];
-            for (int i = 0; i < currentKeyIndex.Length; i++)
-            {
-                currentKeyIndex[i] = -1;
-            }
-
-            bool SelectNext()
-            {
-                var j = 0;
-                while (j < currentKeyIndex.Length)
-                {
-                    currentKeyIndex[j]++;
-                    if (currentKeyIndex[j] ==
-                        possibleTags[keys[j]].Count)
-                    {
-                        // This index rolls over
-                        currentKeyIndex[j] = -1;
-                        j++;
-                    }
-                    else
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-
-
-            do
-            {
-                var tags = new Dictionary<string, string>();
-                for (int i = 0; i < keys.Count(); i++)
-                {
-                    var key = keys[i];
-                    var j = currentKeyIndex[i];
-                    if (j >= 0)
-                    {
-                        var value = possibleTags[key][j];
-                        tags.Add(key, value);
-                    }
-                }
-
-                yield return f(tags);
-            } while (SelectNext());
-        }
 
         public static Dictionary<string, (List<Type> Types, string inFunction)> UsedParameters(
             this ProfileMetaData profile, Context context)
@@ -492,7 +377,7 @@ namespace AspectedRouting.Language
         /// </summary>
         /// <param name="e"></param>
         /// <returns>A dictionary containing all possible values. An entry with an empty list indicates a wildcard</returns>
-        public static Dictionary<string, List<string>> PossibleTags(this IExpression e)
+        public static Dictionary<string, HashSet<string>> PossibleTags(this IExpression e)
         {
             var mappings = new List<Mapping>();
             e.Visit(x =>
@@ -524,7 +409,7 @@ namespace AspectedRouting.Language
 
             // Visit will have the main mapping at the first position
             var rootMapping = mappings[0];
-            var result = new Dictionary<string, List<string>>();
+            var result = new Dictionary<string, HashSet<string>>();
 
             foreach (var (key, expr) in rootMapping.StringToResultFunctions)
             {
@@ -538,7 +423,7 @@ namespace AspectedRouting.Language
 
                     return true;
                 });
-                result[key] = values;
+                result[key] = values.ToHashSet();
             }
 
             return result;

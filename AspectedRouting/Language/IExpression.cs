@@ -25,7 +25,20 @@ namespace AspectedRouting.Language
         /// </summary>
         IExpression Specialize(IEnumerable<Type> allowedTypes);
 
+        /// <summary>
+        /// Optimize a single expression, eventually recursively (e.g. a list can optimize all the contents)
+        /// </summary>
+        /// <returns></returns>
         IExpression Optimize();
+
+        /// <summary>
+        /// Optimize with the given argument, e.g. listdot can become a list of applied arguments.
+        ///
+        /// By default, this should return 'this.Apply(argument)'
+        /// </summary>
+        /// <param name="argument"></param>
+        /// <returns></returns>
+      //  IExpression OptimizeWithArgument(IExpression argument);
 
         void Visit(Func<IExpression, bool> f);
     }
@@ -97,7 +110,9 @@ namespace AspectedRouting.Language
                     continue;
                 }
 
-                var specialized = specializedTypes.SpecializeTo(f.Types.RenameVars(specializedTypes));
+                // TODO FIXME
+                // EITHER THE TYPES HAVE TO BE FROM SPECIFIC TO NON-SPECIFIC ORDER OR VICE VERSA
+                var specialized = f.Types.RenameVars(specializedTypes).SpecializeTo(specializedTypes);
                 // ReSharper disable once JoinNullCheckWithUsage
                 if (specialized == null)
                 {

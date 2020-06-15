@@ -10,6 +10,7 @@ namespace AspectedRouting.Language.Functions
         private static Var b = new Var("b");
 
         public override string Description { get; } = "Selects either one of the branches, depending on the condition." +
+                                                      " The 'then' branch is returned if the condition returns the string `yes` or `true` or the boolean `true`" +
                                                       "If the `else` branch is not set, `null` is returned in the condition is false.";
         public override List<string> ArgNames { get; } = new List<string> {"condition", "then", "else"};
 
@@ -18,12 +19,8 @@ namespace AspectedRouting.Language.Functions
             {
                 Curry.ConstructFrom(a, Typs.Bool, a, a),
                 Curry.ConstructFrom(a, Typs.Bool, a),
-                
-                Curry.ConstructFrom(a, 
-                    new Curry(b, Typs.Bool),
-                    new Curry(b, a),
-                    new Curry(b, a),
-                    b)
+                Curry.ConstructFrom(a, Typs.String, a, a),
+                Curry.ConstructFrom(a, Typs.String, a)
             }
         )
         {
@@ -38,19 +35,19 @@ namespace AspectedRouting.Language.Functions
         {
             var condition =  arguments[0].Evaluate(c);
             var then = arguments[1];
-            IExpression _else = null;
+            IExpression @else = null;
             if (arguments.Length > 2)
             {
-                _else = arguments[2];
+                @else = arguments[2];
             }
 
-            if (condition != null && (condition.Equals("yes") || condition.Equals("true")))
+            if (condition != null && (condition.Equals("yes") || condition.Equals("true") || condition.Equals(true)))
             {
                 return then.Evaluate(c);
             }
             else
             {
-                return _else?.Evaluate(c);
+                return @else?.Evaluate(c);
             }
         }
 

@@ -23,6 +23,8 @@ namespace AspectedRouting.IO.jsonParser
                     // this is a profile
                     return null;
                 }
+                
+                Console.WriteLine("Parsing " + fileName);
 
                 return doc.RootElement.ParseAspect(fileName, c);
             }
@@ -49,6 +51,15 @@ namespace AspectedRouting.IO.jsonParser
             {
                 throw new Exception("In the file " + f, e);
             }
+        }
+
+        /**
+         * Mostly used in the unit tests
+         */
+        [Obsolete]
+        public static IExpression ParseExpression(Context c, string json)
+        {
+            return JsonDocument.Parse(json).RootElement.ParseExpression(c);
         }
 
 
@@ -113,7 +124,7 @@ namespace AspectedRouting.IO.jsonParser
 
 
             var weights = new Dictionary<string, IExpression>();
-            
+
             var weightProperty = GetTopProperty("priority");
             foreach (var prop in weightProperty.EnumerateObject())
             {
@@ -188,10 +199,10 @@ namespace AspectedRouting.IO.jsonParser
                 if (keys.Count == 1)
                 {
                     // We can interpret this directly without going through a list
-                    
-                    wrapped = Funcs.Either(Funcs.Id, 
-                        new Apply(Funcs.Dot, Funcs.Head), 
-                            wrapped);
+
+                    wrapped = Funcs.Either(Funcs.Id,
+                        new Apply(Funcs.Dot, Funcs.Head),
+                        wrapped);
                 }
 
                 return wrapped;
@@ -229,7 +240,8 @@ namespace AspectedRouting.IO.jsonParser
             if (e.ValueKind == JsonValueKind.Array)
             {
                 var exprs = e.EnumerateArray().Select(json =>
-                    Funcs.Either(Funcs.Id, Funcs.Const, json.ParseExpression(context)));
+                    Funcs.Either(Funcs.Id, Funcs.Const, json.ParseExpression(context)))
+                    .ToList();
                 var list = new Constant(exprs);
                 return Funcs.Either(Funcs.Id, Funcs.ListDot, list);
             }
@@ -318,20 +330,21 @@ namespace AspectedRouting.IO.jsonParser
                 return func.Apply(args);
             }
 
+            
             args.Add(firstArgument);
 
             var allExprs = allArgs
                 .Where(kv => !kv.NameEquals("#")) // Leave out comments
                 .ToDictionary(kv => kv.Name, kv => kv.Value.ParseExpression(context));
-            
+
 
             if (allExprs.Count > 1)
             {
                 if (func.ArgNames == null || func.ArgNames.Count < 2)
                     throw new ArgumentException("{funcName} does not specify argument names");
 
-                
-                foreach (var argName in func.ArgNames.GetRange(1, func.ArgNames.Count - 2))
+
+                foreach (var argName in func.ArgNames.GetRange(1, func.ArgNames.Count - 1))
                     // We skip the first argument, that one is already added
                 {
                     args.Add(allExprs[argName]);
@@ -363,14 +376,14 @@ namespace AspectedRouting.IO.jsonParser
 
 
                 var f = (IExpression) Funcs.BuiltinByName(prop.Name);
-                if (f == null)
+                if (f == null || f.Types.Count() == 0)
                 {
                     throw new KeyNotFoundException($"The builtin function {prop.Name} was not found");
                 }
 
                 var fArg = prop.Value.ParseExpression(context);
 
-                if (fArg == null)
+                if (fArg == null || fArg.Types.Count() == 0)
                 {
                     throw new ArgumentException("Could not type expression " + prop);
                 }
@@ -464,6 +477,9 @@ namespace AspectedRouting.IO.jsonParser
             {
                 throw new NullReferenceException("The finalized form of expression `" + exprSpec + "` is null");
             }
+
+            expr = expr.SpecializeToSmallestType();
+            
 
             var name = e.Get("name");
             if (expr.Types.Count() > 1)

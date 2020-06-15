@@ -53,7 +53,7 @@ namespace AspectedRouting.IO.itinero1
                 "normalize = false",
                 "vehicle_type = {" + string.Join(", ", _profile.VehicleTyps.Select(s => "\"" + s + "\"")) + "}",
                 // meta_whitelist is defined in the profile file, these are tags that are included in the generated route, but are not relevant for determining weights
-                "meta_whitelist = {\n      \"cycle_network_colour\"," // cycle network colour is sneaked in here for legacy reasons 
+                "meta_whitelist = {\n      \"cycle_network_colour\",\n    " // cycle network colour is sneaked in here for legacy reasons 
                 + string.Join("\n    , ", _profile.Metadata.Select(s => "\"" + s + "\""))
                 + " }",
                 "profile_whitelist = {\n      " + string.Join("\n    , ", keys) + "\n    }",

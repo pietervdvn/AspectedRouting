@@ -14,17 +14,17 @@ namespace AspectedRouting.Language
         public static readonly Dictionary<string, Function> Builtins = new Dictionary<string, Function>();
         public static IEnumerable<string> BuiltinNames = Builtins.Keys;
 
-        
+
         public static readonly Function Eq = new Eq();
         public static readonly Function NotEq = new NotEq();
         public static readonly Function Inv = new Inv();
-        
+
         public static readonly Function Default = new Default();
-        
+
         public static readonly Function Parse = new Parse();
         public static readonly Function ToStringFunc = new ToString();
         public static readonly Function Concat = new Concat();
-        
+
         public static readonly Function ContainedIn = new ContainedIn();
         public static readonly Function Min = new Min();
         public static readonly Function Max = new Max();
@@ -36,10 +36,10 @@ namespace AspectedRouting.Language
         public static readonly Function MustMatch = new MustMatch();
 
         public static readonly Function MemberOf = new MemberOf();
-        
-        
-        
+
+
         public static readonly Function If = new If();
+        public static readonly Function IfDotted = new IfDotted();
 
         public static readonly Function Id = new Id();
         public static readonly Function Const = new Const();
@@ -58,7 +58,7 @@ namespace AspectedRouting.Language
 
         public static IExpression Either(IExpression a, IExpression b, IExpression arg)
         {
-            return new Apply(new Apply(new Apply(EitherFunc, a), b), arg);
+            return EitherFunc.Apply(a, b, arg);
         }
 
         public static Function BuiltinByName(string funcName)
@@ -78,13 +78,23 @@ namespace AspectedRouting.Language
             {
                 return null;
             }
-            e = e.SpecializeToSmallestType().Optimize();
+
+            e = e.SpecializeToSmallestType();
+            // TODO FIX THIS so that it works
+            // An argument 'optimizes' it's types from 'string -> bool' to 'string -> string'
+            e = e.Optimize();
+            //
             e.SanityCheck();
             return e;
         }
-        
+
         public static IExpression SpecializeToSmallestType(this IExpression e)
         {
+            if (e.Types.Count() == 1)
+            {
+                return e;
+            }
+
             Type smallest = null;
             foreach (var t in e.Types)
             {
@@ -97,6 +107,7 @@ namespace AspectedRouting.Language
                 var smallestIsSuperset = smallest.IsSuperSet(t);
                 if (!t.IsSuperSet(smallest) && !smallestIsSuperset)
                 {
+                    // Neither one is smaller then the other, we can not compare them
                     return e;
                 }
 
@@ -110,6 +121,11 @@ namespace AspectedRouting.Language
         }
 
         public static IExpression Apply(this IExpression function, IEnumerable<IExpression> args)
+        {
+            return function.Apply(args.ToList());
+        }
+
+        public static IExpression Apply(this IExpression function, params IExpression[] args)
         {
             return function.Apply(args.ToList());
         }

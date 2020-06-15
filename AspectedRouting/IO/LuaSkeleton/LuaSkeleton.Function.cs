@@ -19,7 +19,7 @@ namespace AspectedRouting.IO.LuaSkeleton
 
             _alreadyAddedFunctions.Add(meta.Name);
 
-            var possibleTags = meta.PossibleTags() ?? new Dictionary<string, List<string>>();
+            var possibleTags = meta.PossibleTags() ?? new Dictionary<string, HashSet<string>>();
             int numberOfCombinations;
             numberOfCombinations = possibleTags.Values.Select(lst => 1 + lst.Count).Multiply();
 

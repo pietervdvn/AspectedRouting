@@ -55,9 +55,13 @@ namespace AspectedRouting.Language.Functions
                 var exprSpecialized = expr.Specialize(enumerable);
                 if (exprSpecialized == null)
                 {
-                    throw new Exception($"Could not specialize a mapping of type {string.Join(",", Types)}\n" +
+                    /*throw new Exception($"Could not specialize a mapping of type {string.Join(",", Types)}\n" +
                                         $"to types {string.Join(", ", allowedTypesList)};\n" +
-                                        $"Expression {expr} could not be specialized to {functionType}");
+                                        $"Expression {expr}:{string.Join(" ; ", expr.Types)} could not be specialized to {string.Join("; ",functionType)}");
+               
+               
+*/
+                    return null;
                 }
 
                 newFunctions[k] = exprSpecialized;

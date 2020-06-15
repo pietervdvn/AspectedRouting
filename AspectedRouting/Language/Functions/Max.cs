@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using AspectedRouting.Language.Expression;
 using AspectedRouting.Language.Typ;
 
@@ -56,11 +57,19 @@ namespace AspectedRouting.Language.Functions
                     }
 
                     return "no";
-                case DoubleType _:
-                case PDoubleType _:
-                    return ls.Select(o => (double) o).Max();
                 default:
-                    return ls.Select(o => (int) o).Max();
+                    return ls.Select(o =>
+                    {
+                        switch (o)
+                        {
+                            case double d:
+                                return d;
+                            case int i:
+                                return i;
+                            default:
+                                throw new SwitchExpressionException("Unknwon type: " + o);
+                        }
+                    }).Max();
             }
         }
     }

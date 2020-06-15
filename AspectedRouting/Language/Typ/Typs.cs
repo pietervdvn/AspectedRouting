@@ -23,19 +23,19 @@ namespace AspectedRouting.Language.Typ
         }
 
 
-        public static HashSet<Type> SpecializeTo(this IEnumerable<Type> types0, IEnumerable<Type> types1)
+        public static HashSet<Type> SpecializeTo(this IEnumerable<Type> types0, IEnumerable<Type> allowedTypes)
         {
             var results = new HashSet<Type>();
 
-            var enumerable = types1.ToList();
+            allowedTypes = allowedTypes.ToList();
             foreach (var t0 in types0)
             {
-                foreach (var t1 in enumerable)
+                foreach (var allowed in allowedTypes)
                 {
-                    var unification = t0.Unify(t1);
-                    if (unification != null)
+                    var unified = t0.Unify(allowed, true);
+                    if (unified != null)
                     {
-                        results.Add(unification);
+                        results.Add(unified);
                     }
                 }
             }
@@ -49,15 +49,54 @@ namespace AspectedRouting.Language.Typ
         }
 
 
-        public static Type Unify(this Type t0, Type t1)
+        /// <summary>
+        /// Unifies the two types, where t0 is the allowed, wider type and t1 is the actual, smaller type (unless reverseSuperset is true).
+        /// Unification will attempt to keep the type as small as possible
+        /// </summary>
+        /// <param name="t0">The expected, wider type</param>
+        /// <param name="t1">The actual type</param>
+        /// <param name="reverseSuperset">True if the supertyping relationship should be reversed</param>
+        /// <returns></returns>
+        public static Type Unify(this Type t0, Type t1, bool reverseSuperset = false)
         {
-            var table = t0.UnificationTable(t1);
+            var table = t0.UnificationTable(t1, reverseSuperset);
             if (table == null)
             {
                 return null;
             }
 
-            return t0.Substitute(table);
+            var subbed = t0.Substitute(table);
+            if (reverseSuperset)
+            {
+                return SelectSmallestUnion(t1, subbed);
+            }
+            return SelectSmallestUnion(subbed, t1);
+        }
+        
+        private static Type SelectSmallestUnion(this Type wider, Type smaller, bool reverse = false)
+        {
+            switch (wider)
+            {
+                case Var a:
+                    return a;
+                case ListType l when smaller is ListType lsmaller:
+                    return new ListType(
+                        l.InnerType.SelectSmallestUnion(
+                            l.InnerType.SelectSmallestUnion(lsmaller.InnerType, reverse)));
+                case Curry cWider when smaller is Curry cSmaller:
+                    var arg =
+                        cWider.ArgType.SelectSmallestUnion(cSmaller.ArgType, !reverse);
+                    var result =
+                        cWider.ResultType.SelectSmallestUnion(cSmaller.ResultType, reverse);
+                    return new Curry(arg, result);
+                default:
+                    if (wider.IsSuperSet(smaller) && !(smaller.IsSuperSet(wider)))
+                    {
+                        return smaller;
+                    }
+
+                    return wider;
+            }
         }
 
         /// <summary>
@@ -69,7 +108,7 @@ namespace AspectedRouting.Language.Typ
         /// <returns></returns>
         public static IEnumerable<Type> UnifyAny(this Type t0, IEnumerable<Type> t1)
         {
-            var result = t1.Select(t0.Unify).Where(unification => unification != null).ToHashSet();
+            var result = t1.Select(t => t0.Unify(t)).Where(unification => unification != null).ToHashSet();
             if (!result.Any())
             {
                 return null;
@@ -87,7 +126,7 @@ namespace AspectedRouting.Language.Typ
         /// <returns></returns>
         public static IEnumerable<Type> UnifyAll(this Type t0, IEnumerable<Type> t1)
         {
-            var result = t1.Select(t0.Unify).ToHashSet();
+            var result = t1.Select(t => t0.Unify(t)).ToHashSet();
             if (result.Any(x => x == null))
             {
                 return null;
@@ -95,6 +134,8 @@ namespace AspectedRouting.Language.Typ
 
             return result;
         }
+
+
 
         public static Type Substitute(this Type t0, Dictionary<string, Type> substitutions)
         {
@@ -111,7 +152,16 @@ namespace AspectedRouting.Language.Typ
             }
         }
 
-        public static Dictionary<string, Type> UnificationTable(this Type t0, Type t1)
+        /// <summary>
+        /// The unification table is built when the type of an argument is introspected to see if it fits in the excpect type
+        /// t0 here is the **expected** (wider) type, whereas t1 is the **actual** argument type.
+        /// In other words, if we expect a `double`, a `pdouble` fits in there too.
+        /// If we expect a function capable of handling pdoubles and giving strings, a function capable of handling doubles and giving bools will work just as well
+        /// </summary>
+        /// <param name="t0"></param>
+        /// <param name="t1"></param>
+        /// <returns></returns>
+        public static Dictionary<string, Type> UnificationTable(this Type t0, Type t1, bool reverseSupersetRelation = false)
         {
             var substitutionsOn0 = new Dictionary<string, Type>();
 
@@ -156,7 +206,7 @@ namespace AspectedRouting.Language.Typ
                     break;
                 case ListType l0 when t1 is ListType l1:
                 {
-                    var table = l0.InnerType.UnificationTable(l1.InnerType);
+                    var table = l0.InnerType.UnificationTable(l1.InnerType, reverseSupersetRelation);
                     if (!AddAllSubs(table))
                     {
                         return null;
@@ -167,8 +217,9 @@ namespace AspectedRouting.Language.Typ
 
                 case Curry curry0 when t1 is Curry curry1:
                 {
-                    var tableA = curry0.ArgType.UnificationTable(curry1.ArgType);
-                    var tableB = curry0.ResultType.UnificationTable(curry1.ResultType);
+                    // contravariance for arguments: reversed 
+                    var tableA = curry0.ArgType.UnificationTable(curry1.ArgType, !reverseSupersetRelation);
+                    var tableB = curry0.ResultType.UnificationTable(curry1.ResultType, reverseSupersetRelation);
                     if (!(AddAllSubs(tableA) && AddAllSubs(tableB)))
                     {
                         return null;
@@ -182,8 +233,15 @@ namespace AspectedRouting.Language.Typ
                     if (t1 is Var v)
                     {
                         AddSubs(v.Name, t0);
+                        break;
                     }
-                    else if (!t0.Equals(t1))
+                    
+                    if (!reverseSupersetRelation && !t0.IsSuperSet(t1))
+                    {
+                        return null;
+                    }
+
+                    if (reverseSupersetRelation && !t1.IsSuperSet(t0))
                     {
                         return null;
                     }
@@ -197,7 +255,7 @@ namespace AspectedRouting.Language.Typ
 
         public static HashSet<string> UsedVariables(this Type t0, HashSet<string> addTo = null)
         {
-            addTo ??=new HashSet<string>();
+            addTo ??= new HashSet<string>();
             switch (t0)
             {
                 case Var a:
@@ -256,16 +314,23 @@ namespace AspectedRouting.Language.Typ
 
         public static IEnumerable<Type> RenameVars(this IEnumerable<Type> toRename, IEnumerable<Type> noUseVar)
         {
-            var usedToRename = toRename.SelectMany(t => UsedVariables(t));
+            // Variables used in 'toRename'
+            var usedToRename = toRename.SelectMany(t => UsedVariables(t)).ToHashSet();
+            // Variables that should not be used
             var blacklist = noUseVar.SelectMany(t => UsedVariables(t)).ToHashSet();
-            var alreadyUsed = blacklist.Concat(usedToRename).ToHashSet();
+            // variables that should be renamed
             var variablesToRename = usedToRename.Intersect(blacklist).ToHashSet();
+
+            // All variables that are used and thus not free anymore, sum of 'usedToRename' and the blacklist
+            var alreadyUsed = blacklist.Concat(usedToRename).ToHashSet();
+
+            // The substitution table
             var subsTable = new Dictionary<string, Type>();
             foreach (var v in variablesToRename)
             {
                 var newValue = Var.Fresh(alreadyUsed);
                 subsTable.Add(v, newValue);
-                blacklist.Add(newValue.Name);
+                alreadyUsed.Add(newValue.Name);
             }
 
             return toRename.Select(t => t.Substitute(subsTable));

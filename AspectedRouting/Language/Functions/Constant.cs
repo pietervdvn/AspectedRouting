@@ -14,41 +14,54 @@ namespace AspectedRouting.Language.Functions
 
         public Constant(IEnumerable<Type> types, object o)
         {
-            Types = types;
+            Types = types.ToList();
+            if (o is IEnumerable<IExpression> enumerable)
+            {
+                o = enumerable.ToList();
+            }
+
             _o = o;
         }
 
         public Constant(Type t, object o)
         {
-            Types = new[] {t};
+            Types = new List<Type> {t};
+            if (o is IEnumerable<IExpression> enumerable)
+            {
+                o = enumerable.ToList();
+            }
+
             _o = o;
         }
 
         public Constant(IExpression[] exprs)
         {
-            Types = exprs.SpecializeToCommonTypes(out var specializedVersions).Select(t => new ListType(t));
+            var tps = exprs
+                .SpecializeToCommonTypes(out var specializedVersions)
+                .Select(t => new ListType(t));
+            Types = tps.ToList();
             _o = specializedVersions;
         }
 
-        public Constant(IEnumerable<IExpression> xprs)
+        public Constant(List<IExpression> exprs)
         {
-            var exprs = xprs.ToList();
             try
             {
-                Types = exprs.SpecializeToCommonTypes(out var specializedVersions).Select(t => new ListType(t));
+                Types = exprs
+                    .SpecializeToCommonTypes(out var specializedVersions).Select(t => new ListType(t)).ToList();
                 _o = specializedVersions.ToList();
             }
             catch (Exception e)
             {
-                throw new Exception($"While creating a list with members "+
-                        string.Join(", ", exprs.Select(x => x.Optimize()))+
-                      $" {e.Message}", e);
+                throw new Exception($"While creating a list with members " +
+                                    string.Join(", ", exprs.Select(x => x.Optimize())) +
+                                    $" {e.Message}", e);
             }
         }
 
         public Constant(string s)
         {
-            Types = new[] {Typs.String};
+            Types = new List<Type> {Typs.String};
             _o = s;
         }
 
@@ -121,10 +134,10 @@ namespace AspectedRouting.Language.Functions
             addTo.Add(this);
         }
 
-        public IExpression Specialize(IEnumerable<Type> allowedTypes)
+        public IExpression Specialize(IEnumerable<Type> allowedTypesEnumerable)
         {
-            var enumerable = allowedTypes.ToList();
-            var unified = Types.SpecializeTo(enumerable);
+            var allowedTypes = allowedTypesEnumerable.ToList();
+            var unified = Types.SpecializeTo(allowedTypes);
             if (unified == null)
             {
                 return null;
@@ -133,15 +146,39 @@ namespace AspectedRouting.Language.Functions
             var newO = _o;
             if (_o is IExpression e)
             {
-                newO = e.Specialize(enumerable);
+                newO = e.Specialize(allowedTypes);
             }
 
             if (_o is IEnumerable<IExpression> es)
             {
-                var innerTypes = enumerable
-                    .Where(t => t is ListType)
-                    .Select(t => ((ListType) t).InnerType);
-                newO = es.Select(x => x.Specialize(innerTypes)).Where(x => x != null);
+                var innerTypes = new List<Type>();
+                foreach (var allowedType in allowedTypes)
+                {
+                    if (allowedType is ListType listType)
+                    {
+                        innerTypes.Add(listType.InnerType);
+                    }
+                }
+
+                var specializedExpressions = new List<IExpression>();
+                foreach (var expr in es)
+                {
+                    if (expr == null)
+                    {
+                        throw new NullReferenceException("Subexpression is null");
+                    }
+
+                    var specialized = expr.Specialize(innerTypes);
+                    if (specialized == null)
+                    {
+                        // If a subexpression can not be specialized, this list cannot be specialized
+                        return null;
+                    }
+
+                    specializedExpressions.Add(specialized);
+                }
+
+                newO = specializedExpressions;
             }
 
             return new Constant(unified, newO);
@@ -151,15 +188,34 @@ namespace AspectedRouting.Language.Functions
         {
             if (_o is IEnumerable<IExpression> exprs)
             {
-                return new Constant(exprs.Select(x => x.Optimize()));
+                // This is a list
+                var optExprs = new List<IExpression>();
+                foreach (var expression in exprs)
+                {
+                    var exprOpt = expression.Optimize();
+                    if (exprOpt == null || exprOpt.Types.Count() == 0)
+                    {
+                        throw new ArgumentException("Non-optimizable expression:" + expression);
+                    }
+
+                    optExprs.Add(exprOpt);
+                }
+
+                return new Constant(optExprs.ToList());
             }
 
             if (_o is IExpression expr)
             {
+                // This is a list
                 return new Constant(expr.Types, expr.Optimize());
             }
 
             return this;
+        }
+
+        public IExpression OptimizeWithArgument(IExpression argument)
+        {
+            return this.Apply(argument);
         }
 
         public void Visit(Func<IExpression, bool> f)
@@ -185,7 +241,7 @@ namespace AspectedRouting.Language.Functions
             return _o.Pretty();
         }
     }
-
+    
     public static class ObjectExtensions
     {
         public static string Pretty(this object o, Context context = null)

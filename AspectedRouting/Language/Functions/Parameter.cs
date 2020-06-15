@@ -44,6 +44,11 @@ namespace AspectedRouting.Language.Functions
         {
             return this;
         }
+        
+        public IExpression OptimizeWithArgument(IExpression arg)
+        {
+            throw new NotSupportedException("Trying to invoke a parameter");
+        }
 
         public void Visit(Func<IExpression, bool> f)
         {

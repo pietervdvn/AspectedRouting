@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using AspectedRouting.IO.LuaSkeleton;
 using AspectedRouting.Language;
 using AspectedRouting.Language.Functions;
 using AspectedRouting.Language.Typ;
@@ -12,6 +13,11 @@ namespace AspectedRouting.IO.itinero1
 
         private string GenerateMainProfileFunction()
         {
+
+            var access = _skeleton.ToLua(_profile.Access);
+            var oneway = _skeleton.ToLua(_profile.Oneway);
+            var speed = _skeleton.ToLua(_profile.Speed);
+            
             var impl = string.Join("\n",
                 "",
                 "",
@@ -33,14 +39,14 @@ namespace AspectedRouting.IO.itinero1
                 "    result.canstop = true",
                 "    result.attributes_to_keep = {}",
                 "",
-                "    local access = " + _skeleton.ToLua(_profile.Access),
+                "    local access = " + access,
                 "    if (access == nil or access == \"no\") then",
                 "         return",
                 "    end",
                 "    tags.access = access",
-                "    local oneway = " + _skeleton.ToLua(_profile.Oneway),
+                "    local oneway = " + oneway,
                 "    tags.oneway = oneway",
-                "    local speed = " + _skeleton.ToLua(_profile.Speed),
+                "    local speed = " + speed,
                 "    tags.speed = speed",
                 "    local distance = 1 -- the weight per meter for distance travelled is, well, 1m/m",
                 "");

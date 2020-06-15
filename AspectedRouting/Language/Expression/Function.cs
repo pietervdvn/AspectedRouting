@@ -40,6 +40,11 @@ namespace AspectedRouting.Language.Expression
             return this;
         }
 
+        public IExpression OptimizeWithArgument(IExpression argument)
+        {
+            return this.Apply(argument);
+        }
+
         public virtual void Visit(Func<IExpression, bool> f)
         {
             f(this);
@@ -50,10 +55,6 @@ namespace AspectedRouting.Language.Expression
             return $"${Name}";
         }
 
-        public IExpression Apply(params IExpression[] args)
-        {
-            return this.Apply(args.ToList());
-        }
 
         /// <summary>
         /// Gives an overview per argument what the possible types are.

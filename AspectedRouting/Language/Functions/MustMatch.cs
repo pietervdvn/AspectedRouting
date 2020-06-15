@@ -9,7 +9,9 @@ namespace AspectedRouting.Language.Functions
     public class MustMatch : Function
     {
         public override string Description { get; } =
-            "Every key that is used in the subfunction must be present.\n" +
+            "Checks that every specified key is present and gives a non-false value\n." +
+            "" +
+            "\n" +
             "If, on top, a value is present with a mapping, every key/value will be executed and must return a value that is not 'no' or 'false'\n" +
             "Note that this is a privileged builtin function, as the parser will automatically inject the keys used in the called function.";
 
@@ -22,10 +24,10 @@ namespace AspectedRouting.Language.Functions
         public MustMatch() : base("mustMatch", true,
             new[]
             {
-                // [String] -> (Tags -> [a]) -> Tags -> a
+                // [String] -> (Tags -> [string]) -> Tags -> bool
                 Curry.ConstructFrom(Typs.Bool, // Result type on top!
                     new ListType(Typs.String), // List of keys to check for
-                    new Curry(Typs.Tags, new ListType(Typs.Bool)), // The function to execute on every key
+                    new Curry(Typs.Tags, new ListType(Typs.String)), // The function to execute on every key
                     Typs.Tags // The tags to apply this on
                 )
             })

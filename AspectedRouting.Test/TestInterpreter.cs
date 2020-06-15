@@ -25,7 +25,7 @@ namespace AspectedRouting.Test
                 {"ferry", "yes"}
             };
 
-            Assert.Equal("tags -> pdouble", string.Join(", ", aspect.Types));
+            Assert.Equal("tags -> double", string.Join(", ", aspect.Types));
             Assert.Equal(42d, new Apply(aspect, new Constant(tags)).Evaluate(null));
         }
 
@@ -33,16 +33,18 @@ namespace AspectedRouting.Test
         public void MaxSpeed_AnalyzeTags_AllTagsReturned()
         {
             var json =
-                "{\"name\": \"legal_maxspeed_be\",\"description\": \"Gives, for each type of highway, which the default legal maxspeed is in Belgium. This file is intended to be reused for in all vehicles, from pedestrian to car. In some cases, a legal maxspeed is not really defined (e.g. on footways). In that case, a socially acceptable speed should be taken (e.g.: a bicycle on a pedestrian path will go say around 12km/h)\",\"unit\": \"km/h\",\"$max\": {\"maxspeed\": \"$parse\",\"highway\": {\"residential\": 30},\"ferry\":5}}";
+                "{\"name\": \"legal_maxspeed_be\",\"description\": \"Gives, for each type of highway, which the default legal maxspeed is in Belgium. This file is intended to be reused for in all vehicles, from pedestrian to car. In some cases, a legal maxspeed is not really defined (e.g. on footways). In that case, a socially acceptable speed should be taken (e.g.: a bicycle on a pedestrian path will go say around 12km/h)\"," +
+                "\"unit\": \"km/h\"," +
+                "\"$max\": {\"maxspeed\": \"$parse\",\"highway\": {\"residential\": 30},\"ferry\":5}}";
 
             var aspect = JsonParser.AspectFromJson(null, json, null);
 
             Assert.Equal(
-                new Dictionary<string, List<string>>
+                new Dictionary<string, HashSet<string>>
                 {
-                    {"maxspeed", new List<string>()},
-                    {"highway", new List<string> {"residential"}},
-                    {"ferry", new List<string>()}
+                    {"maxspeed", new HashSet<string>()},
+                    {"highway", new HashSet<string> {"residential"}},
+                    {"ferry", new HashSet<string>()}
                 },
                 aspect.PossibleTags());
         }
@@ -177,6 +179,15 @@ namespace AspectedRouting.Test
             Assert.Equal(Funcs.Id.Name, ((Function) f).Name);
             Assert.Equal(new List<IExpression> {Funcs.Id, Funcs.Id, a}.Select(e => e.ToString()),
                 args.Select(e => e.ToString()));
+        }
+
+        [Fact]
+        public void SpecializeToSmallest_IsSmallestType()
+        {
+            var app = new Apply(Funcs.Id, Funcs.Parse);
+            Assert.Equal(2, app.Types.Count());
+            var smaller = app.SpecializeToSmallestType();
+            Assert.Single(smaller.Types);
         }
     }
 }

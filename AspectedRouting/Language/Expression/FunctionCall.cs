@@ -56,6 +56,21 @@ namespace AspectedRouting.Language.Expression
             return this;
         }
 
+        public IExpression OptimizeWithArgument(IExpression argument)
+        {
+
+            if (_name.Equals(Funcs.Id.Name))
+            {
+                return argument;
+            }
+
+            return this.Apply(argument);
+
+
+
+
+        }
+
         public void Visit(Func<IExpression, bool> f)
         {
             f(this);

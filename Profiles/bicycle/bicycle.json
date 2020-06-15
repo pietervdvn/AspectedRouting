@@ -15,7 +15,15 @@
     "status",
     "network"
   ],
-  "access": "$bicycle.legal_access",
+  "access": {
+    "$ifDotted": {
+      "$dot": {"$notEq": "no"},
+      "f": "$bicycle.legal_access"
+    },
+    
+    "then": "$bicycle.legal_access",
+    "else": "$bicycle.network_is_bicycle_network"
+  },
   "oneway": "$bicycle.oneway",
   "speed": {
     "$min": [
