@@ -322,9 +322,19 @@ namespace AspectedRouting.Test
                 new Curry(Typs.String, Typs.String));
 
             var f1 = f.Specialize(strstrstr);
-            
-            Assert.Equal(new[] {strstrb, strstrstr}, f1.Types);
 
+            Assert.Equal(new[] {strstrb, strstrstr}, f1.Types);
+        }
+
+        [Fact]
+        public void SpecializeToCommonType()
+        {
+            var p0 = Funcs.Parse;
+            var p1 = Funcs.Const.Apply(new Constant(1.0));
+
+            var exprs = new[] {p0, p1};
+            var newTypes = exprs.SpecializeToCommonTypes(out var specializedExpressions);
+            Assert.Single(newTypes);
         }
     }
 }

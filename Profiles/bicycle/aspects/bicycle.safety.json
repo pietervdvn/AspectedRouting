@@ -9,7 +9,7 @@
         "#": "access=no and access 'destination' implies this access for cars too and is a bonus!",
         "no": 1.5,
         "destination": 1.4,
-        "dismount": 0.01,
+        "dismount": 0.2,
         "designated": 1.5
       },
       "motor_vehicle": {
@@ -33,7 +33,7 @@
       },
       "highway": {
         "cycleway": 1.0,
-        "primary": 0.3,
+        "primary": 0.1,
         "secondary": 0.4,
         "tertiary": 0.5,
         "unclassified": 0.8,
@@ -44,31 +44,28 @@
         "path": 0.9
       },
       "cycleway": {
-        "yes": 0.95,
-        "#": "TODO: the implied value for quite a bit of roads (residential, unclassified) is 'no', so this is a bit weird",
-        "no": 0.5,
-        "lane": 1,
-        "shared": 0.8,
-        "shared_lane": 0.8,
-        "share_busway": 0.9,
+        "#": "A distinct cycleway _always_ makes the road safer for cyclists, even if it is but a small lane. The default assumption is 'no', no cycleway, in which case the safety feeling is not improved",
+        "yes": 1.15,
+        "lane": 1.15,
+        "shared": 1.03,
+        "shared_lane": 1.03,
+        "share_busway": 1.05,
         "track": 1.5
       },
       "cycleway:left": {
-        "yes": 0.95,
-        "no": 0.5,
-        "lane": 1,
-        "shared": 0.8,
-        "shared_lane": 0.8,
-        "share_busway": 0.9,
+        "yes": 1.15,
+        "lane": 1.15,
+        "shared": 1.03,
+        "shared_lane": 1.03,
+        "share_busway": 1.05,
         "track": 1.5
       },
       "cycleway:right": {
-        "yes": 0.95,
-        "no": 0.5,
-        "lane": 1,
-        "shared": 0.8,
-        "shared_lane": 0.8,
-        "share_busway": 0.9,
+        "yes": 1.15,
+        "lane": 1.15,
+        "shared": 1.03,
+        "shared_lane": 1.03,
+        "share_busway": 1.05,
         "track": 1.5
       }
     }

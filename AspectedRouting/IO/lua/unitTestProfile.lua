@@ -30,7 +30,13 @@ function unit_test_profile(profile_function, profile_name, index, expected, tags
     end
 
 
-    local actualOneway = result.direction;
+    local actualOneway = result.direction
+    
+    if(actualOneway == nil) then
+        print("Fail: result.direction is nil")
+        profile_failed = true;
+    end
+    
     if (result.direction == 0) then
         actualOneway = "both"
     elseif (result.direction == 1) then
@@ -40,7 +46,7 @@ function unit_test_profile(profile_function, profile_name, index, expected, tags
     end
 
     if (expected.oneway ~= actualOneway) then
-        print("Test " .. tostring(index) .. " failed for " .. profile_name .. ".oneway: expected " .. expected.direction .. " but got " .. actualOneway)
+        print("Test " .. tostring(index) .. " failed for " .. profile_name .. ".oneway: expected " .. expected.oneway .. " but got " .. actualOneway)
         failed_profile_tests = true
         profile_failed = true
     end

@@ -27,7 +27,7 @@ namespace AspectedRouting.IO.itinero1
                 "end"
             };
 
-            return string.Join("\n",impl);
+            return string.Join("\n", impl);
         }
 
         /// <summary>
@@ -56,7 +56,11 @@ namespace AspectedRouting.IO.itinero1
                     continue;
                 }
 
-                impl += $"    parameters.{paramName.TrimStart('#').AsLuaIdentifier()} = {_skeleton.ToLua(value)}\n";
+                var paramNameTrimmed = paramName.TrimStart('#').AsLuaIdentifier();
+                if (!string.IsNullOrEmpty(paramNameTrimmed))
+                {
+                    impl += $"    parameters.{paramNameTrimmed} = {_skeleton.ToLua(value)}\n";
+                }
             }
 
             return impl;

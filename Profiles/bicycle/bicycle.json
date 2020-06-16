@@ -15,15 +15,7 @@
     "status",
     "network"
   ],
-  "access": {
-    "$ifDotted": {
-      "$dot": {"$notEq": "no"},
-      "f": "$bicycle.legal_access"
-    },
-    
-    "then": "$bicycle.legal_access",
-    "else": "$bicycle.network_is_bicycle_network"
-  },
+  "access": "$bicycle.legal_access",
   "oneway": "$bicycle.oneway",
   "speed": {
     "$min": [
@@ -46,7 +38,8 @@
     "#bicycleNetworkScore": "$bicycle.network_is_bicycle_network",
     "#timeNeeded": "$speed",
     "#distance": "$distance",
-    "#trespassingPenalty":"$clean_permission_score"
+    "#trespassingPenalty": "$clean_permission_score",
+    "#leastSafetyPenalty": 0
   },
   "defaults": {
     "#defaultSpeed": 15,
@@ -60,7 +53,10 @@
     "#cycleHighwayNetworkScore": 0,
     "#nodeNetworkScore": 0,
     "#bicycleNetworkScore": 0,
-    "#trespassingPenalty": 15
+    "#trespassingPenalty": 15,
+    "#": "This is not a priority weight, but rather a kind of access restriction. If 'leastafety' is not met, a huge penalty is applied, namely #leastSafetyPenalty. Note: 0.1 is the safety level of a primary without cycle highway",
+    "#leastSafetyRequired": 0.11,
+    "#leastSafetyPenalty": 2
   },
   "behaviours": {
     "fastest": {

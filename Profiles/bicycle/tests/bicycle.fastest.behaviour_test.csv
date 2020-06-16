@@ -1,7 +1,7 @@
 access,oneway,speed,priority,highway,bicycle,surface,cycleway:left,oneway,oneway:bicycle,access,maxspeed,junction
 no,both,0,0,,,,,,,,,
 designated,both,15,15,cycleway,,,,,,,,
-no,both,0,0,primary,,,,,,,,
+yes,both,15,15,primary,,,,,,,,
 yes,both,15,15,primary,yes,,,,,,,
 yes,both,15,15,residential,,,,,,,,
 yes,both,13.5,13.5,residential,yes,sett,,,,,,

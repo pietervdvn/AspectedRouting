@@ -1,8 +1,8 @@
 expected,highway,cycleway,cyclestreet,foot,bicycle,cycleway:right,access
-0.15,primary,no,,,,,
-0.285,primary,yes,,,,,
-0.45,primary,track,,,,,
-0.4,secondary,lane,,,,,
+0.1,primary,no,,,,,
+0.115,primary,yes,,,,,
+0.15,primary,track,,,,,
+0.46,secondary,lane,,,,,
 0.9,residential,,,,,,
 1.5,cycleway,,,,,,designated
 1.35,residential,,yes,,,,
@@ -10,4 +10,4 @@ expected,highway,cycleway,cyclestreet,foot,bicycle,cycleway:right,access
 0.9025,footway,,,designated,,,
 1.2825,path,,,designated,designated,,
 1.35,path,,,,designated,,
-0.4,secondary,,,,,lane,
+0.46,secondary,,,,,lane,

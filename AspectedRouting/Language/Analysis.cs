@@ -237,7 +237,7 @@ namespace AspectedRouting.Language
             var unused = defaultParameters.Except(usedParameters);
             if (unused.Any())
             {
-                throw new ArgumentException("A default value is set for parameter, but it is unused: " +
+                Console.WriteLine("[WARNING] A default value is set for parameter, but it is unused: " +
                                             string.Join(", ", unused));
             }
 

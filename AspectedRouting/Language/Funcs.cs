@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AspectedRouting.Language.Expression;
@@ -32,6 +33,7 @@ namespace AspectedRouting.Language
         public static readonly Function Multiply = new Multiply();
 
 
+        public static readonly Function AtLeast = new AtLeast();
         public static readonly Function FirstOf = new FirstMatchOf();
         public static readonly Function MustMatch = new MustMatch();
 
@@ -79,13 +81,35 @@ namespace AspectedRouting.Language
                 return null;
             }
 
-            e = e.SpecializeToSmallestType();
+            if (e.Types.Count() == 0)
+            {
+                throw new Exception("Expression has no valid types:\n" + e);
+            }
+
+            var eSmallest = e.SpecializeToSmallestType();
+            if (eSmallest == null || eSmallest.Types.Count() == 0)
+            {
+                throw new Exception("Could not specialize " + e);
+            }
+
             // TODO FIX THIS so that it works
             // An argument 'optimizes' it's types from 'string -> bool' to 'string -> string'
-            e = e.Optimize();
-            //
-            e.SanityCheck();
-            return e;
+            try
+            {
+                var eOpt = eSmallest.Optimize();            if (eOpt == null || eOpt.Types.Count() == 0)
+                {
+                    throw new Exception("Could not optimize " + eSmallest);
+                }
+                eOpt.SanityCheck();
+                return eOpt;
+            }
+            catch
+            {
+                Console.WriteLine("Optimalization failed for "+eSmallest);
+                return eSmallest;
+            }
+
+
         }
 
         public static IExpression SpecializeToSmallestType(this IExpression e)

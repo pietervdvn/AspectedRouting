@@ -12,7 +12,7 @@ designated,residential,designated,,,,
 designated,motorway,designated,,,,
 no,residential,use_sidepath,,,,
 yes,residential,,no,yes,,
-no,primary,,,,,
+yes,primary,,,,,
 yes,primary,,,,yes,
 yes,primary,,,,,yes
 yes,secondary,,,,track,
