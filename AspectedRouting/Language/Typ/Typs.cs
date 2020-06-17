@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -23,7 +24,7 @@ namespace AspectedRouting.Language.Typ
         }
 
 
-        public static HashSet<Type> SpecializeTo(this IEnumerable<Type> types0, IEnumerable<Type> allowedTypes)
+        public static HashSet<Type> SpecializeTo(this IEnumerable<Type> types0, IEnumerable<Type> allowedTypes, bool reverseSuperSet = true)
         {
             var results = new HashSet<Type>();
 
@@ -32,7 +33,7 @@ namespace AspectedRouting.Language.Typ
             {
                 foreach (var allowed in allowedTypes)
                 {
-                    var unified = t0.Unify(allowed, true);
+                    var unified = t0.Unify(allowed, reverseSuperSet);
                     if (unified != null)
                     {
                         results.Add(unified);
@@ -70,9 +71,10 @@ namespace AspectedRouting.Language.Typ
             {
                 return SelectSmallestUnion(t1, subbed);
             }
+
             return SelectSmallestUnion(subbed, t1);
         }
-        
+
         private static Type SelectSmallestUnion(this Type wider, Type smaller, bool reverse = false)
         {
             switch (wider)
@@ -97,6 +99,81 @@ namespace AspectedRouting.Language.Typ
 
                     return wider;
             }
+        }
+
+        public static List<IExpression> SortWidestToSmallest(this IEnumerable<IExpression> expressions)
+        {
+            var all = expressions.ToHashSet();
+            var sorted = new List<IExpression>();
+            while (all.Any())
+            {
+                var widest = SelectWidestType(all);
+                if (widest == null)
+                {
+                    throw new ArgumentException("Can not sort widest to smallest");
+                }
+                all.Remove(widest);
+                sorted.Add(widest);
+            }
+
+            return sorted;
+        }
+
+        public static IExpression SelectSmallestType(IEnumerable<IExpression> expressions)
+        {
+            IExpression smallest = null;
+            foreach (var current in expressions)
+            {
+                if (smallest == null)
+                {
+                    smallest = current;
+                    continue;
+                }
+                if (smallest.Types.AllAreSuperset(current.Types))
+                {
+                    smallest = current;
+                }
+            }
+            
+            
+
+            return smallest;
+        }
+
+        public static IExpression SelectWidestType(IEnumerable<IExpression> expressions)
+        {
+            IExpression widest = null;
+            foreach (var current in expressions)
+            {
+                if (widest == null)
+                {
+                    widest = current;
+                    continue;
+                }
+
+                if (current.Types.AllAreSuperset(widest.Types))
+                {
+                    widest = current;
+                }
+            }
+
+            return widest;
+        }
+
+        public static bool AllAreSuperset(this IEnumerable<Type> shouldBeSuper, IEnumerable<Type> shouldBeSmaller)
+        {
+            foreach (var super in shouldBeSuper)
+            {
+                foreach (var smaller in shouldBeSmaller)
+                {
+                    if (!super.IsSuperSet(smaller))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -136,7 +213,6 @@ namespace AspectedRouting.Language.Typ
         }
 
 
-
         public static Type Substitute(this Type t0, Dictionary<string, Type> substitutions)
         {
             switch (t0)
@@ -161,7 +237,8 @@ namespace AspectedRouting.Language.Typ
         /// <param name="t0"></param>
         /// <param name="t1"></param>
         /// <returns></returns>
-        public static Dictionary<string, Type> UnificationTable(this Type t0, Type t1, bool reverseSupersetRelation = false)
+        public static Dictionary<string, Type> UnificationTable(this Type t0, Type t1,
+            bool reverseSupersetRelation = false)
         {
             var substitutionsOn0 = new Dictionary<string, Type>();
 
@@ -235,7 +312,7 @@ namespace AspectedRouting.Language.Typ
                         AddSubs(v.Name, t0);
                         break;
                     }
-                    
+
                     if (!reverseSupersetRelation && !t0.IsSuperSet(t1))
                     {
                         return null;
@@ -281,6 +358,11 @@ namespace AspectedRouting.Language.Typ
 
         public static bool IsSuperSet(this Type t0, Type t1)
         {
+            if (t0 is Var || t1 is Var)
+            {
+                return true;
+            }
+            
             switch (t0)
             {
                 case StringType _ when t1 is BoolType _:

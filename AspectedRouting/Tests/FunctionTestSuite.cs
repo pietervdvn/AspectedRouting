@@ -61,7 +61,7 @@ namespace AspectedRouting.Tests
 
      
 
-        public void Run()
+        public bool Run()
         {
             var failed = false;
             var testCase = 0;
@@ -88,12 +88,9 @@ namespace AspectedRouting.Tests
                 }
             }
 
-            if (failed)
-            {
-                throw new ArgumentException("Some test failed");
-            }
 
-            Console.WriteLine($"[{FunctionToApply.Name}] {testCase} tests successful");
+            Console.WriteLine($"[{FunctionToApply.Name}] {testCase} tests " + (failed ? "failed" : "successful"));
+            return !failed;
         }
     }
 }

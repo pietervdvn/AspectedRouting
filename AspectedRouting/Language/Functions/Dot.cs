@@ -8,9 +8,10 @@ namespace AspectedRouting.Language.Functions
 {
     public class Dot : Function
     {
-        public override string Description { get; } = "Higher order function: converts `f (g a)` into `(dot f g) a`. In other words, this fuses `f` and `g` in a new function, which allows the argument to be lifted out of the expression ";
+        public override string Description { get; } =
+            "Higher order function: converts `f (g a)` into `(dot f g) a`. In other words, this fuses `f` and `g` in a new function, which allows the argument to be lifted out of the expression ";
 
-        public override List<string> ArgNames { get; } = new List<string>{"f","g","a"};
+        public override List<string> ArgNames { get; } = new List<string> {"f", "g", "a"};
         public static readonly Var A = new Var("a");
         public static readonly Var B = new Var("b");
         public static readonly Var C = new Var("c");
@@ -33,6 +34,10 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
+            if (arguments.Count() <= 2)
+            {
+            }
+
             var f0 = arguments[0];
             var f1 = arguments[1];
             var resultType = ((Curry) f1.Types.First()).ResultType;

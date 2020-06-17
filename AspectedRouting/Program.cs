@@ -21,7 +21,7 @@ namespace AspectedRouting
             foreach (var file in jsonFileNames)
             {
                 var fi = new FileInfo(file);
-                
+
                 var aspect = JsonParser.AspectFromJson(context, File.ReadAllText(file), fi.Name);
                 if (aspect == null) continue;
 
@@ -63,11 +63,6 @@ namespace AspectedRouting
             var result = new List<(ProfileMetaData profile, List<BehaviourTestSuite> profileTests)>();
             foreach (var jsonFile in jsonFiles)
             {
-                if (!jsonFile.Contains("bicycle"))
-                {
-                    continue;
-                }
-                
                 try
                 {
                     var profile =
@@ -227,6 +222,7 @@ namespace AspectedRouting
 
 
             // With everything parsed and typechecked, time for tests
+            var testsOk = true;
             foreach (var (aspect, t) in aspects)
             {
                 if (t == null)
@@ -235,18 +231,27 @@ namespace AspectedRouting
                 }
                 else
                 {
-                    t.Run();
+                    testsOk &= t.Run();
                 }
             }
 
+            
             foreach (var (profile, profileTests) in profiles)
             {
                 foreach (var test in profileTests)
                 {
-                    test.Run(context);
+                    testsOk &= test.Run(context);
                 }
+            }
 
+            if (!testsOk)
+            {
+                Console.WriteLine("Some tests failed, quitting now without generating output");
+                return;
+            }
 
+            foreach (var (profile, profileTests) in profiles)
+            {
                 PrintUsedTags(profile, context);
 
                 var aspectTests = aspects.Select(a => a.tests).ToList();

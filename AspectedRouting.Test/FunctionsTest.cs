@@ -329,12 +329,17 @@ namespace AspectedRouting.Test
         [Fact]
         public void SpecializeToCommonType()
         {
-            var p0 = Funcs.Parse;
-            var p1 = Funcs.Const.Apply(new Constant(1.0));
+            var p0 = Funcs.Parse.Specialize(new Curry(Typs.String, Typs.PDouble));
+            var p1 = Funcs.Const.Apply(new Constant(1.0)).Specialize(
+                new Curry(new Var("a"), Typs.Double));
 
             var exprs = new[] {p0, p1};
-            var newTypes = exprs.SpecializeToCommonTypes(out var specializedExpressions);
-            Assert.Single(newTypes);
+            var newTypes = exprs.SpecializeToCommonTypes(out var _);
+            Assert.Single( newTypes);
+
+            exprs = new[] {p1, p0};
+            newTypes = exprs.SpecializeToCommonTypes(out var _);
+            Assert.Single( newTypes);
         }
     }
 }

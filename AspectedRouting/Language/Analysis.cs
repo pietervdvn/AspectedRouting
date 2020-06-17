@@ -197,13 +197,8 @@ namespace AspectedRouting.Language
 
         public static string TypeBreakdown(this IExpression e)
         {
-            var text = "";
-            e.Visit(x =>
-            {
-                text += $"\n\n{x}\n  : {string.Join("\n  : ", x.Types)}";
-                return true;
-            });
-            return text;
+           
+            return e.ToString() + " : "+string.Join(" ; ", e.Types);
         }
 
         public static void SanityCheckProfile(this ProfileMetaData pmd, Context context)

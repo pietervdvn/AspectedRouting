@@ -45,16 +45,25 @@ namespace AspectedRouting.Language.Functions
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
             var minimum = arguments[0].Evaluate(c);
-            var f = (IExpression) arguments[1].Evaluate(c);
             var then = arguments[2].Evaluate(c);
             var @else = arguments[3].Evaluate(c);
             var x = arguments[4];
 
-            var arg1 = f.Evaluate(c, x);
+            var arg1 = arguments[1].Evaluate(c, x);
             
             if (minimum == null || arg1 == null)
             {
                 return null;
+            }
+
+            if (minimum is IExpression e)
+            {
+                minimum = e.Evaluate(c);
+            }
+            
+            if (arg1 is IExpression e1)
+            {
+                arg1 = e1.Evaluate(c);
             }
 
             if (minimum is int i0)

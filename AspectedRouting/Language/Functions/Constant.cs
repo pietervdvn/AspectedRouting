@@ -18,6 +18,10 @@ namespace AspectedRouting.Language.Functions
             if (o is IEnumerable<IExpression> enumerable)
             {
                 o = enumerable.ToList();
+                if (enumerable.Any(x => x == null))
+                {
+                    throw new NullReferenceException("Some subexpression is null");
+                }
             }
 
             _o = o;
@@ -29,6 +33,10 @@ namespace AspectedRouting.Language.Functions
             if (o is IEnumerable<IExpression> enumerable)
             {
                 o = enumerable.ToList();
+                if (enumerable.Any(x => x == null))
+                {
+                    throw new NullReferenceException("Some subexpression is null");
+                }
             }
 
             _o = o;
@@ -39,6 +47,10 @@ namespace AspectedRouting.Language.Functions
             var tps = exprs
                 .SpecializeToCommonTypes(out var specializedVersions)
                 .Select(t => new ListType(t));
+            if(specializedVersions.Any(x => x == null))
+            {
+                throw new Exception("Specializing to common types failed for "+string.Join("," ,exprs.Select(e => e.ToString())));
+            }
             Types = tps.ToList();
             _o = specializedVersions;
         }
@@ -49,6 +61,10 @@ namespace AspectedRouting.Language.Functions
             {
                 Types = exprs
                     .SpecializeToCommonTypes(out var specializedVersions).Select(t => new ListType(t)).ToList();
+                if (specializedVersions.Any(x => x == null))
+                {
+                    throw new NullReferenceException("Some subexpression is null");
+                }
                 _o = specializedVersions.ToList();
             }
             catch (Exception e)

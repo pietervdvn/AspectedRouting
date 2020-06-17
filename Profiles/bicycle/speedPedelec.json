@@ -27,9 +27,14 @@
 	"speed":{
 		"$min":
 		[
-		{"$multiply":["#defaultSpeed", "$bicycle.speed_factor"]}, 
-		"$legal_maxspeed_be",
-		"#maxspeed"
+			"#maxspeed",
+			"$legal_maxspeed_be",
+			{
+				"$multiply": [
+					"#defaultSpeed",
+					"$bicycle.speed_factor"
+				]
+			}
 		]
 	},
 	"access":"$speedPedelec.access_be",

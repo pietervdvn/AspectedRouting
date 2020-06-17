@@ -83,14 +83,15 @@ namespace AspectedRouting.Language.Expression
             {
                 try
                 {
-                    _debugInfo = $"\n{f.Optimize().TypeBreakdown()}\n" +
-                                 $"is applied on an argument with types:" +
-                                 $"{string.Join(", ", argument.Optimize().Types)}";
+                    _debugInfo = $"\n{f.Optimize().TypeBreakdown().Indent()}\n" +
+                                 $"is given the argument: " +
+                                 "(" + argument.Optimize().TypeBreakdown() + ")";
                 }
                 catch (Exception)
                 {
-                    _debugInfo = $"\n{f.TypeBreakdown()}\n" +
-                                 $"{argument.TypeBreakdown()}";
+                    _debugInfo =$"\n (NO OPT) {f.TypeBreakdown().Indent()}\n" +
+                                $"is given the argument: " +
+                                "(" + argument.TypeBreakdown() + ")";
                 }
             }
         }
@@ -197,6 +198,7 @@ namespace AspectedRouting.Language.Expression
 
             if (Types.Count() > 1)
             {
+                // Too much types to optimize
                 var optimized = new Dictionary<Type, (IExpression f, IExpression a)>();
                 foreach (var (resultType, (f, a)) in FunctionApplications)
                 {
@@ -209,6 +211,7 @@ namespace AspectedRouting.Language.Expression
             }
 
             {
+                // id a => a
                 var arg = new List<IExpression>();
                 if (
                     Deconstruct.UnApplyAny(
@@ -219,6 +222,37 @@ namespace AspectedRouting.Language.Expression
                     return arg.First();
                 }
             }
+
+
+            {
+                // ifdotted fcondition fthen felse arg => if (fcondition arg) (fthen arg) (felse arg)
+                var fcondition = new List<IExpression>();
+                var fthen = new List<IExpression>();
+                var felse = new List<IExpression>();
+                var arg = new List<IExpression>();
+
+                if (
+                    Deconstruct.UnApplyAny(
+                        Deconstruct.UnApply(
+                            Deconstruct.UnApply(
+                                Deconstruct.UnApply(
+                                    Deconstruct.IsFunc(Funcs.IfDotted),
+                                    Deconstruct.Assign(fcondition)),
+                                Deconstruct.Assign(fthen)),
+                            Deconstruct.Assign(felse)),
+                        Deconstruct.Assign(arg)
+                    ).Invoke(this))
+                {
+                    var a = arg.First();
+                    return
+                        Funcs.If.Apply(
+                            fcondition.First().Apply(a),
+                            fthen.First().Apply(a),
+                            felse.First().Apply(a)
+                        );
+                }
+            }
+
 
             {
                 var (f, a) = FunctionApplications.Values.First();

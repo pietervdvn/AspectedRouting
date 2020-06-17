@@ -158,6 +158,11 @@ namespace AspectedRouting.Language.Expression
                 priority += aspectInfluence * aspectWeight;
             }
 
+            if (priority <= 0)
+            {
+                canAccess = "no";
+            }
+
             return new ProfileResult((string) canAccess, (string) oneway, speed, priority,
                 string.Join("\n  ", weightExplanation));
         }

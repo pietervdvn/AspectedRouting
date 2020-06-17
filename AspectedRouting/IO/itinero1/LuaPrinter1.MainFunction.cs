@@ -60,9 +60,8 @@ namespace AspectedRouting.IO.itinero1
 
 
                 var exprInLua = _skeleton.ToLua(expression.Optimize());
-                var subs = new Curry(Typs.Tags, new Var(("a"))).UnificationTable(expression.Types.First());
-                if (subs != null && subs.TryGetValue("$a", out var resultType) &&
-                    (resultType.Equals(Typs.Bool) || resultType.Equals(Typs.String)))
+                var resultTypes = expression.Types.Select(t => t.Uncurry().Last());
+                if (resultTypes.Any(t => t.Name.Equals(Typs.Bool.Name)))
                 {
                    _skeleton. AddDep("parse");
                     exprInLua = "parse(" + exprInLua + ")";

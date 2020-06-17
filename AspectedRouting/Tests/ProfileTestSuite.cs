@@ -77,8 +77,7 @@ namespace AspectedRouting.Tests
                             weight = double.Parse(testData[3]);
                         }
 
-                        
-                        
+
                         var expected = new ProfileResult(
                             testData[0],
                             testData[1],
@@ -88,9 +87,10 @@ namespace AspectedRouting.Tests
 
                         if (expected.Priority == 0 && expected.Access != "no")
                         {
-                            throw new ArgumentException("A priority of zero is interpreted as 'no access' - don't use it");
+                            throw new ArgumentException(
+                                "A priority of zero is interpreted as 'no access' - don't use it");
                         }
-                        
+
                         var vals = testData.GetRange(4, testData.Count - 4);
                         var tags = new Dictionary<string, string>();
                         for (int i = 0; i < keys.Count; i++)
@@ -192,11 +192,8 @@ namespace AspectedRouting.Tests
             return success;
         }
 
-        public void Run(Context c)
-
+        public bool Run(Context c)
         {
-        
-
             var allOk = true;
             var i = 1;
             foreach (var (expected, tags) in Tests)
@@ -213,14 +210,9 @@ namespace AspectedRouting.Tests
                 i++;
             }
 
-            if (!allOk)
-            {
-                throw new ArgumentException("Some tests failed for " + BehaviourName);
-            }
-            else
-            {
-                Console.WriteLine($"[{Profile.Name}] {Tests.Count()} tests successful for behaviour {BehaviourName}");
-            }
+            Console.WriteLine($"[{Profile.Name}] {Tests.Count()} tests " + (allOk ? "successfull" : "executed, some failed") +
+                              $" for behaviour {BehaviourName}");
+            return allOk;
         }
     }
 }

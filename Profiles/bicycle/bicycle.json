@@ -39,7 +39,17 @@
     "#timeNeeded": "$speed",
     "#distance": "$distance",
     "#trespassingPenalty": "$clean_permission_score",
-    "#leastSafetyPenalty": 0
+    "#leastSafetyPenalty": {
+      "$multiply": [
+        "$speed",
+        {
+          "$atleast": "#leastSafetyRequired",
+          "f": "$bicycle.safety",
+          "then": 0,
+          "else": -1
+        }
+      ]
+    }
   },
   "defaults": {
     "#defaultSpeed": 15,
@@ -56,16 +66,18 @@
     "#trespassingPenalty": 15,
     "#": "This is not a priority weight, but rather a kind of access restriction. If 'leastafety' is not met, a huge penalty is applied, namely #leastSafetyPenalty. Note: 0.1 is the safety level of a primary without cycle highway",
     "#leastSafetyRequired": 0.11,
-    "#leastSafetyPenalty": 2
+    "#leastSafetyPenalty": 0
   },
   "behaviours": {
     "fastest": {
       "description": "The fastest route to your destination",
-      "#timeNeeded": 1
+      "#timeNeeded": 1,
+      "#leastSafetyPenalty": 2
     },
     "shortest": {
       "description": "The shortest route, independent of of speed",
-      "#distance": 1
+      "#distance": 1,
+      "#leastSafetyPenalty": 2
     },
     "safety": {
       "description": "A defensive route shying away from big roads with lots of cars",
@@ -73,7 +85,8 @@
     },
     "comfort": {
       "description": "A comfortable route preferring well-paved roads, smaller roads and a bit of scenery at the cost of speed",
-      "#comfort": 1
+      "#comfort": 1,
+      "#leastSafetyPenalty": 2
     },
     "comfort_safety": {
       "description": "A route which aims to be both safe and comfortable at the cost of speed",
@@ -84,7 +97,8 @@
       "description": "A profile for a bike with an electrical motor where the engine doesn't go faster then 25km/h (thus NOT the speed-pedelec). This is a variation of the normal fastest, but with a faster default speed. As the maxspeed is 30, it'll resemble shortest a bit more on 'normal' streets and will penalize slower roads more",
       "#defaultSpeed": 23,
       "#maxspeed": 30,
-      "#timeNeeded": 1
+      "#timeNeeded": 1,
+      "#leastSafetyPenalty": 2
     },
     "networks": {
       "description": "A recreative route following any existing cycling network. Might make a few detours",
@@ -111,7 +125,8 @@
     "cycle_highway": {
       "description": "A route preferring the 'cycle-highways'. On non-cycleways, fastest is used (with a very low factor) in order to make sure the behaviour there is defined ",
       "#cycleHighwayNetworkScore": 20,
-      "#timeNeeded": 0.1
+      "#timeNeeded": 0.1,
+      "#leastSafetyPenalty": 2
     },
     "node_network": {
       "description": "A route following the recreational node network. Might make detours",

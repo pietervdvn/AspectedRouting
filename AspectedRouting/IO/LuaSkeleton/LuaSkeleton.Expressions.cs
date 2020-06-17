@@ -169,6 +169,7 @@ namespace AspectedRouting.IO.LuaSkeleton
                         return called.Name;
                     }
 
+                    AddDependenciesFor(called);
                     AddFunction(called);
                     return $"{fc.CalledFunctionName.AsLuaIdentifier()}(parameters, tags, result)";
                 case Constant c:

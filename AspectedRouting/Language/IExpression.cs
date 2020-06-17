@@ -38,8 +38,7 @@ namespace AspectedRouting.Language
         /// </summary>
         /// <param name="argument"></param>
         /// <returns></returns>
-      //  IExpression OptimizeWithArgument(IExpression argument);
-
+        //  IExpression OptimizeWithArgument(IExpression argument);
         void Visit(Func<IExpression, bool> f);
     }
 
@@ -47,7 +46,7 @@ namespace AspectedRouting.Language
     {
         public static object Run(this IExpression e, Context c, Dictionary<string, string> tags)
         {
-            return e.Apply(new []{new Constant(tags)}).Evaluate(c);
+            return e.Apply(new[] {new Constant(tags)}).Evaluate(c);
         }
 
         public static IExpression Specialize(this IExpression e, Type t)
@@ -101,8 +100,11 @@ namespace AspectedRouting.Language
             out IEnumerable<Type> specializedTypes, out IEnumerable<IExpression> specializedExpressions)
         {
             specializedTypes = null;
-            var expressions = exprs.ToList();
-            foreach (var f in expressions)
+            var exprsForTypes = exprs.SortWidestToSmallest();
+            exprsForTypes.Reverse();
+
+
+            foreach (var f in exprsForTypes)
             {
                 if (specializedTypes == null)
                 {
@@ -110,9 +112,7 @@ namespace AspectedRouting.Language
                     continue;
                 }
 
-                // TODO FIXME
-                // EITHER THE TYPES HAVE TO BE FROM SPECIFIC TO NON-SPECIFIC ORDER OR VICE VERSA
-                var specialized = f.Types.RenameVars(specializedTypes).SpecializeTo(specializedTypes);
+                var specialized = f.Types.RenameVars(specializedTypes).SpecializeTo(specializedTypes, false);
                 // ReSharper disable once JoinNullCheckWithUsage
                 if (specialized == null)
                 {
@@ -126,7 +126,15 @@ namespace AspectedRouting.Language
             }
 
             var tps = specializedTypes;
-            return specializedExpressions = expressions.Select(expr => expr.Specialize(tps));
+
+            var optExprs = new List<IExpression>();
+            foreach (var expr in exprs)
+            {
+                var exprOpt = expr.Specialize(tps);
+                optExprs.Add(exprOpt);
+            }
+
+            return specializedExpressions = optExprs;
         }
     }
 }
