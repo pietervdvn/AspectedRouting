@@ -10,9 +10,6 @@
       "anyways:construction",
       "bicycle",
       "access",
-      "cycleway:right",
-      "cycleway:left",
-      "cycleway",
       "service",
       "highway"
     ],
@@ -25,7 +22,8 @@
         "permissive": "permissive",
         "destination": "destination",
         "delivery": "destination",
-        "service": "destination"
+        "service": "destination",
+        "permit": "destination"
       },
       "highway": {
         "cycleway": "designated",
@@ -38,6 +36,7 @@
         "footway": "dismount",
         "pedestrian": "dismount",
         "corridor": "dismount",
+        "construction": "dismount",
         "path": "yes",
         "primary": "yes",
         "primary_link": "yes",
@@ -62,17 +61,10 @@
         "permissive": "permissive",
         "private": "private",
         "official": "designated",
-        "dismount": "dismount"
+        "dismount": "dismount",
+        "permit": "destination"
       },
-      "cycleway:right": {
-        "$not": "no"
-      },
-      "cycleway:left": {
-        "$not": "no"
-      },
-      "cycleway": {
-        "$not": "no"
-      },
+
       "anyways:bicycle": "$id",
       "anyways:access": {
         "no": "no",
