@@ -94,22 +94,14 @@ namespace AspectedRouting.Language
 
             // TODO FIX THIS so that it works
             // An argument 'optimizes' it's types from 'string -> bool' to 'string -> string'
-            try
+            var eOpt = eSmallest.Optimize();
+            if (eOpt == null || eOpt.Types.Count() == 0)
             {
-                var eOpt = eSmallest.Optimize();            if (eOpt == null || eOpt.Types.Count() == 0)
-                {
-                    throw new Exception("Could not optimize " + eSmallest);
-                }
-                eOpt.SanityCheck();
-                return eOpt;
-            }
-            catch
-            {
-                Console.WriteLine("Optimalization failed for "+eSmallest);
-                return eSmallest;
+                throw new Exception("Could not optimize " + eSmallest);
             }
 
-
+            eOpt.SanityCheck();
+            return eOpt;
         }
 
         public static IExpression SpecializeToSmallestType(this IExpression e)
