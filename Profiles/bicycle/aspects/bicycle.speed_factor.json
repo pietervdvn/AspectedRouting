@@ -10,9 +10,11 @@
       "#": "A small forest path is typically slow",
       "path": 0.5,
       "#": "an unmaintained track (in Belgium: tractor path) is slower as well",
-      "track": 0.7
+      "track": 0.7,
+      "#": "A road under construction slows one down, despite (normally) already being dismount",
+      "construction": 0.5
     },
-    "surface": {
+  "surface": {
       "paved": 0.99,
       "asphalt": 1,
       "concrete": 1,
