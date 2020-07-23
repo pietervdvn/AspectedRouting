@@ -1,4 +1,4 @@
-expected,highway,bicycle,access,anyways:access,cycleway:right,cycleway:right
+expected,highway,bicycle,access,anyways:access,cycleway:right,cycleway
 no,,,,,,
 no,,,no,,,
 yes,,yes,no,,,
@@ -18,3 +18,5 @@ yes,primary,,,,,yes
 yes,secondary,,,,track,
 destination,service,,destination,,,
 no,residential,use_sidepath,,,,
+yes,tertiary,,,,,no
+dismount,construction,,,,,
