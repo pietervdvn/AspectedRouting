@@ -13,5 +13,10 @@ function legacy_relation_preprocessor(attributes, result)
             -- for the americans!
             result.attributes_to_keep.cycle_network_colour = attributes.color
         end
+        
+        if (attributes.ref ~= nil) then
+            -- for the americans!
+            result.attributes_to_keep.cycle_network_ref = attributes.ref
+        end
     end
 end

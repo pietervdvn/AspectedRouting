@@ -11,6 +11,7 @@
     "tunnel",
     "colour",
     "cycle_network_colour",
+    "cycle_network_ref",
     "ref",
     "status",
     "network"
