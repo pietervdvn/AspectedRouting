@@ -1,5 +1,5 @@
 function first_match_of(tags, result, order_of_keys, table)
-    for _, key in ipairs(order_of_keys) do
+    for _, key in pairs(order_of_keys) do
         local v = tags[key]
         if (v ~= nil) then
 

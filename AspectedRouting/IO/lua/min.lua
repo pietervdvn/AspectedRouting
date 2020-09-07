@@ -1,10 +1,12 @@
 function min(list)
     local min
-    for _, value in ipairs(list) do
-        if (min == nil) then
-            min = value
-        elseif (min > value) then
-            min = value
+    for _, value in pairs(list) do
+        if(value ~= nil) then
+            if (min == nil) then
+                min = value
+            elseif (value < min) then
+                min = value
+            end
         end
     end
 

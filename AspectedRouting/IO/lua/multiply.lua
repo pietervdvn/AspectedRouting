@@ -1,7 +1,9 @@
 function multiply(list)
     local factor = 1
-    for _, value in ipairs(list) do
-        factor = factor * value
+    for _, value in pairs(list) do
+        if (value ~= nil) then
+            factor = factor * value
+        end
     end
     return factor;
 end

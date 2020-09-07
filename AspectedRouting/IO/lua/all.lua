@@ -1,5 +1,5 @@
 function all(list)
-    for _, value in ipairs(list) do
+    for _, value in pairs(list) do
         if (value == nil) then
             return false
         end

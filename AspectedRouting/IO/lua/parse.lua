@@ -22,6 +22,15 @@ function parse(string)
         end
     end
 
+    if(string:match("%d*:%d*")) then
+        -- duration in minute
+        local duration = 0
+        for part in string:gmatch "%d*" do
+            duration = duration * 60 + tonumber(part)
+        end
+        return duration
+    end
+
 
     return tonumber(string)
 end
