@@ -335,11 +335,33 @@ namespace AspectedRouting.Test
 
             var exprs = new[] {p0, p1};
             var newTypes = exprs.SpecializeToCommonTypes(out var _);
-            Assert.Single( newTypes);
+            Assert.Single(newTypes);
 
             exprs = new[] {p1, p0};
             newTypes = exprs.SpecializeToCommonTypes(out var _);
-            Assert.Single( newTypes);
+            Assert.Single(newTypes);
         }
+
+
+        [Fact]
+        public void ParseFunction_InvalidInput_NullOutput()
+        {
+            var f = Funcs.Parse;
+            var c = new Context();
+            var result = f.Evaluate(c, new Constant("abc"));
+
+            Assert.Null(result);
+        }
+        
+        [Fact]
+        public void ParseFunction_Duration_TotalMinutes()
+        {
+            var f = Funcs.Parse;
+            var c = new Context();
+            var result = f.Evaluate(c, new Constant("01:15"));
+
+            Assert.Equal(75, result);
+        }
+
     }
 }

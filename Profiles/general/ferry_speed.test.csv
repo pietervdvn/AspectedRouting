@@ -1,0 +1,5 @@
+expected,route,duration,interval,_length,comment
+1,ferry,,,
+2,ferry,25,,1000,25 minutes duration + 5 minutes to get on is 30 minutes total for one kilometer -> 2 km/h
+4,ferry,10,,1000,10 minutes duration + 5 minutes to get on is 15 minutes total for one kilometer -> 4km/h
+null,,,,Ferry is not set

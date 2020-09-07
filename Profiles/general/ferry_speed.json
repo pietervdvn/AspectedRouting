@@ -1,0 +1,35 @@
+{
+  "name": "ferry_speed",
+  "description": "Gives the expected speed for a ferry. This includes the time needed to board and the expected waiting time (if duration is present). This uses the tag '_length', which is expected to be added by the preprocessing-step.",
+  "unit": "km/h",
+  "value": {
+    "$ifDotted": {
+      "route": {
+        "ferry": "yes"
+      }
+    },
+    "then": {
+      "#": "(length (m) / (duration (minutes) + 5 minutes slack)) * 0.06 minutes/kilometer",
+      "$multiply": [
+        {
+          "#": "The default value is chosen so that it defaults to 1km/h",
+          "$default": 83.33333333333333,
+          "value": {
+            "_length": "$parse"
+          }
+        },
+        {
+          "$inv": {
+            "$sum": [
+              {
+                "duration": "$parse"
+              },
+              5
+            ]
+          }
+        },
+        0.06
+      ]
+    }
+  }
+}

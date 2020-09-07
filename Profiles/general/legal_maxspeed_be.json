@@ -7,8 +7,7 @@
     "$firstMatchOf": [
       "maxspeed",
       "designation",
-      "highway",
-      "route"
+      "highway"
     ],
     "value": {
       "maxspeed": "$parse",
@@ -37,10 +36,6 @@
       },
       "designation": {
         "towpath": 30
-      },
-      "route": {
-        "#": "A ferry often goes once every half-an-hour, to cross like 100m; in other words: 0.2km/h",
-        "ferry": 0.2
       }
     }
   }
