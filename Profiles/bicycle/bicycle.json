@@ -19,14 +19,18 @@
   "access": "$bicycle.legal_access",
   "oneway": "$bicycle.oneway",
   "speed": {
-    "$min": [
-      "$legal_maxspeed_be",
-      "#maxspeed",
+    "$max": [
       "$ferry_speed",
       {
-        "$multiply": [
-          "#defaultSpeed",
-          "$bicycle.speed_factor"
+        "$min": [
+          "$legal_maxspeed_be",
+          "#maxspeed",
+          {
+            "$multiply": [
+              "#defaultSpeed",
+              "$bicycle.speed_factor"
+            ]
+          }
         ]
       }
     ]

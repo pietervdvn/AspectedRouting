@@ -24,7 +24,18 @@
               {
                 "duration": "$parse"
               },
-              5
+              {
+                "$multiply": [
+                  {
+                    "#": "Time needed to get on. We assume a continous ferry (pull it your self) which takes a few minutes to be free. If an interval is specified, we take a quarter of the interval as we assume that people will take into account the schedule",
+                    "$default": 20,
+                    "value": {
+                      "interval": "$parse"
+                    }
+                  },
+                  0.25
+                ]
+              }
             ]
           }
         },

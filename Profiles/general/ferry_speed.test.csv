@@ -3,3 +3,5 @@ expected,route,duration,interval,_length,comment
 2,ferry,25,,1000,25 minutes duration + 5 minutes to get on is 30 minutes total for one kilometer -> 2 km/h
 4,ferry,10,,1000,10 minutes duration + 5 minutes to get on is 15 minutes total for one kilometer -> 4km/h
 null,,,,Ferry is not set
+20.442857142857,ferry,00:16,,7155,Waterbus SintAnna-Zwijndrecht - osm.org/way/632117702
+9.3326086956522,ferry,00:16,2:00,7155,Non-regular waterbus which goes every two hours. Expected time ppl will wait: 30minutes + 16minutes faring duration = 46minutes for 7km = ~9km/h

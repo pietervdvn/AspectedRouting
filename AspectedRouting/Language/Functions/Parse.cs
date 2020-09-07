@@ -48,7 +48,7 @@ namespace AspectedRouting.Language.Functions
                 // This is a duration of the form 'hh:mm' -> we return the total minute count
               var hours = int.Parse(duration.Groups[1].Value);
               var minutes = int.Parse(duration.Groups[2].Value);
-              return hours * 60 + minutes;
+              arg = (hours * 60 + minutes).ToString();
             }
             
             try
