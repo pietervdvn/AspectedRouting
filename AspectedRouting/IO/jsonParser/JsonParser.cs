@@ -21,7 +21,7 @@ namespace AspectedRouting.IO.jsonParser
             try
             {
                 var expr = ParseExpression(prop, c);
-                if (expr.Types.Count() == 0)
+                if (!expr.Types.Any())
                 {
                     throw new Exception($"Could not parse field {property}, no valid typing for expression found");
                 }

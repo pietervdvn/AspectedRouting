@@ -23,7 +23,7 @@ namespace AspectedRouting.IO.jsonParser
                     // this is a profile
                     return null;
                 }
-                
+
                 Console.WriteLine("Parsing " + fileName);
 
                 return doc.RootElement.ParseAspect(fileName, c);
@@ -240,7 +240,7 @@ namespace AspectedRouting.IO.jsonParser
             if (e.ValueKind == JsonValueKind.Array)
             {
                 var exprs = e.EnumerateArray().Select(json =>
-                    Funcs.Either(Funcs.Id, Funcs.Const, json.ParseExpression(context)))
+                        Funcs.Either(Funcs.Id, Funcs.Const, json.ParseExpression(context)))
                     .ToList();
                 var list = new Constant(exprs);
                 return Funcs.Either(Funcs.Id, Funcs.ListDot, list);
@@ -330,7 +330,7 @@ namespace AspectedRouting.IO.jsonParser
                 return func.Apply(args);
             }
 
-            
+
             args.Add(firstArgument);
 
             var allExprs = allArgs
@@ -479,7 +479,7 @@ namespace AspectedRouting.IO.jsonParser
             }
 
             expr = expr.SpecializeToSmallestType();
-            
+
 
             var name = e.Get("name");
             if (expr.Types.Count() > 1)
@@ -503,6 +503,7 @@ namespace AspectedRouting.IO.jsonParser
                 }
             }
 
+            Console.WriteLine($"Aspect {name} has type {string.Join(",", expr.Types)}");
             return new AspectMetadata(
                 expr,
                 name,

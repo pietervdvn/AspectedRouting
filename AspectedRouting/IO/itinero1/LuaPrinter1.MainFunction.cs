@@ -59,7 +59,7 @@ namespace AspectedRouting.IO.itinero1
                 var paramInLua = _skeleton.ToLua(new Parameter(parameterName));
 
 
-                var exprInLua = _skeleton.ToLua(expression.Optimize());
+                var exprInLua = _skeleton.ToLua(expression.Optimize(), forceFirstArgInDot: true);
                 var resultTypes = expression.Types.Select(t => t.Uncurry().Last());
                 if (resultTypes.Any(t => t.Name.Equals(Typs.Bool.Name)))
                 {

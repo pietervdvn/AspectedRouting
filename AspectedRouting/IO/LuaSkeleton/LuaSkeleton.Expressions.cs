@@ -13,9 +13,8 @@ namespace AspectedRouting.IO.LuaSkeleton
 {
     public partial class LuaSkeleton
     {
-        internal string ToLua(IExpression bare, string key = "nil")
+        internal string ToLua(IExpression bare, string key = "nil", bool forceFirstArgInDot = false)
         {
-            
             var collectedMapping = new List<IExpression>();
             var order = new List<IExpression>();
 
@@ -61,13 +60,9 @@ namespace AspectedRouting.IO.LuaSkeleton
                 return "member_of(funcName, parameters, tags, result)";
             }
 
+           
             var collectedList = new List<IExpression>();
             var func = new List<IExpression>();
-
-
-
-            
-            
             if (
                 UnApply(
                     UnApply(IsFunc(Funcs.Dot), Assign(func)),
@@ -98,14 +93,9 @@ namespace AspectedRouting.IO.LuaSkeleton
                 return "\n        " + funcName + "({\n         " + string.Join(",\n         ", luaExprs) +
                        "\n        })";
             }
-
-
             collectedMapping.Clear();
             var dottedFunction = new List<IExpression>();
-
-
             dottedFunction.Clear();
-
             if (UnApply(
                     UnApply(
                         IsFunc(Funcs.Dot),
@@ -127,6 +117,7 @@ namespace AspectedRouting.IO.LuaSkeleton
                        "))";
             }
 
+
             // The expression might be a function which still expects a string (the value from the tag) as argument
             if (!(bare is Mapping) &&
                 bare.Types.First() is Curry curr &&
@@ -144,16 +135,36 @@ namespace AspectedRouting.IO.LuaSkeleton
                 var (f, args) = fArgs.Value;
                 var baseFunc = (Function) f;
 
-                if (baseFunc.Name.Equals(Funcs.Id.Name) ||
-                    baseFunc.Name.Equals(Funcs.Dot.Name))
+                if (baseFunc.Name.Equals(Funcs.Id.Name))
                 {
                     // This is an ugly hack
                     return ToLua(args.First());
                 }
                 
+                if(baseFunc.Name.Equals(Funcs.Dot.Name))
+                {
+
+                    if (args.Count == 1 || forceFirstArgInDot)
+                    {
+                        return ToLua(args[0]);
+                    }
+                    
+                    var argsAsLua = args.Select(arg => ToLua(arg, key)).ToList();
+                    var fName = argsAsLua[0];
+                    var actualArgs = 
+                        string.Join(",",argsAsLua.GetRange(1, argsAsLua.Count - 1));
+                      return $"{fName}({actualArgs})";
+                }
+                
                 AddDep(baseFunc.Name);
 
-                return baseFunc.Name + "(" + string.Join(", ", args.Select(arg => ToLua(arg, key))) + ")";
+                var argExpressions = new List<string>();
+                foreach (var arg in args)
+                {
+                    argExpressions.Add(ToLua(arg, key));
+                }
+
+                return baseFunc.Name + "(" + string.Join(", ", argExpressions) + ")";
             }
 
 
@@ -178,7 +189,6 @@ namespace AspectedRouting.IO.LuaSkeleton
                     return MappingToLua(m).Indent();
                 case Function f:
                     var fName = f.Name.TrimStart('$');
-
                     if (Funcs.Builtins.ContainsKey(fName))
                     {
                         AddDep(f.Name);
