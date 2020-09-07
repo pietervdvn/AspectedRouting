@@ -49,17 +49,15 @@ namespace AspectedRouting.Tests
             AspectMetadata functionToApply,
             IEnumerable<(string expected, Dictionary<string, string> tags)> tests)
         {
-
             if (functionToApply == null)
             {
                 throw new NullReferenceException("functionToApply is null");
             }
+
             FunctionToApply = functionToApply;
             Tests = tests;
         }
 
-
-     
 
         public bool Run()
         {
@@ -77,14 +75,28 @@ namespace AspectedRouting.Tests
                     }
                 }
 
-                var actual = FunctionToApply.Evaluate(context, new Constant(test.tags));
-                if (!actual.ToString().Equals(test.expected) &&
-                    !(actual is double actualD && Math.Abs(double.Parse(test.expected) - actualD) < 0.0001)
-                )
+                try
                 {
-                    failed = true;
+                    var actual = FunctionToApply.Evaluate(context, new Constant(test.tags));
+                    if (test.expected == "null" && actual == null)
+                    {
+                        // Test ok
+                    }
+                    else if (!actual.ToString().Equals(test.expected) &&
+                             !(actual is double actualD && Math.Abs(double.Parse(test.expected) - actualD) < 0.0001)
+                    )
+                    {
+                        failed = true;
+                        Console.WriteLine(
+                            $"[{FunctionToApply.Name}] Line {testCase + 1} failed:\n   Expected: {test.expected}\n   actual: {actual}\n   tags: {test.tags.Pretty()}\n");
+                    }
+                }
+                catch (Exception e)
+                {
                     Console.WriteLine(
-                        $"[{FunctionToApply.Name}] Line {testCase+1} failed:\n   Expected: {test.expected}\n   actual: {actual}\n   tags: {test.tags.Pretty()}\n");
+                        $"[{FunctionToApply.Name}] Line {testCase + 1} ERROR:\n   Expected: {test.expected}\n   error message: {e.Message}\n   tags: {test.tags.Pretty()}\n");
+
+                    failed = true;
                 }
             }
 
