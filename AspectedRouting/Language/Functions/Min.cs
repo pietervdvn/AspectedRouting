@@ -8,7 +8,7 @@ namespace AspectedRouting.Language.Functions
     public class Min : Function
     {
         public override string Description { get; } =
-            "Out of a list of values, gets the smallest value. IN case of a list of bools, this acts as `and`";
+            "Out of a list of values, gets the smallest value. In case of a list of bools, this acts as `and`. Note that 'null'-values are ignored.";
 
         public override List<string> ArgNames { get; } = new List<string> {"list"};
 

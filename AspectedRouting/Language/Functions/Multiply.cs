@@ -8,7 +8,7 @@ namespace AspectedRouting.Language.Functions
     public class Multiply : Function
     {
         public override string Description { get; } =
-            "Multiplies all the values in a given list. On a list of booleans, this acts as 'and' or 'all'";
+            "Multiplies all the values in a given list. On a list of booleans, this acts as 'and' or 'all', as `false` and `no` are interpreted as zero. Null values are ignored and thus considered to be `one`";
 
         public override List<string> ArgNames { get; } = new List<string> {"list"};
 

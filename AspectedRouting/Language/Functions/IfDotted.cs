@@ -16,7 +16,8 @@ namespace AspectedRouting.Language.Functions
                                                       "`(ifDotted fc fthen felse) a` === `(if (fc a) (fthen a) (felse a)" +
                                                       "Selects either one of the branches, depending on the condition." +
                                                       " The 'then' branch is returned if the condition returns the string `yes` or `true` or the boolean `true`" +
-                                                      "If the `else` branch is not set, `null` is returned in the condition is false.";
+                                                      "If the `else` branch is not set, `null` is returned in the condition is false." +
+                                                      "In case the condition returns 'null', then the 'else'-branch is taken.";
         public override List<string> ArgNames { get; } = new List<string> {"condition", "then", "else"};
 
         public IfDotted() : base("if_then_else_dotted", true,
@@ -73,7 +74,7 @@ namespace AspectedRouting.Language.Functions
             }
             else
             {
-                return elsefunc.Apply(argument).Evaluate(c);
+                return elsefunc?.Apply(argument)?.Evaluate(c);
             }
         }
 

@@ -7,7 +7,7 @@ namespace AspectedRouting.Language.Functions
 {
     public class Sum : Function
     {
-        public override string Description { get; } = "Sums all the numbers in the given list. If the list contains bool, `yes` or `true` will be considered to equal `1`";
+        public override string Description { get; } = "Sums all the numbers in the given list. If the list is a list of booleans, `yes` or `true` will be considered to equal `1`. Null values are ignored (and thus handled as being `0`)";
         public override List<string> ArgNames { get; } = new List<string>{"list"};
 
         public Sum() : base("sum", true,
@@ -26,7 +26,7 @@ namespace AspectedRouting.Language.Functions
         }
 
 
-        private Sum(IEnumerable<Type> specializedTypes) : base("max", specializedTypes)
+        private Sum(IEnumerable<Type> specializedTypes) : base("sum", specializedTypes)
         {
         }
 
@@ -44,7 +44,9 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var ls = ((IEnumerable<object>) arguments[0].Evaluate(c)).Where(o => o!=null);
+            var ls = ((IEnumerable<object>) arguments[0]
+                .Evaluate(c))
+                .Where(o => o!=null);
             var expectedType = (Types.First() as Curry).ResultType;
 
             switch (expectedType)
