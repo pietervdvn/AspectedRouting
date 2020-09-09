@@ -14,8 +14,8 @@ function legacy_relation_preprocessor(attributes, result)
             result.attributes_to_keep.cycle_network_colour = attributes.color
         end
         
-        if (attributes.ref ~= nil) then
-            -- for the americans!
+        if (attributes.ref ~= nil and attributes.operator == "Stad Genk") then 
+            -- This is pure legacy: we need the ref number only of stad Genk
             result.attributes_to_keep.cycle_network_ref = attributes.ref
         end
     end
