@@ -5,3 +5,4 @@ expected,route,duration,interval,_length,comment
 null,,,,Ferry is not set
 20.442857142857,ferry,00:16,,7155,Waterbus SintAnna-Zwijndrecht - osm.org/way/632117702
 9.3326086956522,ferry,00:16,2:00,7155,Non-regular waterbus which goes every two hours. Expected time ppl will wait: 30minutes + 16minutes faring duration = 46minutes for 7km = ~9km/h
+24,ferry,0:,0:1,100,

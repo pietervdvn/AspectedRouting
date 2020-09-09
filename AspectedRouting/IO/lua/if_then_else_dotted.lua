@@ -14,9 +14,6 @@ function if_then_else_dotted(conditionf, thnf, elsef, arg)
     if (condition) then
         return applyIfNeeded(thnf, arg)
     else
-        if(elsef == nil) then
-            return nil
-         end
         return applyIfNeeded(elsef, arg) -- if no third parameter is given, 'els' will be nil
     end
 end
