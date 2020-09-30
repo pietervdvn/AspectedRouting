@@ -14,6 +14,12 @@ namespace AspectedRouting.Language.Expression
         public string Author { get; }
         public string Filename { get; }
         public List<string> VehicleTyps { get; }
+        
+        /*
+         * Which tags are included in the routerdb but are _not_ used for routeplanning?
+         * Typically these are tags that are useful for navigation (name of the road, is this a tunnel, ...)
+         * but not relevant for determining the road
+         */
         public List<string> Metadata { get; }
 
         public Dictionary<string, IExpression> DefaultParameters { get; }

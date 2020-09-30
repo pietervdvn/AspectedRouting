@@ -1,6 +1,6 @@
 {
   "name": "bicycle",
-  "description": "A simple profile which routes a normal bicycle",
+  "description": "Profile for a normal bicycle",
   "vehicletypes": [
     "vehicle",
     "bicycle"
@@ -122,11 +122,11 @@
     },
     "genk": {
       "description": "A route preferring the cycling network by operator 'Stad Genk'",
-      "#operatorNetworkScore": 5,
+      "#operatorNetworkScore": 50,
       "#networkOperator": [
         "Stad Genk"
       ],
-      "#safety": 1
+      "#safety": 0.1
     },
     "cycle_highway": {
       "description": "A route preferring the 'cycle-highways'. On non-cycleways, fastest is used (with a very low factor) in order to make sure the behaviour there is defined ",
@@ -151,7 +151,7 @@
       "#safety": 3
     },
     "b2w": {
-      "description": "[Custom] Route specifically for Bike2Work. Same as commute at this moment. A route preferring the 'cycle-highways' or the cycling network by operator 'Brussels Mobility'",
+      "description": "[Custom][Private] Route specifically for Bike2Work. Same as commute at this moment. A route preferring the 'cycle-highways' or the cycling network by operator 'Brussels Mobility'",
       "#operatorNetworkScore": 3,
       "#networkOperator": [
         "Brussels Mobility"

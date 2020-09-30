@@ -203,7 +203,8 @@ namespace AspectedRouting.Language
 
         public static void SanityCheckProfile(this ProfileMetaData pmd, Context context)
         {
-            var defaultParameters = pmd.DefaultParameters.Keys.Select(k => k.TrimStart('#'));
+            var defaultParameters = pmd.DefaultParameters.Keys
+                .Select(k => k.TrimStart('#')).ToList();
 
 
             var usedMetadata = pmd.UsedParameters(context);

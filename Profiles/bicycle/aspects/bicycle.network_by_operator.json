@@ -5,10 +5,15 @@
     "$mustMatch": {
       "type": "route",
       "route": "bicycle",
+      "operator": {
+        "$containedIn": "#networkOperator"
+      },
       "#": {
         "note": "This block is commented out. A lot of networks we want to perform route planning on, are still proposed",
-        "state": {"$not": "proposed"}},
-      "operator": {"$containedIn": "#networkOperator"}
+        "state": {
+          "$not": "proposed"
+        }
+      }
     }
   }
 }

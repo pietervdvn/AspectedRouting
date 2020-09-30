@@ -114,6 +114,12 @@ namespace AspectedRouting
                     return; // End of stream has been reached
                 }
 
+                if (read == "")
+                {
+                    Console.WriteLine("looƆ sᴉ dɐWʇǝǝɹʇSuǝdO");
+                    continue;
+                }
+
                 if (read.Equals("quit"))
                 {
                     return;
@@ -141,6 +147,11 @@ namespace AspectedRouting
                 var tags = new Dictionary<string, string>();
                 foreach (var str in tagsRaw)
                 {
+                    if (str == "")
+                    {
+                        continue;
+                    }
+
                     var strSplit = str.Split("=");
                     var k = strSplit[0].Trim();
                     var v = strSplit[1].Trim();
@@ -206,8 +217,19 @@ namespace AspectedRouting
             var files = Directory.EnumerateFiles(inputDir, "*.json", SearchOption.AllDirectories)
                 .ToList();
 
-            var tests = Directory.EnumerateFiles(inputDir, "*test.csv", SearchOption.AllDirectories)
+            var tests = Directory.EnumerateFiles(inputDir, "*.csv", SearchOption.AllDirectories)
                 .ToList();
+
+            foreach (var test in tests)
+            {
+                if (test.EndsWith(".test.csv") || test.EndsWith(".behaviour_test.csv"))
+                {
+                    continue;
+                }
+
+                throw new ArgumentException(
+                    $"Invalid name for csv file ${test}, should end with either '.behaviour_test.csv' or '.test.csv'");
+            }
 
             var context = new Context();
 
@@ -235,7 +257,7 @@ namespace AspectedRouting
                 }
             }
 
-            
+
             foreach (var (profile, profileTests) in profiles)
             {
                 foreach (var test in profileTests)
@@ -274,8 +296,19 @@ namespace AspectedRouting
                 }
             }
 
-            Repl(context,
-                profiles.First(p => p.profile.Name.Equals("bicycle")).profile);
+            File.WriteAllText($"{outputDir}/metadata.json",
+                Utils.GenerateExplanationJson(profiles.Select(p => p.profile))
+            );
+
+            if (!args.Contains("--no-repl"))
+            {
+                Repl(context,
+                    profiles.First(p => p.profile.Name.Equals("bicycle")).profile);
+            }
+            else
+            {
+                Console.WriteLine("Not starting REPL as --no-repl is specified");
+            }
         }
     }
 }

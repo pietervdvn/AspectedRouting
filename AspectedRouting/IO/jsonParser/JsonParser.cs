@@ -51,6 +51,11 @@ namespace AspectedRouting.IO.jsonParser
             foreach (var obj in e.EnumerateObject())
             {
                 var nm = obj.Name.TrimStart('#');
+                if (nm == "")
+                {
+                    // This is a comment - not a parameter!
+                    continue;
+                }
                 switch (obj.Value.ValueKind)
                 {
                     case JsonValueKind.String:
