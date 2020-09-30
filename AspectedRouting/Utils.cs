@@ -54,12 +54,6 @@ namespace AspectedRouting
                 {
                     var behaviourDescription = behaviour.Value["description"].Evaluate(new Context()) as string;
                     behaviourDescription ??= "";
-                    if (behaviourDescription.ToLower().Contains("[private]"))
-                    {
-                        // This profile is marked as private, we are hiding it
-                        continue;
-                    }
-
                     var meta = new Dictionary<string, string>
                     {
                         {"name", behaviour.Key},

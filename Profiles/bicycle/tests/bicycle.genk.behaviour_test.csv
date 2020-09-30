@@ -1,0 +1,9 @@
+access,oneway,speed,priority,highway,_relation:bicycle.network_by_operator
+no,both,0,0,,
+yes,both,15,0.09,residential,
+yes,both,15,50.09,residential,yes
+dismount,both,2.25,0.019,footway,
+yes,both,15,50.09,residential,yes
+designated,both,15,50.15,cycleway,yes
+yes,both,15,0.09,residential,no
+designated,both,15,0.15,cycleway,no
