@@ -26,7 +26,12 @@ namespace AspectedRouting.Language.Functions
         public object Evaluate(Context c, params IExpression[] args)
         {
             var paramName = ParamName.TrimStart('#'); // context saves paramnames without '#'
-            return c?.Parameters?.GetValueOrDefault(paramName, null);
+            var value = c?.Parameters?.GetValueOrDefault(paramName, null);
+            if(value is Constant constant)
+            {
+                return constant.Evaluate(c);
+            }
+            return value;
         }
 
         public IExpression Specialize(IEnumerable<Type> allowedTypes)

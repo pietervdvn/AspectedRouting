@@ -162,7 +162,7 @@
       "#safety": 3
     },
     "anyways.network": {
-      "description": "[Internal use] A route using the Anyways branded network; mainly used in ShortCut/Impact",
+      "description": "[Private][Internal use] A route using the Anyways branded network; mainly used in ShortCut/Impact",
       "#timeNeeded": 1,
       "#operatorNetworkScore": 10,
       "#networkOperator": [

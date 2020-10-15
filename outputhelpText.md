@@ -179,7 +179,7 @@ s | returns |
 string | double |
 string | pdouble |
 
-Parses a string into a numerical value. Returns 'null' if parsing fails or no input is given
+Parses a string into a numerical value. Returns 'null' if parsing fails or no input is given. If a duration is given (e.g. `01:15`), then the number of minutes (75) is returned
 
 
 
@@ -208,6 +208,15 @@ function parse(string)
         else
             return 0
         end
+    end
+
+    if(string:match("%d+:%d+")) then
+        -- duration in minute
+        local duration = 0
+        for part in string:gmatch "%d+" do
+            duration = duration * 60 + tonumber(part)
+        end
+        return duration
     end
 
 
@@ -268,7 +277,7 @@ Lua implementation:
 
 ````lua
 function containedIn(list, a)
-    for _, value in ipairs(list) do
+    for _, value in pairs(list) do
         if (value == a) then
             return true
         end
@@ -298,11 +307,13 @@ Lua implementation:
 ````lua
 function min(list)
     local min
-    for _, value in ipairs(list) do
-        if (min == nil) then
-            min = value
-        elseif (value < min) then
-            min = value
+    for _, value in pairs(list) do
+        if(value ~= nil) then
+            if (min == nil) then
+                min = value
+            elseif (value < min) then
+                min = value
+            end
         end
     end
 
@@ -330,11 +341,13 @@ Lua implementation:
 ````lua
 function min(list)
     local min
-    for _, value in ipairs(list) do
-        if (min == nil) then
-            min = value
-        elseif (value < min) then
-            min = value
+    for _, value in pairs(list) do
+        if(value ~= nil) then
+            if (min == nil) then
+                min = value
+            elseif (value < min) then
+                min = value
+            end
         end
     end
 
@@ -362,11 +375,13 @@ Lua implementation:
 ````lua
 function max(list)
     local max
-    for _, value in ipairs(list) do
-        if (max == nil) then
-            max = value
-        elseif (max < value) then
-            max = value
+    for _, value in pairs(list) do
+        if (value ~= nil) then
+            if (max == nil) then
+                max = value
+            elseif (max < value) then
+                max = value
+            end
         end
     end
 
@@ -394,11 +409,13 @@ Lua implementation:
 ````lua
 function max(list)
     local max
-    for _, value in ipairs(list) do
-        if (max == nil) then
-            max = value
-        elseif (max < value) then
-            max = value
+    for _, value in pairs(list) do
+        if (value ~= nil) then
+            if (max == nil) then
+                max = value
+            elseif (max < value) then
+                max = value
+            end
         end
     end
 
@@ -425,12 +442,14 @@ Lua implementation:
 
 ````lua
 function sum(list)
-    local sum = 1
-    for _, value in ipairs(list) do
-        if(value == 'yes' or value == 'true') then
-            value = 1
+    local sum = 0
+    for _, value in pairs(list) do
+        if(value ~= nil) then
+            if(value == 'yes' or value == 'true') then
+                value = 1
+            end
+            sum = sum + value
         end
-        sum = sum + value
     end
     return sum;
 end
@@ -455,12 +474,14 @@ Lua implementation:
 
 ````lua
 function sum(list)
-    local sum = 1
-    for _, value in ipairs(list) do
-        if(value == 'yes' or value == 'true') then
-            value = 1
+    local sum = 0
+    for _, value in pairs(list) do
+        if(value ~= nil) then
+            if(value == 'yes' or value == 'true') then
+                value = 1
+            end
+            sum = sum + value
         end
-        sum = sum + value
     end
     return sum;
 end
@@ -485,12 +506,14 @@ Lua implementation:
 
 ````lua
 function sum(list)
-    local sum = 1
-    for _, value in ipairs(list) do
-        if(value == 'yes' or value == 'true') then
-            value = 1
+    local sum = 0
+    for _, value in pairs(list) do
+        if(value ~= nil) then
+            if(value == 'yes' or value == 'true') then
+                value = 1
+            end
+            sum = sum + value
         end
-        sum = sum + value
     end
     return sum;
 end
@@ -516,8 +539,10 @@ Lua implementation:
 ````lua
 function multiply(list)
     local factor = 1
-    for _, value in ipairs(list) do
-        factor = factor * value
+    for _, value in pairs(list) do
+        if (value ~= nil) then
+            factor = factor * value
+        end
     end
     return factor;
 end
@@ -562,7 +587,7 @@ Lua implementation:
 
 ````lua
 function first_match_of(tags, result, order_of_keys, table)
-    for _, key in ipairs(order_of_keys) do
+    for _, key in pairs(order_of_keys) do
         local v = tags[key]
         if (v ~= nil) then
 
@@ -789,9 +814,6 @@ function if_then_else_dotted(conditionf, thnf, elsef, arg)
     if (condition) then
         return applyIfNeeded(thnf, arg)
     else
-        if(elsef == nil) then
-            return nil
-         end
         return applyIfNeeded(elsef, arg) -- if no third parameter is given, 'els' will be nil
     end
 end
@@ -832,9 +854,6 @@ function if_then_else_dotted(conditionf, thnf, elsef, arg)
     if (condition) then
         return applyIfNeeded(thnf, arg)
     else
-        if(elsef == nil) then
-            return nil
-         end
         return applyIfNeeded(elsef, arg) -- if no third parameter is given, 'els' will be nil
     end
 end
@@ -875,9 +894,6 @@ function if_then_else_dotted(conditionf, thnf, elsef, arg)
     if (condition) then
         return applyIfNeeded(thnf, arg)
     else
-        if(elsef == nil) then
-            return nil
-         end
         return applyIfNeeded(elsef, arg) -- if no third parameter is given, 'els' will be nil
     end
 end
@@ -1030,7 +1046,7 @@ function head(ls)
    if(ls == nil) then
        return nil
    end
-   for _, v in ipairs(ls) do
+   for _, v in pairs(ls) do
        if(v ~= nil) then
            return v
        end

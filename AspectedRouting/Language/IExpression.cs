@@ -46,7 +46,14 @@ namespace AspectedRouting.Language
     {
         public static object Run(this IExpression e, Context c, Dictionary<string, string> tags)
         {
-            return e.Apply(new[] {new Constant(tags)}).Evaluate(c);
+            try
+            {
+                return e.Apply(new[] {new Constant(tags)}).Evaluate(c);
+            }
+            catch (Exception err)
+            {
+                throw new Exception($"While evaluating the expression {e} with arguments a list of tags", err);
+            }
         }
 
         public static IExpression Specialize(this IExpression e, Type t)

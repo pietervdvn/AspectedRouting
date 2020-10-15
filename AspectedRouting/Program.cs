@@ -102,8 +102,10 @@ namespace AspectedRouting
             return result;
         }
 
-        private static void Repl(Context c, ProfileMetaData profile)
+        private static void Repl(Context c, Dictionary<string, ProfileMetaData> profiles)
         {
+            
+            var profile = profiles["bicycle"];
             var behaviour = profile.Behaviours.Keys.First();
             do
             {
@@ -124,10 +126,33 @@ namespace AspectedRouting
                 {
                     return;
                 }
+                
+                if (read.Equals("clear"))
+                {
+                    for (int i = 0; i < 80; i++)
+                    {
+                        Console.WriteLine();
+                    }
+
+                    continue;
+                }
 
                 if (read.StartsWith("select"))
                 {
                     var beh = read.Substring("select".Length + 1).Trim();
+
+                    if (beh.Contains("."))
+                    {
+                        var profileName = beh.Split(".")[0];
+                        if (!profiles.TryGetValue(profileName, out profile))
+                        {
+                            Console.Error.WriteLine("Profile " + profileName + " not found, ignoring");
+                            continue;
+                        }
+
+                        beh = beh.Substring(beh.IndexOf(".")+1);
+                    }
+                    
                     if (profile.Behaviours.ContainsKey(beh))
                     {
                         behaviour = beh;
@@ -165,6 +190,7 @@ namespace AspectedRouting
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine(e);
                     Console.WriteLine(e.Message);
                 }
             } while (true);
@@ -296,14 +322,15 @@ namespace AspectedRouting
                 }
             }
 
-            File.WriteAllText($"{outputDir}/metadata.json",
+            File.WriteAllText($"{outputDir}/ProfileMetadata.json",
                 Utils.GenerateExplanationJson(profiles.Select(p => p.profile))
             );
 
             if (!args.Contains("--no-repl"))
             {
-                Repl(context,
-                    profiles.First(p => p.profile.Name.Equals("bicycle")).profile);
+                Repl(context, profiles
+                    .Select(p => p.profile)
+                    .ToDictionary(p => p.Name, p => p));
             }
             else
             {
