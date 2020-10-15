@@ -36,6 +36,11 @@ namespace AspectedRouting.IO.LuaSkeleton
         {
             return _functionImplementations;
         }
+
+        public bool ContainsFunction(string name)
+        {
+            return _alreadyAddedFunctions.Contains(name);
+        }
         
         public void AddDependenciesFor(IExpression e)
         {

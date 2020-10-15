@@ -103,6 +103,12 @@ namespace AspectedRouting.IO.itinero1
         private string GenerateAspectTestSuite(AspectTestSuite testSuite)
         {
             var fName = testSuite.FunctionToApply.Name;
+
+            if (!_skeleton.ContainsFunction(fName))
+            {
+                return "";
+            }
+            
             var tests =
                 testSuite.Tests
                     .Select((test, i) => GenerateAspectUnitTestCall(fName, i, test.expected, test.tags))
