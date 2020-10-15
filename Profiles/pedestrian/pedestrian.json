@@ -1,0 +1,45 @@
+{
+  "name": "pedestrian",
+  "description": "Profile for someone who is walking",
+  "vehicletypes": [
+    "vehicle",
+    "foot"
+  ],
+  "metadata": [
+    "name",
+    "bridge",
+    "tunnel",
+    "colour",
+    "ref",
+    "status",
+    "network"
+  ],
+  "access": "$pedestrian.legal_access",
+  "oneway": "both",
+  "speed": "#defaultSpeed",
+  "priority": {
+    "#timeNeeded": "$speed",
+    "#distance": "$distance",
+    "#slow_road_preference": "$pedestrian.slow_road_preference",
+    "#trespassingPenalty": "$clean_permission_score"
+  },
+  "defaults": {
+    "#defaultSpeed": 4,
+    "#maxspeed": 6,
+    "#timeNeeded": 0,
+    "#distance": 0,
+    "#slow_road_preference": 0,
+    "#trespassingPenalty": 1
+  },
+  "behaviours": {
+    "shortest": {
+      "description": "The shortest route, independent of of speed",
+      "#distance": 1,
+      "#leastSafetyPenalty": 2
+    },
+    "slow_roads": {
+      "description": "A route prefering pedestrian-oriented infrastructure",
+      "#slow_road_preference": 1
+    }
+  }
+}
