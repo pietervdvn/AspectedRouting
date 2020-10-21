@@ -37,6 +37,7 @@
         "pedestrian": "dismount",
         "corridor": "dismount",
         "construction": "dismount",
+        "steps": "dismount",
         "path": "yes",
         "primary": "yes",
         "primary_link": "yes",

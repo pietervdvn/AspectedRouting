@@ -2,4 +2,9 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=46c4a96e_002D61f1_002D4d55_002Da7ff_002D649a683870dc/@EntryIndexedValue">&lt;SessionState ContinuousTestingIsOn="False" ContinuousTestingMode="0" FrameworkVersion="{x:Null}" IsLocked="False" Name="ParseFunction_Duration_TotalMinutes" PlatformMonoPreference="{x:Null}" PlatformType="{x:Null}" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"&gt;
   &lt;Project Location="/home/pietervdvn/werk/AspectedRouting/AspectedRouting.Test" Presentation="&amp;lt;AspectedRouting.Test&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a6a74f48_002D8456_002D43c7_002Dbbee_002Dd3da33a8a4be/@EntryIndexedValue">&lt;SessionState ContinuousTestingIsOn="False" ContinuousTestingMode="0" FrameworkVersion="{x:Null}" IsLocked="False" Name="Integration_TestExamples" PlatformMonoPreference="{x:Null}" PlatformType="{x:Null}" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;xUnit::A1309041-8AAE-42D7-A886-94C9FFC6A28C::.NETCoreApp,Version=v3.1::AspectedRouting.Test.ExamplesTest.Integration_TestExamples&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
 	</wpf:ResourceDictionary>

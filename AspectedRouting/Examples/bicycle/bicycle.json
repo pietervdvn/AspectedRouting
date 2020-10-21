@@ -1,0 +1,95 @@
+{
+  "name": "bicycle",
+  "description": "Profile for a normal bicycle",
+  "vehicletypes": [
+    "vehicle",
+    "bicycle"
+  ],
+  "metadata": [
+    "name",
+    "bridge",
+    "tunnel",
+    "colour",
+    "cycle_network_colour",
+    "cycle_network_ref",
+    "ref",
+    "status",
+    "network"
+  ],
+  "access": "$bicycle.legal_access",
+  "oneway": "$bicycle.oneway",
+  "speed": {
+    "$max": [
+      "$ferry_speed",
+      {
+        "$min": [
+          "$legal_maxspeed_be",
+          "#maxspeed",
+          {
+            "$multiply": [
+              "#defaultSpeed",
+              "$bicycle.speed_factor"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "priority": {
+    "#comfort": "$bicycle.comfort",
+    "#safety": "$bicycle.safety",
+    "#nodeNetworkScore": "$bicycle.network_is_nodenetwork",
+    "#timeNeeded": "$speed",
+    "#distance": "$distance",
+    "#trespassingPenalty": "$clean_permission_score",
+    "#leastSafetyPenalty": {
+      "$multiply": [
+        "$speed",
+        {
+          "$atleast": "#leastSafetyRequired",
+          "f": "$bicycle.safety",
+          "then": 0,
+          "else": -1
+        }
+      ]
+    }
+  },
+  "defaults": {
+    "#defaultSpeed": 15,
+    "#maxspeed": 30,
+    "#timeNeeded": 0,
+    "#distance": 0,
+    "#comfort": 0,
+    "#safety": 0,
+    "#operatorNetworkScore": 0,
+    "#networkOperator": [],
+    "#cycleHighwayNetworkScore": 0,
+    "#nodeNetworkScore": 0,
+    "#bicycleNetworkScore": 0,
+    "#trespassingPenalty": 15,
+    "#": "This isn't a weight, but is used as cut-off in 'leastSafetyPenalty'",
+    "#leastSafetyRequired": 0.11,
+    "#leastSafetyPenalty": 2
+  },
+  "behaviours": {
+    "fastest": {
+      "description": "The fastest route to your destination",
+      "#timeNeeded": 1,
+      "#leastSafetyPenalty": 2
+    },
+    "shortest": {
+      "description": "The shortest route, independent of of speed",
+      "#distance": 1,
+      "#leastSafetyPenalty": 2
+    },
+    "comfort": {
+      "description": "A comfortable route preferring well-paved roads, smaller roads and a bit of scenery at the cost of speed",
+      "#comfort": 1
+    },
+    "node_network": {
+      "description": "A route following the recreational node network. Might make detours",
+      "#nodeNetworkScore": 10,
+      "#safety": 1
+    }
+  }
+}

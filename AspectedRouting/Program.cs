@@ -12,7 +12,7 @@ using AspectedRouting.Tests;
 
 namespace AspectedRouting
 {
-    static class Program
+    public static class Program
     {
         public static List<(AspectMetadata aspect, AspectTestSuite tests)> ParseAspects(
             this IEnumerable<string> jsonFileNames, List<string> testFileNames, Context context)
@@ -104,7 +104,6 @@ namespace AspectedRouting
 
         private static void Repl(Context c, Dictionary<string, ProfileMetaData> profiles)
         {
-            
             var profile = profiles["bicycle"];
             var behaviour = profile.Behaviours.Keys.First();
             do
@@ -126,7 +125,7 @@ namespace AspectedRouting
                 {
                     return;
                 }
-                
+
                 if (read.Equals("clear"))
                 {
                     for (int i = 0; i < 80; i++)
@@ -150,9 +149,9 @@ namespace AspectedRouting
                             continue;
                         }
 
-                        beh = beh.Substring(beh.IndexOf(".")+1);
+                        beh = beh.Substring(beh.IndexOf(".") + 1);
                     }
-                    
+
                     if (profile.Behaviours.ContainsKey(beh))
                     {
                         behaviour = beh;
@@ -225,17 +224,27 @@ namespace AspectedRouting
             Console.WriteLine("\n\n\n------------------------");
         }
 
-        public static void Main(string[] args)
+        static void Main(string[] args)
         {
-            if (args.Length < 2)
+            var errMessage = MainWithError(args);
+            if (errMessage != null)
             {
-                Console.WriteLine("Usage: <directory where all aspects and profiles can be found> <outputdirectory>");
-                return;
+                Console.WriteLine(errMessage);
+            }
+        }
+        public static string MainWithError(string[] args){
+        if (args.Length < 2)
+            {
+                return "Usage: <directory where all aspects and profiles can be found> <outputdirectory>";
             }
 
             var inputDir = args[0];
             var outputDir = args[1];
 
+            if (!Directory.Exists(outputDir))
+            {
+                Directory.CreateDirectory(outputDir);
+            }
 
             MdPrinter.GenerateHelpText(outputDir + "helpText.md");
 
@@ -294,8 +303,7 @@ namespace AspectedRouting
 
             if (!testsOk)
             {
-                Console.WriteLine("Some tests failed, quitting now without generating output");
-                return;
+                return "Some tests failed, quitting now without generating output";
             }
 
             foreach (var (profile, profileTests) in profiles)
@@ -318,7 +326,13 @@ namespace AspectedRouting
                         aspectTests,
                         profileTests.Where(testsSuite => testsSuite.BehaviourName == behaviourName)
                     ).ToLua();
-                    File.WriteAllText($"{outputDir}/itinero2/{profile.Name}.{behaviourName}.lua", lua2behaviour);
+                    if(!Directory.Exists($"{outputDir}/itinero2/"))
+                    {
+                        Directory.CreateDirectory($"{outputDir}/itinero2/");
+                    }
+                    File.WriteAllText(
+                        $"{outputDir}/itinero2/{profile.Name}.{behaviourName}.lua", 
+                        lua2behaviour);
                 }
             }
 
@@ -336,6 +350,7 @@ namespace AspectedRouting
             {
                 Console.WriteLine("Not starting REPL as --no-repl is specified");
             }
+            return null;
         }
     }
 }

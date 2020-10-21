@@ -12,9 +12,14 @@
       "#": "an unmaintained track (in Belgium: tractor path) is slower as well",
       "track": 0.7,
       "#": "A road under construction slows one down, despite (normally) already being dismount",
-      "construction": 0.5
+      "construction": 0.5,
+      "steps": 0.1
     },
-  "surface": {
+    "ramp:bicycle": {
+      "#": "These are stairs (highway=steps), but there is a bicycle ramp, so we go a little bit faster",
+      "yes": 3
+    },
+    "surface": {
       "paved": 0.99,
       "asphalt": 1,
       "concrete": 1,

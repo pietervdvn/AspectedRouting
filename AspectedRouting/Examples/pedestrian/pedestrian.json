@@ -20,7 +20,6 @@
   "priority": {
     "#timeNeeded": "$speed",
     "#distance": "$distance",
-    "#slow_road_preference": "$pedestrian.slow_road_preference",
     "#trespassingPenalty": "$clean_permission_score"
   },
   "defaults": {
@@ -36,10 +35,6 @@
       "description": "The shortest route, independent of of speed",
       "#distance": 1,
       "#leastSafetyPenalty": 2
-    },
-    "slow_roads": {
-      "description": "A route prefering pedestrian-oriented infrastructure",
-      "#slow_road_preference": 1
     }
   }
 }
