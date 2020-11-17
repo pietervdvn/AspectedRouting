@@ -20,6 +20,14 @@ namespace AspectedRouting.Test
             return JsonParser.AspectFromJson(new Context(), json, "test.json");
         }
 
+        private IExpression MustMatchJsonWithOr()
+        {
+            var json = "{" +
+                       "\"name\":\"test\"," +
+                       "\"description\":\"test\"," +
+                       "\"$mustMatch\":{\"a\":\"b\",\"x\":\"y\"}}";
+            return JsonParser.AspectFromJson(new Context(), json, "test.json");
+        }
 
         [Fact]
         public void TestAll_AllTags_Yes()
