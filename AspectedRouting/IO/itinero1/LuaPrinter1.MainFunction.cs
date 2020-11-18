@@ -90,7 +90,7 @@ namespace AspectedRouting.IO.itinero1
                 "    result.direction = 0",
                 "    if (oneway == \"with\" or oneway == \"yes\") then",
                 "        result.direction = 1",
-                "    if (oneway == \"against\" or oneway == \"-1\") then",
+                "    elseif (oneway == \"against\" or oneway == \"-1\") then",
                 "         result.direction = 2",
                 "    end",
                 "",
