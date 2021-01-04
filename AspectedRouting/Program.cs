@@ -222,6 +222,7 @@ namespace AspectedRouting
 
             var tests = Directory.EnumerateFiles(inputDir, "*.csv", SearchOption.AllDirectories)
                 .ToList();
+            tests.Sort();
 
             foreach (var test in tests)
             {
