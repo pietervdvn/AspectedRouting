@@ -34,7 +34,7 @@ namespace AspectedRouting.IO.jsonParser
             }
         }
 
-        public static ProfileMetaData ProfileFromJson(Context c, string json, FileInfo f)
+        public static ProfileMetaData ProfileFromJson(Context c, string json, FileInfo f, DateTime lastChange)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace AspectedRouting.IO.jsonParser
                     // this is an aspect
                 }
 
-                return ParseProfile(doc.RootElement, c, f);
+                return ParseProfile(doc.RootElement, c, f, lastChange);
             }
             catch (Exception e)
             {
@@ -63,7 +63,7 @@ namespace AspectedRouting.IO.jsonParser
         }
 
 
-        private static ProfileMetaData ParseProfile(this JsonElement e, Context context, FileInfo filepath)
+        private static ProfileMetaData ParseProfile(this JsonElement e, Context context, FileInfo filepath, DateTime lastChange)
         {
             if (!e.TryGetProperty("speed", out _))
             {
@@ -141,6 +141,11 @@ namespace AspectedRouting.IO.jsonParser
                 profiles[profile.Name] = ParseParameters(profile.Value);
             }
 
+            if (lastChange < filepath.LastWriteTimeUtc)
+            {
+                lastChange = filepath.LastWriteTimeUtc;
+            }
+
             return new ProfileMetaData(
                 name,
                 e.Get("description"),
@@ -153,7 +158,8 @@ namespace AspectedRouting.IO.jsonParser
                 oneway,
                 speed,
                 weights,
-                metadata
+                metadata,
+                lastChange
             );
         }
 

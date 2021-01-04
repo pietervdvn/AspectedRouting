@@ -32,6 +32,7 @@ namespace AspectedRouting.IO.itinero2
         private readonly Context _context;
         private readonly List<AspectTestSuite> _aspectTests;
         private readonly IEnumerable<BehaviourTestSuite> _behaviourTestSuite;
+        private readonly DateTime _lastChangeTime;
 
         private readonly LuaSkeleton.LuaSkeleton _skeleton;
         private readonly LuaParameterPrinter _parameterPrinter;
@@ -39,7 +40,8 @@ namespace AspectedRouting.IO.itinero2
 
         public LuaPrinter2(ProfileMetaData profile, string behaviourName,
             Context context,
-            List<AspectTestSuite> aspectTests, IEnumerable<BehaviourTestSuite> behaviourTestSuite)
+            List<AspectTestSuite> aspectTests, IEnumerable<BehaviourTestSuite> behaviourTestSuite,
+            DateTime lastChangeTime)
         {
             _skeleton = new LuaSkeleton.LuaSkeleton(context);
             _profile = profile;
@@ -47,6 +49,7 @@ namespace AspectedRouting.IO.itinero2
             _context = context;
             _aspectTests = aspectTests;
             _behaviourTestSuite = behaviourTestSuite;
+            _lastChangeTime = lastChangeTime;
             _parameterPrinter = new LuaParameterPrinter(_profile, _skeleton);
         }
 
@@ -56,7 +59,7 @@ namespace AspectedRouting.IO.itinero2
                 new List<string>
                 {
                     $"name = \"{_profile.Name}.{_behaviourName}\"",
-                    $"generationDate = \"{DateTime.Now:s}\"",
+                    $"generationDate = \"{_lastChangeTime:s}\"",
                     $"description = \"{_profile.Description}\""
                 };
 

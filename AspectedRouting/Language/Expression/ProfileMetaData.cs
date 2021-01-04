@@ -29,12 +29,16 @@ namespace AspectedRouting.Language.Expression
         public IExpression Oneway { get; }
         public IExpression Speed { get; }
         public Dictionary<string, IExpression> Priority { get; }
+        /**
+         * Moment of last change of any upstream file
+         */
+        public DateTime LastChange { get; }
 
         public ProfileMetaData(string name, string description, string author, string filename,
             List<string> vehicleTyps, Dictionary<string, IExpression> defaultParameters,
             Dictionary<string, Dictionary<string, IExpression>> behaviours,
             IExpression access, IExpression oneway, IExpression speed,
-            Dictionary<string, IExpression> priority, List<string> metadata)
+            Dictionary<string, IExpression> priority, List<string> metadata, DateTime lastChange)
         {
             Name = name;
             Description = description;
@@ -46,6 +50,7 @@ namespace AspectedRouting.Language.Expression
             Speed = speed.Optimize();
             Priority = priority;
             Metadata = metadata;
+            LastChange = lastChange;
             DefaultParameters = defaultParameters;
             Behaviours = behaviours;
         }
