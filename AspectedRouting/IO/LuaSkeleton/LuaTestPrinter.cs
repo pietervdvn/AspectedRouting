@@ -15,7 +15,7 @@ namespace AspectedRouting.IO.itinero1
         }
         
         
-        public string GenerateFullTestSuite(List<BehaviourTestSuite> profileTests, List<AspectTestSuite> aspectTests)
+        public string GenerateFullTestSuite(List<BehaviourTestSuite> profileTests, List<AspectTestSuite> aspectTests, bool invertPriority = false)
         {
             
             _skeleton.AddDep("inv");
@@ -33,7 +33,7 @@ namespace AspectedRouting.IO.itinero1
                 string.Join("\n\n", profileTests
                     .Where(x => x != null)
                     .Select(
-                        GenerateProfileTestSuite
+                       t => GenerateProfileTestSuite(t, invertPriority)
                     ));
 
             return string.Join("\n\n\n", new List<string>
@@ -47,15 +47,15 @@ namespace AspectedRouting.IO.itinero1
         }
 
 
-        private string GenerateProfileTestSuite(BehaviourTestSuite testSuite)
+        private string GenerateProfileTestSuite(BehaviourTestSuite testSuite, bool invertPriority)
         {
             return string.Join("\n",
-                testSuite.Tests.Select((test, i) => GenerateProfileUnitTestCall(testSuite, i, test.Item1, test.tags))
+                testSuite.Tests.Select((test, i) => GenerateProfileUnitTestCall(testSuite, i, test.Item1, test.tags, invertPriority))
                     .ToList());
         }
 
         private string GenerateProfileUnitTestCall(BehaviourTestSuite testSuite, int index, ProfileResult expected,
-            Dictionary<string, string> tags)
+            Dictionary<string, string> tags, bool invertPriority)
         {
             _skeleton.AddDep("debug_table");
             var parameters = new Dictionary<string, string>();
@@ -88,13 +88,18 @@ namespace AspectedRouting.IO.itinero1
                 tags.Remove("#" + paramName);
             }
 
+            var expectedPriority = "" + expected.Priority;
+            if (invertPriority) {
+                expectedPriority = $"inv({expectedPriority})";
+            }
+
             // Generates something like:
             // function unit_test_profile(profile_function, profile_name, index, expected, tags)
             return
                 $"unit_test_profile(behaviour_{testSuite.Profile.Name.AsLuaIdentifier()}_{testSuite.BehaviourName.AsLuaIdentifier()}, " +
                 $"\"{testSuite.BehaviourName}\", " +
                 $"{index}, " +
-                $"{{access = \"{D(expected.Access)}\", speed = {expected.Speed}, oneway = \"{D(expected.Oneway)}\", priority = {expected.Priority} }}, " +
+                $"{{access = \"{D(expected.Access)}\", speed = {expected.Speed}, oneway = \"{D(expected.Oneway)}\", priority = {expectedPriority} }}, " +
                 tags.ToLuaTable() +
                 ")";
         }

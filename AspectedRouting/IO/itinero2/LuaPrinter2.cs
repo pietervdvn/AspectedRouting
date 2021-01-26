@@ -55,16 +55,20 @@ namespace AspectedRouting.IO.itinero2
 
         public string ToLua()
         {
+        var profileDescr =    _profile.Behaviours[_behaviourName]["description"].Evaluate(_context).ToString();
             var header =
                 new List<string>
                 {
                     $"name = \"{_profile.Name}.{_behaviourName}\"",
                     $"generationDate = \"{_lastChangeTime:s}\"",
-                    $"description = \"{_profile.Description}\""
+                    $"description = \"{profileDescr} ({_profile.Description})\""
                 };
 
-            var tests = new LuaTestPrinter(_skeleton, new List<string>() {"unitTestProfile2"}).GenerateFullTestSuite(
-                _behaviourTestSuite.ToList(), new List<AspectTestSuite>());
+            var tests = new LuaTestPrinter(_skeleton, 
+                new List<string>() {"unitTestProfile2"}).GenerateFullTestSuite(
+                _behaviourTestSuite.ToList(), 
+                new List<AspectTestSuite>(),
+                true);
             var all = new List<string>
             {
                 header.Lined(),
