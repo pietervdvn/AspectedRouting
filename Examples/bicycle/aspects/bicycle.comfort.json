@@ -1,0 +1,75 @@
+{
+  "name": "bicycle.comfort",
+  "description": "Gives a comfort factor for a road, purely based on physical aspects of the road, which is a bit subjective; this takes a bit of scnery into account with a preference for `railway=abandoned` and `towpath=yes`",
+  "unit": "[0, 2]",
+  "$default": 1,
+  "value": {
+    "$multiply": {
+      "highway": {
+        "cycleway": 1.2,
+        "primary": 0.3,
+        "secondary": 0.4,
+        "tertiary": 0.5,
+        "unclassified": 0.8,
+        "track": 0.95,
+        "residential": 1.0,
+        "living_street": 1.1,
+        "footway": 0.95,
+        "path": 0.5,
+        "construction": 0.5
+      },
+      "railway": {
+        "abandoned": 2
+      },
+      "towpath": {
+        "yes": 2
+      },
+      "cycleway": {
+        "track": 1.2
+      },
+      "cyclestreet": {
+        "yes": 1.1
+      },
+      "access": {
+        "designated": 1.2,
+        "dismount": 0.01
+      },
+      "bicycle:class":{
+      	"-3": 0.5,
+      	"-2": 0.7,
+      	"-1": 0.9,
+      	"0": 1,
+      	"1": 1.1,
+      	"2": 1.3,
+      	"3": 1.5
+      },
+      "surface": {
+        "#": "The surface mapping heavily resembles the one in speed_factor, but it is not entirely the same",
+        "paved": 0.99,
+        "concrete:lanes": 0.8,
+        "concrete:plates": 1.0,
+        "sett": 0.9,
+        "unhewn_cobblestone": 0.75,
+        "cobblestone": 0.8,
+        "unpaved": 0.75,
+        "compacted": 0.95,
+        "fine_gravel": 0.7,
+        "gravel": 0.9,
+        "dirt": 0.6,
+        "earth": 0.6,
+        "grass": 0.6,
+        "grass_paver": 0.9,
+        "ground": 0.7,
+        "sand": 0.5,
+        "woodchips": 0.5,
+        "snow": 0.5,
+        "pebblestone": 0.5,
+        "mud": 0.4
+      },
+      "route": {
+        "#": "Discourage ferries",
+        "ferry": 0.01
+      }
+    }
+  }
+}

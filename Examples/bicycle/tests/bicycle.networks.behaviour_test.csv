@@ -1,0 +1,6 @@
+access,oneway,speed,priority,highway,_relation:bicycle.network_is_bicycle_network
+no,,,,,
+designated,both,15,1.5,cycleway,
+designated,both,15,4.5,cycleway,yes
+yes,both,15,0.9,residential,
+yes,both,15,3.9,residential,yes

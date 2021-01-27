@@ -1,0 +1,54 @@
+{
+  "name": "bicycle.oneway",
+  "description": "Determines wether or not a bicycle can go in both ways in this street, and if it is oneway, in what direction",
+  "unit": "both: direction is allowed in both direction\nwith: this is a oneway street with direction allowed with the grain of the way\nagainst: oneway street with direction against the way",
+  "$default": "both",
+  "value": {
+    "$firstMatchOf": [
+      "oneway:bicycle",
+      "junction",
+      "cycleway",
+      "cycleway:left",
+      "oneway"
+    ],
+    "value": {
+      "oneway": {
+        "yes": "with",
+        "no": "both",
+        "1": "with",
+        "-1": "against"
+      },
+      "oneway:bicycle": {
+        "yes": "with",
+        "no": "both",
+        "1": "with",
+        "-1": "against"
+      },
+      "junction": {
+        "roundabout": "with"
+      },
+      "cycleway": {
+        "right": "against",
+        "#": "We ignore 'no' as it has no meaning and is the default assumption",
+        "opposite_lane": "both",
+        "track": "both",
+        "lane": "both",
+        "opposite": "both",
+        "opposite_share_busway": "both",
+        "opposite_track": "both"
+      },
+      "cycleway:left": {
+        "no": "with",
+        "none": "with",
+        "yes": "both",
+        "lane": "both",
+        "track": "both",
+        "shared_lane": "both",
+        "share_busway": "both",
+        "opposite_lane": "both",
+        "opposite_track": "both",
+        "opposite": "both"
+      }
+    }
+  }
+}

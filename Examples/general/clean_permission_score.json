@@ -1,0 +1,12 @@
+{
+  "name": "clean_permission_score",
+  "description": "Gives 0 on private roads, 0.1 on destination-only roads, and 0.9 on permissive roads; gives 1 by default. This helps to select roads with no access retrictions on them",
+  "$default": 0,
+  "value": {
+    "access": {
+      "private": -50,
+      "destination": -3,
+      "permissive": -1
+    }
+  }
+}
