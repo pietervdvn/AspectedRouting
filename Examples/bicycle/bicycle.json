@@ -2,10 +2,22 @@
   "name": "bicycle",
   "description": "Profile for a normal bicycle",
   
+  "vehicletypes":["vehicle","bicycle"],
+  "metadata":["name",
+    "bridge",
+    "tunnel",
+    "colour",
+    "cycle_network_colour",
+    "cycle_network_ref",
+    "ref",
+    "status",
+    "network"	],
+  
   "defaults": {
-    "#maxspeed": 25,
+    "#defaultSpeed": 15,
     "#timeNeeded": 0,
     "#distance": 0,
+    "#comfort": 0
   },
   
   "access": "$bicycle.legal_access",
@@ -20,21 +32,27 @@
   "behaviours": {
     "fastest": {
       "description": "The fastest route to your destination",
-      "#timeNeeded": 1,
+      "#timeNeeded": 1
     },
     "shortest": {
       "description": "The shortest route, independent of of speed",
-      "#distance": 1,
+      "#distance": 1
     },
     "comfort": {
       "description": "A comfortable route preferring well-paved roads, smaller roads and a bit of scenery at the cost of speed",
       "#comfort": 1
+    },
+    "electric":{
+      "description": "An electrical bicycle",
+      "#defaultSpeed": 25,
+      "#comfort":1,
+      "#timeNeeded": 5
     }
   },
   
   "priority": {
     "#comfort": "$bicycle.comfort",
     "#timeNeeded": "$speed",
-    "#distance": "$distance",
+    "#distance": "$distance"
   }
 }
