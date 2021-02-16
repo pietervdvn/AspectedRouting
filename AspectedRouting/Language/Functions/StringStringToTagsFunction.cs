@@ -7,7 +7,8 @@ namespace AspectedRouting.Language.Functions
     public class StringStringToTagsFunction : Function
     {
         public override string Description { get; } =
-            "stringToTags converts a function `string -> string -> a` into a function `tags -> [a]`";
+            "*stringToTags* converts a function `string -> string -> a` into a function `tags -> [a]`. " +
+            "It is used internally to convert a hash of functions. `stringToTags` shouldn't be needed when implementing profiles.";
 
         public override List<string> ArgNames { get; } = new List<string> {"f", "tags"};
 

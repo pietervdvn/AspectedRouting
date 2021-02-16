@@ -1,6 +1,0 @@
-[{"name": "shortest","type": "pedestrian","author": "","description": "The shortest route, independent of of speed (Profile for someone who is walking)"}
-,{"name": "fastest","type": "bicycle","author": "","description": "The fastest route to your destination (Profile for a normal bicycle)"}
-,{"name": "shortest","type": "bicycle","author": "","description": "The shortest route, independent of of speed (Profile for a normal bicycle)"}
-,{"name": "comfort","type": "bicycle","author": "","description": "A comfortable route preferring well-paved roads, smaller roads and a bit of scenery at the cost of speed (Profile for a normal bicycle)"}
-,{"name": "electric","type": "bicycle","author": "","description": "An electrical bicycle (Profile for a normal bicycle)"}
-]
