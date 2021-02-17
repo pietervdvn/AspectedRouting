@@ -296,7 +296,7 @@ namespace AspectedRouting
             }
 
             File.WriteAllText($"{outputDir}/ProfileMetadata.json",
-                Utils.GenerateExplanationJson(profiles.Select(p => p.profile))
+                Utils.GenerateExplanationJson(profiles.Select(p => p.profile), context)
             );
 
             if (!args.Contains("--no-repl"))

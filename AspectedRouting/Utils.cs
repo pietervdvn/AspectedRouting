@@ -26,8 +26,7 @@ namespace AspectedRouting
         public static int Multiply(this IEnumerable<int> ints)
         {
             var factor = 1;
-            foreach (var i in ints)
-            {
+            foreach (var i in ints) {
                 factor += i;
             }
 
@@ -36,39 +35,41 @@ namespace AspectedRouting
 
         public static T[] SubArray<T>(this T[] data, int index, int length)
         {
-            T[] result = new T[length];
+            var result = new T[length];
             Array.Copy(data, index, result, 0, length);
             return result;
         }
-        
+
         public static T[] SubArray<T>(this T[] data, int index)
         {
             return data.SubArray(index, data.Length - index);
         }
 
         /// <summary>
-        /// Generates a JSON file where all the profiles are listed, together with descriptions and other metadata.
-        /// Useful for other apps, e.g. the routing api to have
+        ///     Generates a JSON file where all the profiles are listed, together with descriptions and other metadata.
+        ///     Useful for other apps, e.g. the routing api to have
         /// </summary>
+        /// <param name="profiles"></param>
+        /// <param name="context"></param>
         /// <param name="select"></param>
         /// <returns></returns>
-        public static string GenerateExplanationJson(IEnumerable<ProfileMetaData> profiles)
+        public static string GenerateExplanationJson(IEnumerable<ProfileMetaData> profiles, Context context)
         {
             var metaItems = new List<string>();
 
-            foreach (var profile in profiles)
-            {
+            foreach (var profile in profiles) {
                 var profileName = profile.Name;
                 var author = profile.Author;
                 var profileDescription = profile.Description;
 
 
-                foreach (var behaviour in profile.Behaviours)
-                {
+                foreach (var behaviour in profile.Behaviours) {
                     var behaviourDescription = behaviour.Value["description"].Evaluate(new Context()) as string;
                     behaviourDescription ??= "";
-                    var meta = new Dictionary<string, string>
-                    {
+                    var keys = string.Join(", ",
+                        profile.AllExpressions(context).PossibleTags().Select(tag => $"\"{tag.Key}\"")
+                    );
+                    var meta = new Dictionary<string, string> {
                         {"name", behaviour.Key},
                         {"type", profileName},
                         {"author", author},
@@ -77,11 +78,11 @@ namespace AspectedRouting
 
                     var json = string.Join(",", meta.Select(d =>
                         $"\"{d.Key}\": \"{d.Value}\""));
-                    metaItems.Add("{" + json + "}\n");
+                    metaItems.Add("{" + json + ", \"usedKeys\": [" + keys + "] }\n");
                 }
             }
 
-            return "[" + string.Join(",", metaItems) + "]";
+            return "[" + string.Join(",\n", metaItems) + "]";
         }
     }
 }

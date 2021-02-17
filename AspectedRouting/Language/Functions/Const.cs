@@ -12,16 +12,17 @@ namespace AspectedRouting.Language.Functions
 
         public override List<string> ArgNames { get; } = new List<string>{"a","b"};
 
-        public Const() : base("const", true,
+        public Const() : base("firstArg", true,
             new[]
             {
                 Curry.ConstructFrom(new Var("a"), new Var("a"), new Var("b"))
             }
         )
         {
+            Funcs.AddBuiltin(this,"const");
         }
 
-        private Const(IEnumerable<Type> types) : base("const", types
+        private Const(IEnumerable<Type> types) : base("firstArg", types
         )
         {
         }
