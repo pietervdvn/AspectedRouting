@@ -84,12 +84,16 @@ namespace AspectedRouting.IO.itinero2
             _skeleton.AddDependenciesFor(_profile.Speed);
 
             _skeleton.AddDep("eq");
+            _skeleton.AddDep("remove_relation_prefix");
             var code = new List<string>
             {
                 "--[[",
                 "Calculate the actual factor.forward and factor.backward for a segment with the given properties",
                 "]]",
                 "function factor(tags, result)",
+                "    ",
+                "    -- Cleanup the relation tags to make them usable with this profile",
+                $"    tags = remove_relation_prefix(tags, \"{_behaviourName}\")",
                 "    ",
                 "    -- initialize the result table on the default values",
                 "    result.forward_speed = 0",

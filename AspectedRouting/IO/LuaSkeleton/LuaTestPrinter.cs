@@ -23,14 +23,16 @@ namespace AspectedRouting.IO.itinero1
 
 
             var aspectTestSuite =
-                string.Join("\n\n", aspectTests
+                string.Join("\n\n", 
+                    aspectTests
                     .Where(x => x != null)
                     .Select(
                         GenerateAspectTestSuite
                     ));
 
             var profileTestSuite =
-                string.Join("\n\n", profileTests
+                string.Join("\n\n",
+                    profileTests
                     .Where(x => x != null)
                     .Select(
                        t => GenerateProfileTestSuite(t, invertPriority)
@@ -79,6 +81,9 @@ namespace AspectedRouting.IO.itinero1
             foreach (var key in keysToCheck)
             {
                 var newKey = key.Replace(".", "_");
+                if (newKey == key) {
+                    continue;
+                }
                 tags[newKey] = tags[key];
                 tags.Remove(key);
             }
