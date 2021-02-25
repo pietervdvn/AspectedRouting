@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AspectedRouting.Language;
@@ -88,6 +87,7 @@ namespace AspectedRouting.IO.itinero1
                 functions,
                 "---------------------- UTILS ------------------------".InList(),
                 dependencies,
+                _skeleton.GenerateConstants().ToList(),
                 "----------------------- TESTS ------------------------".InList(),
                 tests.InList(),
                 GenerateLegacyTail().InList()

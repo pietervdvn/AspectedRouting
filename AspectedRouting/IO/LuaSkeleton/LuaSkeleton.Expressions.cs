@@ -218,6 +218,7 @@ namespace AspectedRouting.IO.LuaSkeleton
 
         public string MappingToLua(Mapping m)
         {
+            var isConstant = true;
             var contents = m.StringToResultFunctions.Select(kv =>
                 {
                     var (key, expr) = kv;
@@ -228,13 +229,23 @@ namespace AspectedRouting.IO.LuaSkeleton
                         left = key;
                     }
 
-                    return left + " = " + ToLua(expr, key);
+                    var luaExpr = ToLua(expr, key);
+                    if (luaExpr.Contains("tags")) {
+                        isConstant = false;
+                    }
+                    return left + " = " + luaExpr ;
                 }
             );
-            return
+            var mapping =
                 "{\n    " +
                 string.Join(",\n    ", contents) +
                 "\n}";
+            if (_staticTables && isConstant) {
+                return AddConstant(mapping);
+            }
+
+            return mapping;
+
         }
 
         /// <summary>
