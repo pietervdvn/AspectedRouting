@@ -9,8 +9,6 @@ namespace AspectedRouting.Language.Functions
         private static Var a = new Var("a");
         private static Var b = new Var("b");
         
-        // TODO OPTIMIZE AWAY
-
         public override string Description { get; } = "An if_then_else, but one which takes an extra argument and applies it on the condition, then and else.\n" +
                                                       "Consider `fc`, `fthen` and `felse` are all functions taking an `a`, then:\n" +
                                                       "`(ifDotted fc fthen felse) a` === `(if (fc a) (fthen a) (felse a)" +

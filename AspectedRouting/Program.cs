@@ -109,6 +109,13 @@ namespace AspectedRouting
 
                 if (read.Equals("quit")) return;
 
+                if (read.Equals("help")) {
+                    Console.WriteLine(
+                        Utils.Lines("select <behaviourName> to change behaviour or <vehicle.behaviourName> to change vehicle",
+                            ""));
+                    continue;
+                }
+
                 if (read.Equals("clear"))
                 {
                     for (var i = 0; i < 80; i++) Console.WriteLine();

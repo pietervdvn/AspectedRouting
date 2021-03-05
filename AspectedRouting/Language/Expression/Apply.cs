@@ -3,25 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using AspectedRouting.Language.Functions;
 using AspectedRouting.Language.Typ;
+using static AspectedRouting.Language.Deconstruct;
 using Type = AspectedRouting.Language.Typ.Type;
 
 namespace AspectedRouting.Language.Expression
 {
     public class Apply : IExpression
     {
-        /// <summary>
-        /// Maps the expected return type onto the argument needed for that.
-        /// The argument is specialized for this return type
-        /// </summary>
-        public readonly Dictionary<Type, (IExpression f, IExpression a)> FunctionApplications;
-
         // Only used for when there is no typechecking possible
         private readonly string _debugInfo;
 
-        public IExpression F => FunctionApplications.Values.First().f;
-        public IExpression A => FunctionApplications.Values.First().a;
-
-        public IEnumerable<Type> Types => FunctionApplications.Keys;
+        /// <summary>
+        ///     Maps the expected return type onto the argument needed for that.
+        ///     The argument is specialized for this return type
+        /// </summary>
+        public readonly Dictionary<Type, (IExpression f, IExpression a)> FunctionApplications;
 
         private Apply(string debugInfo, Dictionary<Type, (IExpression f, IExpression a)> argument)
         {
@@ -31,18 +27,15 @@ namespace AspectedRouting.Language.Expression
 
         public Apply(IExpression f, IExpression argument)
         {
-            if (f == null || argument == null)
-            {
+            if (f == null || argument == null) {
                 throw new NullReferenceException();
             }
 
             FunctionApplications = new Dictionary<Type, (IExpression f, IExpression a)>();
 
             var typesCleaned = argument.Types.RenameVars(f.Types).ToList();
-            foreach (var funcType in f.Types)
-            {
-                if (!(funcType is Curry c))
-                {
+            foreach (var funcType in f.Types) {
+                if (!(funcType is Curry c)) {
                     continue;
                 }
 
@@ -50,12 +43,10 @@ namespace AspectedRouting.Language.Expression
                 var expectedResultType = c.ResultType;
 
 
-                foreach (var argType in typesCleaned)
-                {
+                foreach (var argType in typesCleaned) {
                     // we try to unify the argType with the expected type
                     var substitutions = expectedArgType.UnificationTable(argType);
-                    if (substitutions == null)
-                    {
+                    if (substitutions == null) {
                         continue;
                     }
 
@@ -65,13 +56,11 @@ namespace AspectedRouting.Language.Expression
                     var actualFunction = f.Specialize(new Curry(actualArgType, actualResultType));
                     var actualArgument = argument.Specialize(actualArgType);
 
-                    if (actualFunction == null || actualArgument == null)
-                    {
+                    if (actualFunction == null || actualArgument == null) {
                         continue;
                     }
 
-                    if (FunctionApplications.ContainsKey(actualResultType))
-                    {
+                    if (FunctionApplications.ContainsKey(actualResultType)) {
                         continue;
                     }
 
@@ -79,28 +68,29 @@ namespace AspectedRouting.Language.Expression
                 }
             }
 
-            if (!FunctionApplications.Any())
-            {
-                try
-                {
+            if (!FunctionApplications.Any()) {
+                try {
                     _debugInfo = $"\n{f.Optimize().TypeBreakdown().Indent()}\n" +
-                                 $"is given the argument: " +
+                                 "is given the argument: " +
                                  "(" + argument.Optimize().TypeBreakdown() + ")";
                 }
-                catch (Exception)
-                {
-                    _debugInfo =$"\n (NO OPT) {f.TypeBreakdown().Indent()}\n" +
-                                $"is given the argument: " +
-                                "(" + argument.TypeBreakdown() + ")";
+                catch (Exception) {
+                    _debugInfo = $"\n (NO OPT) {f.TypeBreakdown().Indent()}\n" +
+                                 "is given the argument: " +
+                                 "(" + argument.TypeBreakdown() + ")";
                 }
             }
         }
 
+        public IExpression F => FunctionApplications.Values.First().f;
+        public IExpression A => FunctionApplications.Values.First().a;
+
+        public IEnumerable<Type> Types => FunctionApplications.Keys;
+
 
         public object Evaluate(Context c, params IExpression[] arguments)
         {
-            if (!Types.Any())
-            {
+            if (!Types.Any()) {
                 throw new ArgumentException("Trying to invoke an invalid expression: " + this);
             }
 
@@ -111,8 +101,7 @@ namespace AspectedRouting.Language.Expression
             var arg = argExpr;
             var allArgs = new IExpression[arguments.Length + 1];
             allArgs[0] = arg;
-            for (var i = 0; i < arguments.Length; i++)
-            {
+            for (var i = 0; i < arguments.Length; i++) {
                 allArgs[i + 1] = arguments[i];
             }
 
@@ -125,50 +114,9 @@ namespace AspectedRouting.Language.Expression
             return Specialize(allowedTypes);
         }
 
-        private Apply Specialize(IEnumerable<Type> allowedTypes)
-        {
-            var newArgs = new Dictionary<Type, (IExpression f, IExpression a)>();
-
-            foreach (var allowedType in allowedTypes)
-            {
-                foreach (var (resultType, (funExpr, argExpr)) in FunctionApplications)
-                {
-                    var substitutions = resultType.UnificationTable(allowedType, true);
-                    if (substitutions == null)
-                    {
-                        continue;
-                    }
-
-                    var actualResultType = allowedType.Substitute(substitutions);
-
-                    // f : a -> b
-                    // actualResultType = b (b which was retrieved after a reverse substitution)
-
-                    var actualFunction = funExpr.Specialize(substitutions);
-                    var actualArgument = argExpr.Specialize(substitutions);
-
-                    if (actualFunction == null || actualArgument == null)
-                    {
-                        // One of the subexpressions can't be optimized
-                        return null;
-                    }
-
-                    newArgs[actualResultType] = (actualFunction, actualArgument);
-                }
-            }
-
-            if (!newArgs.Any())
-            {
-                return null;
-            }
-
-            return new Apply(_debugInfo, newArgs);
-        }
-
         public IExpression Optimize()
         {
-            if (Types.Count() == 0)
-            {
+            if (Types.Count() == 0) {
                 throw new ArgumentException("This application contain no valid types, so cannot be optimized" + this);
             }
 
@@ -176,32 +124,29 @@ namespace AspectedRouting.Language.Expression
             // => (const dot _) id => dot id => id
             // or => (constRight _ id) id => id id => id 
             if (
-                Deconstruct.UnApplyAny(
-                    Deconstruct.UnApplyAny(
-                        Deconstruct.UnApplyAny(
-                            Deconstruct.IsFunc(Funcs.Const),
-                            Deconstruct.IsFunc(Funcs.Dot)),
-                        Deconstruct.Any),
-                    Deconstruct.IsFunc(Funcs.Id)
+                UnApplyAny(
+                    UnApplyAny(
+                        UnApplyAny(
+                            IsFunc(Funcs.Const),
+                            IsFunc(Funcs.Dot)),
+                        Any),
+                    IsFunc(Funcs.Id)
                 ).Invoke(this)
-                && Deconstruct.UnApplyAny(Deconstruct.UnApplyAny(
-                        Deconstruct.UnApplyAny(
-                            Deconstruct.IsFunc(Funcs.ConstRight),
-                            Deconstruct.Any),
-                        Deconstruct.IsFunc(Funcs.Id)),
-                    Deconstruct.IsFunc(Funcs.Id)
-                ).Invoke(this))
-            {
+                && UnApplyAny(UnApplyAny(
+                        UnApplyAny(
+                            IsFunc(Funcs.ConstRight),
+                            Any),
+                        IsFunc(Funcs.Id)),
+                    IsFunc(Funcs.Id)
+                ).Invoke(this)) {
                 return Funcs.Id;
             }
 
 
-            if (Types.Count() > 1)
-            {
+            if (Types.Count() > 1) {
                 // Too much types to optimize
                 var optimized = new Dictionary<Type, (IExpression f, IExpression a)>();
-                foreach (var (resultType, (f, a)) in FunctionApplications)
-                {
+                foreach (var (resultType, (f, a)) in FunctionApplications) {
                     var fOpt = f.Optimize();
                     var aOpt = a.Optimize();
                     optimized.Add(resultType, (fOpt, aOpt));
@@ -214,11 +159,10 @@ namespace AspectedRouting.Language.Expression
                 // id a => a
                 var arg = new List<IExpression>();
                 if (
-                    Deconstruct.UnApplyAny(
-                        Deconstruct.IsFunc(Funcs.Id),
-                        Deconstruct.Assign(arg)
-                    ).Invoke(this))
-                {
+                    UnApplyAny(
+                        IsFunc(Funcs.Id),
+                        Assign(arg)
+                    ).Invoke(this)) {
                     return arg.First();
                 }
             }
@@ -232,17 +176,16 @@ namespace AspectedRouting.Language.Expression
                 var arg = new List<IExpression>();
 
                 if (
-                    Deconstruct.UnApplyAny(
-                        Deconstruct.UnApply(
-                            Deconstruct.UnApply(
-                                Deconstruct.UnApply(
-                                    Deconstruct.IsFunc(Funcs.IfDotted),
-                                    Deconstruct.Assign(fcondition)),
-                                Deconstruct.Assign(fthen)),
-                            Deconstruct.Assign(felse)),
-                        Deconstruct.Assign(arg)
-                    ).Invoke(this))
-                {
+                    UnApplyAny(
+                        UnApply(
+                            UnApply(
+                                UnApply(
+                                    IsFunc(Funcs.IfDotted),
+                                    Assign(fcondition)),
+                                Assign(fthen)),
+                            Assign(felse)),
+                        Assign(arg)
+                    ).Invoke(this)) {
                     var a = arg.First();
                     return
                         Funcs.If.Apply(
@@ -253,19 +196,65 @@ namespace AspectedRouting.Language.Expression
                 }
             }
 
-
             {
                 var (f, a) = FunctionApplications.Values.First();
 
                 var (newFa, expr) = OptimizeApplicationPair(f, a);
-                if (expr != null)
-                {
+                if (expr != null) {
                     return expr;
                 }
 
                 (f, a) = newFa.Value;
                 return new Apply(f, a);
             }
+        }
+
+        public void Visit(Func<IExpression, bool> visitor)
+        {
+            var continueVisit = visitor(this);
+            if (!continueVisit) {
+                return;
+            }
+
+            foreach (var (_, (f, a)) in FunctionApplications) {
+                f.Visit(visitor);
+                a.Visit(visitor);
+            }
+        }
+
+        private Apply Specialize(IEnumerable<Type> allowedTypes)
+        {
+            var newArgs = new Dictionary<Type, (IExpression f, IExpression a)>();
+
+            foreach (var allowedType in allowedTypes) {
+                foreach (var (resultType, (funExpr, argExpr)) in FunctionApplications) {
+                    var substitutions = resultType.UnificationTable(allowedType, true);
+                    if (substitutions == null) {
+                        continue;
+                    }
+
+                    var actualResultType = allowedType.Substitute(substitutions);
+
+                    // f : a -> b
+                    // actualResultType = b (b which was retrieved after a reverse substitution)
+
+                    var actualFunction = funExpr.Specialize(substitutions);
+                    var actualArgument = argExpr.Specialize(substitutions);
+
+                    if (actualFunction == null || actualArgument == null) {
+                        // One of the subexpressions can't be optimized
+                        return null;
+                    }
+
+                    newArgs[actualResultType] = (actualFunction, actualArgument);
+                }
+            }
+
+            if (!newArgs.Any()) {
+                return null;
+            }
+
+            return new Apply(_debugInfo, newArgs);
         }
 
         private ((IExpression fOpt, IExpression fArg)?, IExpression result) OptimizeApplicationPair(IExpression f,
@@ -275,44 +264,40 @@ namespace AspectedRouting.Language.Expression
 
             a = a.Optimize();
 
-            switch (f)
-            {
+            switch (f) {
                 case Id _:
                     return (null, a);
 
                 case Apply apply:
 
-                    // const x y -> y
-                    var (subF, subArg) = apply.FunctionApplications.Values.First();
+                    if (apply.F is Const _) {
+                        // (const x) y -> y
+                        // apply == (const x) thus we return 'x' and ignore 'a'
 
-
-                    if (subF is Const _)
-                    {
-                        return (null, subArg);
+                        return (null, apply.A);
                     }
 
-                    if (subF is ConstRight _)
-                    {
+                    if (apply.F is ConstRight _) {
+                        // constRight x y -> y
+                        // apply == (constRight x) so we return a
                         return (null, a);
                     }
 
                     var f0 = new List<IExpression>();
                     var f1 = new List<IExpression>();
-
-
-                    // ((dot f0) f1)
-                    // ((dot f0) f1) arg is the actual expression, but arg is already split of
-                    if (Deconstruct.UnApply(
-                            Deconstruct.UnApply(
-                                Deconstruct.IsFunc(Funcs.Dot),
-                                Deconstruct.Assign(f0)
+                    if (UnApply(
+                            UnApply(
+                                IsFunc(Funcs.Dot),
+                                Assign(f0)
                             ),
-                            Deconstruct.Assign(f1)).Invoke(f)
-                    )
-                    {
+                            Assign(f1)).Invoke(apply)
+                    ) {
+                        // apply == ((dot f0) f1)
+                        // ((dot f0) f1) a is the actual expression, but arg is already split of
+
                         // f0 (f1 arg)
                         // which used to be (f0 . f1) arg
-                        return ((f0.First(), new Apply(f1.First(), subArg)), null);
+                        return ((f0.First(), new Apply(f1.First(), a)), null);
                     }
 
 
@@ -322,37 +307,19 @@ namespace AspectedRouting.Language.Expression
             return ((f, a), null);
         }
 
-        public void Visit(Func<IExpression, bool> visitor)
-        {
-            var continueVisit = visitor(this);
-            if (!continueVisit)
-            {
-                return;
-            }
-
-            foreach (var (_, (f, a)) in FunctionApplications)
-            {
-                f.Visit(visitor);
-                a.Visit(visitor);
-            }
-        }
-
         public override string ToString()
         {
-            if (!FunctionApplications.Any())
-            {
+            if (!FunctionApplications.Any()) {
                 return "NOT-TYPECHECKABLE APPLICATION: " + _debugInfo;
             }
 
             var (f, arg) = FunctionApplications.Values.First();
-            if (f is Id _)
-            {
+            if (f is Id _) {
                 return arg.ToString();
             }
 
             var extra = "";
-            if (FunctionApplications.Count() > 1)
-            {
+            if (FunctionApplications.Count() > 1) {
                 extra = " [" + FunctionApplications.Count + " IMPLEMENTATIONS]";
             }
 

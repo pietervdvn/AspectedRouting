@@ -368,8 +368,18 @@ namespace AspectedRouting.Test
             var c = new Context();
             var result = f.Evaluate(c, new Constant("01:15"));
 
-            Assert.Equal(75, result);
+            Assert.Equal(75.0, result);
         }
 
+        [Fact]
+        public void ApplyDefaultFunctionWithId_ApplicationIsSuccessfull()
+        {
+            var e = new Apply(new Apply(Funcs.Default, new Constant("a")), Funcs.Id);
+            Assert.Single(e.Types);
+            
+            Assert.Equal("string -> string", e.Types.First().ToString());
+            
+        }
+        
     }
 }

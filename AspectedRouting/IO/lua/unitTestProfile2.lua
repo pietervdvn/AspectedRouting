@@ -46,13 +46,13 @@ function unit_test_profile(profile_function, profile_name, index, expected, tags
         end
     end
 
-    if (result.forward_speed ~= expected.speed and result.backward_speed ~= expected.speed) then
+    if (math.abs(result.forward_speed - expected.speed) >= 0.001 and math.abs(result.backward_speed - expected.speed) >= 0.001) then
         print("Test " .. tostring(index) .. " failed for " .. profile_name .. ".speed: expected " .. expected.speed .. " but got " .. result.forward_speed .. " forward and " .. result.backward_speed .. " backward")
         profile_failed = true;
     end
 
 
-    if (result.forward ~= expected.priority and result.backward ~= expected.priority) then
+    if (math.abs(result.forward - expected.priority) >= 0.001 and math.abs(result.backward - expected.priority) >= 0.001) then
         print("Test " .. tostring(index) .. " failed for " .. profile_name .. ".priority: expected " .. expected.priority .. " but got " .. result.forward .. " forward and " .. result.backward .. " backward")
         profile_failed = true;
     end

@@ -10,6 +10,11 @@ namespace AspectedRouting.IO.LuaSkeleton
         public readonly string Lua;
         public IEnumerable<Type> Types { get; }
 
+        public LuaLiteral(Type type, string lua):this(new [] {type}, lua)
+        {
+            
+        }
+
         public LuaLiteral(IEnumerable<Type> types, string lua)
         {
             Lua = lua;
@@ -29,11 +34,6 @@ namespace AspectedRouting.IO.LuaSkeleton
         public IExpression Optimize()
         {
            return this;
-        }
-
-        public IExpression OptimizeWithArgument(IExpression argument)
-        {
-            return this.Apply(argument);
         }
 
         public void Visit(Func<IExpression, bool> f)

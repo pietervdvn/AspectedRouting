@@ -1,4 +1,4 @@
-function member_of(calledIn, parameters, tags, result)
+function memberOf(calledIn, parameters, tags, result)
     local k = "_relation:" .. calledIn
     -- This tag is conventiently setup by all the preprocessors, which take the parameters into account
     local doesMatch = tags[k]

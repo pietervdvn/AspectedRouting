@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using AspectedRouting.IO.itinero1;
+using AspectedRouting.IO.LuaSnippets;
 using AspectedRouting.Language;
 using AspectedRouting.Language.Expression;
+using AspectedRouting.Language.Typ;
 
 namespace AspectedRouting.IO.LuaSkeleton
 {
@@ -37,7 +39,14 @@ namespace AspectedRouting.IO.LuaSkeleton
                 return true;
             });
 
-            var impl = string.Join("\n",
+            var expression = meta.ExpressionImplementation;
+            if (expression.Types.First() is Curry c) {
+                expression = expression.Apply(new LuaLiteral(Typs.Tags, "tags"));
+            }
+
+            var ctx = Context;
+            this._context = _context.WithAspectName(meta.Name);
+                var impl = string.Join("\n",
                 "--[[",
                 meta.Description,
                 "",
@@ -50,10 +59,13 @@ namespace AspectedRouting.IO.LuaSkeleton
                 "Returns values: ",
                 "]]",
                 "function " + meta.Name.AsLuaIdentifier() + "(parameters, tags, result)" + funcNameDeclaration,
-                "    return " + ToLua(meta.ExpressionImplementation),
+                "    local result",
+                "    "+Snippets.Convert(this, "result", expression).Indent(),
+                "    return result" ,
                 "end"
             );
 
+            this._context = ctx;
             _functionImplementations.Add(impl);
         }
     }

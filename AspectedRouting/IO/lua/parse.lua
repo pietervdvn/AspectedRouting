@@ -1,6 +1,6 @@
 function parse(string)
     if (string == nil) then
-        return 0
+        return nil
     end
     if (type(string) == "number") then
         return string

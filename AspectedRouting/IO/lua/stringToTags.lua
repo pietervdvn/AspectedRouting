@@ -1,1 +1,3 @@
-print("ERROR: stringToTag is needed. This should not happen")
+function stringToTags(table, tags)
+    return  table_to_list(tags, {}, table)
+end

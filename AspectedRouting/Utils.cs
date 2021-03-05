@@ -23,6 +23,11 @@ namespace AspectedRouting
             return string.Join("\n", lines);
         }
 
+        public static string Lines(params string[] lines)
+        {
+            return string.Join("\n", lines);
+        }
+
         public static int Multiply(this IEnumerable<int> ints)
         {
             var factor = 1;

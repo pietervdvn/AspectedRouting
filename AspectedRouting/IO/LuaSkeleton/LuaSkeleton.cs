@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace AspectedRouting.IO.LuaSkeleton
         private readonly HashSet<string> _alreadyAddedFunctions = new HashSet<string>();
 
         private readonly List<string> _constants = new List<string>();
-        private readonly Context _context;
+        private Context _context;
 
         private readonly HashSet<string> _dependencies = new HashSet<string>();
         private readonly List<string> _functionImplementations = new List<string>();
@@ -29,6 +30,8 @@ namespace AspectedRouting.IO.LuaSkeleton
         /// </summary>
         private readonly bool _staticTables;
 
+        public Context Context => _context;
+
         public LuaSkeleton(Context context, bool staticTables = false)
         {
             _context = context;
@@ -37,6 +40,9 @@ namespace AspectedRouting.IO.LuaSkeleton
 
         internal void AddDep(string name)
         {
+            if (name.StartsWith("mapping")) {
+                throw new Exception("A mapping was added as dependency - this is a bug");
+            }
             _dependencies.Add(name);
         }
 
@@ -89,6 +95,20 @@ namespace AspectedRouting.IO.LuaSkeleton
         public IEnumerable<string> GenerateConstants()
         {
             return _constants.Select((c, i) => $"c{i} = {c}");
+        }
+
+        private readonly Dictionary<string, uint> counters = new Dictionary<string, uint>();
+        public string FreeVar(string key)
+        {
+            if (!counters.ContainsKey(key)) {
+                counters[key] = 0;
+                return key;
+            }
+
+            var i = counters[key];
+            counters[key]++;
+            return key + i;
+
         }
     }
 }

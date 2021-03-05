@@ -79,10 +79,11 @@ namespace AspectedRouting.Test
         public void EitherFunc_SpecializeToString_Const()
         {
             var a = new Constant("a");
+            
             var mconst = new Apply(new Apply(Funcs.EitherFunc, Funcs.Id), Funcs.Const);
             var specialized = new Apply(mconst, a).Specialize(Typs.String);
 
-            Assert.Equal("((($const $id) $const) \"a\")", specialized.ToString());
+            Assert.Equal("((($firstArg $id) $firstArg) \"a\")", specialized.ToString());
             Assert.Equal("string; $b -> string", string.Join("; ", new Apply(mconst, a).Types));
             Assert.Equal("\"a\"", specialized.Evaluate(null).Pretty());
 
