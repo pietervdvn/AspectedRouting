@@ -45,12 +45,12 @@ namespace AspectedRouting.IO.LuaSnippets
                 }
                 else {
                     tags = lua.FreeVar("tags");
-                    result += "local " + tags + "\n";
+                    result += "local " + tags + " = nil\n";
                     result += Snippets.Convert(lua, tags, mappingArg);
                 }
 
                 var m = lua.FreeVar("m");
-                result += "    local " + m + "\n";
+                result += "    local " + m + " = nil\n";
 
                 foreach (var (key, func) in mapping.StringToResultFunctions) {
                     result += "if (" + tags + "[\"" + key + "\"] ~= nil) then\n";

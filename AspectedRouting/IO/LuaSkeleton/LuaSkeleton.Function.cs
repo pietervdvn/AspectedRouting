@@ -59,9 +59,9 @@ namespace AspectedRouting.IO.LuaSkeleton
                 "Returns values: ",
                 "]]",
                 "function " + meta.Name.AsLuaIdentifier() + "(parameters, tags, result)" + funcNameDeclaration,
-                "    local result",
-                "    "+Snippets.Convert(this, "result", expression).Indent(),
-                "    return result" ,
+                "    local r = nil",
+                "    "+Snippets.Convert(this, "r", expression).Indent(),
+                "    return r" ,
                 "end"
             );
 
