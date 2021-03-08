@@ -15,7 +15,7 @@ namespace AspectedRouting.Test.Snippets
         public void DefaultSnippet_SimpleDefault_GetsLua()
         {
             var gen = new DefaultSnippet();
-            var lua = new LuaSkeleton(new Context());
+            var lua = new LuaSkeleton(new Context(), true);
             var code = gen.Convert(lua, "result", new List<IExpression> {
                 new Constant("the_default_value"),
                 Funcs.Id,
@@ -29,7 +29,7 @@ namespace AspectedRouting.Test.Snippets
         public void FirstOfSnippet_SimpleFirstOf_GetLua()
         {
             var gen = new FirstMatchOfSnippet();
-            var lua = new LuaSkeleton(new Context());
+            var lua = new LuaSkeleton(new Context(), true);
 
             // FirstMatchOf: [a] -> (Tags -> [a]) -> Tags -> a
 
@@ -77,7 +77,7 @@ namespace AspectedRouting.Test.Snippets
                 }
             );
             var gen = new SimpleMappingSnippet(mapping);
-            var code = gen.Convert(new LuaSkeleton(new Context()), "result", new List<IExpression> {
+            var code = gen.Convert(new LuaSkeleton(new Context(), true), "result", new List<IExpression> {
                 new LuaLiteral(Typs.String, "tags.oneway")
             });
 
@@ -96,7 +96,7 @@ namespace AspectedRouting.Test.Snippets
             );
 
 
-            var code = gen.Convert(new LuaSkeleton(new Context()),
+            var code = gen.Convert(new LuaSkeleton(new Context(), true),
                 "result", new List<IExpression>()
             );
 

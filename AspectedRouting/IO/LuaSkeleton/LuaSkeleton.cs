@@ -18,6 +18,7 @@ namespace AspectedRouting.IO.LuaSkeleton
 
         private readonly List<string> _constants = new List<string>();
         private Context _context;
+        private readonly bool _useSnippets;
 
         private readonly HashSet<string> _dependencies = new HashSet<string>();
         private readonly List<string> _functionImplementations = new List<string>();
@@ -32,9 +33,10 @@ namespace AspectedRouting.IO.LuaSkeleton
 
         public Context Context => _context;
 
-        public LuaSkeleton(Context context, bool staticTables = false)
+        public LuaSkeleton(Context context, bool useSnippets,  bool staticTables = false)
         {
             _context = context;
+            _useSnippets = useSnippets;
             _staticTables = staticTables;
         }
 

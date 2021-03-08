@@ -68,7 +68,7 @@ namespace AspectedRouting.IO.itinero1
                 func.Add("    end");
 
 
-                if (usedParameters.Count() == 0)
+                if (!usedParameters.Any())
                 {
                     // Every behaviour uses the default parameters for this one
                     func.Add("    -- No parameter dependence for aspect " + calledInFunction);

@@ -26,7 +26,7 @@ namespace AspectedRouting.IO.itinero1
             _context = context;
             _aspectTestSuites = aspectTestSuites;
             _profileTests = profileTests;
-            _skeleton = new LuaSkeleton.LuaSkeleton(context);
+            _skeleton = new LuaSkeleton.LuaSkeleton(context, false);
             _parameterPrinter = new LuaParameterPrinter(profile, _skeleton);
         }
 

@@ -57,7 +57,7 @@ namespace AspectedRouting.IO.LuaSkeleton
                 ).Invoke(bare))
             {
                 AddDep("memberOf");
-                return "member_of(funcName, parameters, tags, result)";
+                return "memberOf(funcName, parameters, tags, result)";
             }
 
            

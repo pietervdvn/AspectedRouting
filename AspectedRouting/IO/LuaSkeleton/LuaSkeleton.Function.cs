@@ -10,11 +10,9 @@ namespace AspectedRouting.IO.LuaSkeleton
 {
     public partial class LuaSkeleton
     {
-
         public void AddFunction(AspectMetadata meta)
         {
-            if (_alreadyAddedFunctions.Contains(meta.Name))
-            {
+            if (_alreadyAddedFunctions.Contains(meta.Name)) {
                 // already added
                 return;
             }
@@ -29,10 +27,8 @@ namespace AspectedRouting.IO.LuaSkeleton
 
             var funcNameDeclaration = "";
 
-            meta.Visit(e =>
-            {
-                if (e is Function f && f.Name.Equals(Funcs.MemberOf.Name))
-                {
+            meta.Visit(e => {
+                if (e is Function f && f.Name.Equals(Funcs.MemberOf.Name)) {
                     funcNameDeclaration = $"\n    local funcName = \"{meta.Name.AsLuaIdentifier()}\"";
                 }
 
@@ -40,13 +36,28 @@ namespace AspectedRouting.IO.LuaSkeleton
             });
 
             var expression = meta.ExpressionImplementation;
-            if (expression.Types.First() is Curry c) {
-                expression = expression.Apply(new LuaLiteral(Typs.Tags, "tags"));
-            }
 
             var ctx = Context;
-            this._context = _context.WithAspectName(meta.Name);
-                var impl = string.Join("\n",
+            _context = _context.WithAspectName(meta.Name);
+
+            var body = "";
+            if (_useSnippets) {
+                if (expression.Types.First() is Curry c) {
+                    expression = expression.Apply(new LuaLiteral(Typs.Tags, "tags"));
+                }
+
+                body = Utils.Lines(
+                    "    local r = nil",
+                    "    " + Snippets.Convert(this, "r", expression).Indent(),
+                    "    return r"
+                );
+            }
+            else {
+                body = "    return " + ToLua(expression);
+            }
+
+
+            var impl = Utils.Lines(
                 "--[[",
                 meta.Description,
                 "",
@@ -59,13 +70,11 @@ namespace AspectedRouting.IO.LuaSkeleton
                 "Returns values: ",
                 "]]",
                 "function " + meta.Name.AsLuaIdentifier() + "(parameters, tags, result)" + funcNameDeclaration,
-                "    local r = nil",
-                "    "+Snippets.Convert(this, "r", expression).Indent(),
-                "    return r" ,
+                body,
                 "end"
             );
 
-            this._context = ctx;
+            _context = ctx;
             _functionImplementations.Add(impl);
         }
     }

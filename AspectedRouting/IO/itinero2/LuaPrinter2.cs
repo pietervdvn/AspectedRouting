@@ -40,7 +40,7 @@ namespace AspectedRouting.IO.itinero2
             List<AspectTestSuite> aspectTests, IEnumerable<BehaviourTestSuite> behaviourTestSuite,
             DateTime lastChangeTime)
         {
-            _skeleton = new LuaSkeleton.LuaSkeleton(context, false);
+            _skeleton = new LuaSkeleton.LuaSkeleton(context, true);
             _profile = profile;
             _behaviourName = behaviourName;
             _context = context;

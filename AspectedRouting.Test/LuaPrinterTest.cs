@@ -22,7 +22,7 @@ namespace AspectedRouting.Test
                 }
             );
 
-            var luaPrinter = new LuaSkeleton(new Context());
+            var luaPrinter = new LuaSkeleton(new Context(), false);
             var result = luaPrinter.MappingToLua(mapping);
 
             Assert.Equal(
@@ -45,7 +45,7 @@ namespace AspectedRouting.Test
                     )
                 }
             );
-            var luaPrinter = new LuaSkeleton(new Context());
+            var luaPrinter = new LuaSkeleton(new Context(), false);
             var result = luaPrinter.MappingToLua(mapping);
             Assert.Equal("{\n    a = {\n        b = 42\n    }\n}", result);
         }
