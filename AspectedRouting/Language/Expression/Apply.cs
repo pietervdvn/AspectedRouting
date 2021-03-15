@@ -114,6 +114,15 @@ namespace AspectedRouting.Language.Expression
             return Specialize(allowedTypes);
         }
 
+        public IExpression PruneTypes(Func<Type, bool> allowedTypes)
+        {
+            var passed = this.FunctionApplications.Where(kv => allowedTypes.Invoke(kv.Key));
+            if (!passed.Any()) {
+                return null;
+            }
+            return new Apply("pruned", new Dictionary<Type, (IExpression A, IExpression F)>(passed));
+        }
+
         public IExpression Optimize()
         {
             if (Types.Count() == 0) {

@@ -248,6 +248,7 @@ namespace AspectedRouting.IO.jsonParser
                 var exprs = e.EnumerateArray().Select(json =>
                         Funcs.Either(Funcs.Id, Funcs.Const, json.ParseExpression(context)))
                     .ToList();
+                
                 var list = new Constant(exprs);
                 return Funcs.Either(Funcs.Id, Funcs.ListDot, list);
             }

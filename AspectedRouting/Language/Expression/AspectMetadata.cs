@@ -43,6 +43,16 @@ namespace AspectedRouting.Language.Expression
                 Name, Description, Author, Unit, Filepath);
         }
 
+        public IExpression PruneTypes(System.Func<Type, bool> allowedTypes)
+        {
+            var e = ExpressionImplementation.PruneTypes(allowedTypes);
+            if (e == null) {
+                return null;
+            }
+            return new AspectMetadata(e, Name, Description, Author, Unit,
+                Filepath, ProfileInternal);
+        }
+
         public IExpression Optimize()
         {
             return new AspectMetadata(ExpressionImplementation.Optimize(),

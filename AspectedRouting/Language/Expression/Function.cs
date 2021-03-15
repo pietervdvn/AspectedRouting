@@ -34,15 +34,19 @@ namespace AspectedRouting.Language.Expression
 
         public abstract object Evaluate(Context c, params IExpression[] arguments);
         public abstract IExpression Specialize(IEnumerable<Type> allowedTypes);
+        public IExpression PruneTypes(Func<Type, bool> allowedTypes)
+        {
+            var passedTypes = this.Types.Where(allowedTypes);
+            if (!passedTypes.Any()) {
+                return null;
+            }
+
+            return new FunctionCall(this.Name, passedTypes);
+        }
 
         public virtual IExpression Optimize()
         {
             return this;
-        }
-
-        public IExpression OptimizeWithArgument(IExpression argument)
-        {
-            return this.Apply(argument);
         }
 
         public virtual void Visit(Func<IExpression, bool> f)

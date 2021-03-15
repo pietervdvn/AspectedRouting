@@ -60,8 +60,9 @@ namespace AspectedRouting.Test.Snippets
                     tags
                 }
             );
+            // First the more general ones!
             Assert.Equal(
-                "if (tags[\"bicycle\"] ~= nil) then\n    result = tags[\"bicycle\"]\nelseif (tags[\"access\"] ~= nil) then\n    result = tags[\"access\"]\nend\n",
+                "if (tags[\"access\"] ~= nil) then\n    result = tags[\"access\"]\n    \nend\nif (tags[\"bicycle\"] ~= nil) then\n    result = tags[\"bicycle\"]\n    \nend\n",
                 code);
         }
 
@@ -82,27 +83,9 @@ namespace AspectedRouting.Test.Snippets
             });
 
             var expected =
-                "local v\nv = tags.oneway\nif (v == \"1\") then\n    result = \"with\"\nelseif (v == \"-1\") then\n    result = \"against\"\nend";
+                "local v\nv = tags.oneway\n\nif (v == \"1\") then\n    result = \"with\"\nelseif (v == \"-1\") then\n    result = \"against\"\nend";
             Assert.Equal(expected, code);
         }
 
-        [Fact]
-        public void MultiplySnippet_SimpleMultiply_GeneratesLua()
-        {
-            var gen = new MultiplySnippet();
-            var f = new Apply(
-                Funcs.Multiply,
-                null
-            );
-
-
-            var code = gen.Convert(new LuaSkeleton(new Context(), true),
-                "result", new List<IExpression>()
-            );
-
-            var expected =
-                "local v\nv = tags.oneway\nif (v == \"1\") then\n    result = \"with\"\nelseif (v == \"-1\") then\n    result = \"against\"\nend";
-            Assert.Equal(expected, code);
-        }
     }
 }

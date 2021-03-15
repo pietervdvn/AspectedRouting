@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AspectedRouting.Language;
 using Type = AspectedRouting.Language.Typ.Type;
 
@@ -31,6 +32,16 @@ namespace AspectedRouting.IO.LuaSkeleton
             return this;
         }
 
+        public IExpression PruneTypes(Func<Type, bool> allowedTypes)
+        {
+            var passed = this.Types.Where(allowedTypes);
+            if (passed.Any()) {
+                return new LuaLiteral(passed, this.Lua);
+            }
+
+            return null;
+        }
+
         public IExpression Optimize()
         {
            return this;
@@ -40,5 +51,6 @@ namespace AspectedRouting.IO.LuaSkeleton
         {
             throw new NotImplementedException();
         }
+        
     }
 }

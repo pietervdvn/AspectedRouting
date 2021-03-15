@@ -1,7 +1,8 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=3112587d_002D1c06_002D4ad3_002Da845_002D73105d4b723a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="DefaultSnippet_SimpleDefault_GetsLua" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=3112587d_002D1c06_002D4ad3_002Da845_002D73105d4b723a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="DefaultSnippet_SimpleDefault_GetsLua" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
     &lt;TestId&gt;xUnit::A1309041-8AAE-42D7-A886-94C9FFC6A28C::.NETCoreApp,Version=v3.1::AspectedRouting.Test.Snippets.SnippetTests&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::A1309041-8AAE-42D7-A886-94C9FFC6A28C::.NETCoreApp,Version=v3.1::AspectedRouting.Test.TypingTests.SpecializeToCommonTypes_X2PDouble_Y2Double_Gives_X2Double&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5e89d9f5_002D24ed_002D4ea2_002Da7ea_002Dcc7faea6d057/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="JoinApply_Id" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
@@ -12,6 +13,9 @@
 &lt;/SessionState&gt;</s:String>
 	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a6a74f48_002D8456_002D43c7_002Dbbee_002Dd3da33a8a4be/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Integration_TestExamples" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;Project Location="/home/pietervdvn/git/AspectedRouting/AspectedRouting.Test" Presentation="&amp;lt;AspectedRouting.Test&amp;gt;" /&gt;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=d2e3d58f_002Debff_002D4fb5_002D8d18_002Deafe85f4773d/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="SpecializeToCommonTypes_ValueAndFuncType_ShouldFail" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Project Location="/home/pietervdvn/git/AspectedRouting/AspectedRouting.Test" Presentation="&amp;lt;AspectedRouting.Test&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
 	</wpf:ResourceDictionary>

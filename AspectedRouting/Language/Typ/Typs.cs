@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AspectedRouting.Language.Functions;
 
 namespace AspectedRouting.Language.Typ
 {
@@ -72,7 +71,13 @@ namespace AspectedRouting.Language.Typ
             return SelectSmallestUnion(subbed, t1);
         }
 
-        private static Type SelectSmallestUnion(this Type wider, Type smaller, bool reverse = false)
+        /// <summary>
+        ///     Findes the smallest union type between the two types, with the assumption that 'wider' is a supertype of 'smaller'
+        /// </summary>
+        /// <param name="wider"></param>
+        /// <param name="smaller"></param>
+        /// <returns></returns>
+        private static Type SelectSmallestUnion(this Type wider, Type smaller)
         {
             switch (wider) {
                 case Var a:
@@ -80,12 +85,12 @@ namespace AspectedRouting.Language.Typ
                 case ListType l when smaller is ListType lsmaller:
                     return new ListType(
                         l.InnerType.SelectSmallestUnion(
-                            l.InnerType.SelectSmallestUnion(lsmaller.InnerType, reverse)));
+                            l.InnerType.SelectSmallestUnion(lsmaller.InnerType)));
                 case Curry cWider when smaller is Curry cSmaller:
                     var arg =
-                        cWider.ArgType.SelectSmallestUnion(cSmaller.ArgType, !reverse);
+                        cWider.ArgType.SelectSmallestUnion(cSmaller.ArgType);
                     var result =
-                        cWider.ResultType.SelectSmallestUnion(cSmaller.ResultType, reverse);
+                        cWider.ResultType.SelectSmallestUnion(cSmaller.ResultType);
                     return new Curry(arg, result);
                 default:
                     if (wider.IsSuperSet(smaller) && !smaller.IsSuperSet(wider)) {
@@ -94,88 +99,6 @@ namespace AspectedRouting.Language.Typ
 
                     return wider;
             }
-        }
-
-        public static List<IExpression> SortWidestToSmallest(this IEnumerable<IExpression> expressions)
-        {
-            var all = expressions.ToHashSet();
-            var sorted = new List<IExpression>();
-            while (all.Any()) {
-                var widest = SelectWidestType(all);
-                if (widest == null) {
-                    throw new ArgumentException("Can not sort widest to smallest");
-                }
-
-                all.Remove(widest);
-                sorted.Add(widest);
-            }
-
-            return sorted;
-        }
-
-        public static IExpression SelectSmallestType(IEnumerable<IExpression> expressions)
-        {
-            IExpression smallest = null;
-            foreach (var current in expressions) {
-                if (smallest == null) {
-                    smallest = current;
-                    continue;
-                }
-
-                if (smallest.Types.AllAreSuperset(current.Types)) {
-                    smallest = current;
-                }
-            }
-
-
-            return smallest;
-        }
-
-        public static IExpression SelectWidestType(IEnumerable<IExpression> expressions)
-        {
-            IExpression widest = null;
-            foreach (var current in expressions) {
-                if (widest == null) {
-                    widest = current;
-                    continue;
-                }
-
-                if (current.Types.AllAreSuperset(widest.Types)) {
-                    widest = current;
-                }
-            }
-
-            return widest;
-        }
-
-        public static bool AllAreSuperset(this IEnumerable<Type> shouldBeSuper, IEnumerable<Type> shouldBeSmaller)
-        {
-            foreach (var super in shouldBeSuper) {
-                foreach (var smaller in shouldBeSmaller) {
-                    if (!super.IsSuperSet(smaller)) {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        ///     Tries to unify t0 with all t1's.
-        ///     Every match is returned
-        /// </summary>
-        /// <param name="t0"></param>
-        /// <param name="t1"></param>
-        /// <returns></returns>
-        public static IEnumerable<Type> UnifyAny(this Type t0, IEnumerable<Type> t1)
-        {
-            var result = t1.Select(t => t0.Unify(t)).Where(unification => unification != null).ToHashSet();
-            if (!result.Any()) {
-                return null;
-            }
-
-            return result;
         }
 
         /// <summary>
@@ -325,6 +248,7 @@ namespace AspectedRouting.Language.Typ
                         // This means that $a is substituted by e.g. ($a -> $x), implying an infinite and contradictory type
                         return null;
                     }
+
                     substitutionsOn0[key] = newVal;
                     appliedTransitivity = true;
                 }
@@ -425,6 +349,198 @@ namespace AspectedRouting.Language.Typ
 
             args.Add(t);
             return args;
+        }
+
+
+        /// <summary>
+        ///     If given two sets of types, select all the WidestCommonType-Combinations possible
+        ///     e.g.:
+        ///     { Double, Tags -> PDouble} x {PDouble, a -> Double} will result in:
+        ///     { Double, Tags -> Double}
+        /// </summary>
+        /// <param name="t0"></param>
+        /// <param name="t1"></param>
+        /// <returns></returns>
+        public static IEnumerable<Type> WidestCommonTypes(IEnumerable<Type> t0, IEnumerable<Type> t1)
+        {
+            var widest = new HashSet<Type>();
+
+            foreach (var type0 in t0) {
+                foreach (var type1 in t1) {
+                    var t = WidestCommonType(type0, type1);
+                    if (t != null) {
+                        var (type, subsTable) = t.Value;
+                        if (subsTable != null) {
+                            type = type.Substitute(subsTable);
+                        }
+                        widest.Add(type);
+                    }
+                }
+            }
+
+            return widest;
+        }
+
+        /// <summary>
+        ///     Tries to find the widest type between the two given types, without assuming which one is wider.
+        ///     This is used to find the Union of types, e.g. in a list of expressions
+        ///     e.g.:
+        ///     WidestCommonType(Double, PDouble) == Double
+        ///     WidestCommonType(a -> Double, Double) == null
+        ///     WidestCommonType(a -> Double, Tags -> PDouble) => Tags -> Double
+        ///     WidestCommonType(Double -> a, PDouble -> b) => PDouble -> a
+        /// </summary>
+        /// <param name="t0"></param>
+        /// <param name="t1"></param>
+        /// <returns></returns>
+        public static (Type, Dictionary<string, Type>? substitutionTable)? WidestCommonType(Type t0, Type t1)
+        {
+            // First things first: we try to unify
+
+            if (t0 is Curry c0 && t1 is Curry c1) {
+                var arg = SmallestCommonType(c0.ArgType, c1.ArgType);
+                var result = WidestCommonType(c0.ResultType, c1.ResultType);
+                if (arg == null) {
+                    return null;
+                }
+                var (argT, subs0) = arg.Value;
+
+                if (result == null) {
+                    return null;
+                }
+                var (resultT, subs1) = result.Value;
+                return (new Curry(argT, resultT), MergeDicts(subs0, subs1));
+            }
+
+            
+            if (t0 is Var v) {
+                if (t1 is Var vx) {
+                    if (v.Name == vx.Name) {
+                        return (t0, null);
+                    }
+                }
+                return (t1, new Dictionary<string, Type> {{v.Name, t1}});
+            }
+
+            if (t1 is Var v1) {
+                return (t0, new Dictionary<string, Type> {{v1.Name, t1}});
+            }
+            if (t0 == t1 || t0.Equals(t1)) {
+                return (t0, null);
+            }
+            var t0IsSuperT1 = t0.IsSuperSet(t1);
+            var t1IsSuperT0 = t1.IsSuperSet(t0);
+            if (t0IsSuperT1 && !t1IsSuperT0) {
+                return (t0, null);
+            }
+
+            if (t1IsSuperT0 && !t0IsSuperT1) {
+                return (t1, null);
+            }
+
+            return null;
+        }
+
+        private static Dictionary<string, Type> MergeDicts(Dictionary<string, Type> subs0,
+            Dictionary<string, Type> subs1)
+        {
+            if (subs0 == null && subs1 == null) {
+                return null;
+            }
+            var subsTable = new Dictionary<string, Type>();
+
+            void AddSubs(Dictionary<string, Type> dict)
+            {
+                if (dict == null) {
+                    return;
+                }
+                foreach (var kv in dict) {
+                    if (subsTable.TryGetValue(kv.Key, out var t)) {
+                        // We have seen this variable-type-name before... We should check if it matches
+                        if (t.Equals(kv.Value)) {
+                            // Ok! No problem!
+                            // It is already added anyway, so we continue
+                            continue;
+                        }
+
+                        // Bruh, we have a problem!!!
+                        throw new Exception(t + " != " + kv.Value);
+                    }
+
+                    if (kv.Value is Var v) {
+                        if (v.Name == kv.Key) {
+                            // Well, this is a useless substitution...
+                            continue;
+                        }
+                    }
+                    
+                    subsTable[kv.Key] = kv.Value;
+                }
+            }
+
+            AddSubs(subs0);
+            AddSubs(subs1);
+
+            if (!subsTable.Any()) {
+                return null;
+            }
+            
+            return subsTable;
+        }
+
+        /// <summary>
+        ///     Tries to find the smallest type between the two given types, without assuming which one is wider.
+        ///     This is used to find the Union of types, e.g. in a list of expressions
+        ///     e.g.:
+        ///     WidestCommonType(Double, PDouble) == PDouble
+        ///     WidestCommonType(a -> Double, Double) == null
+        ///     WidestCommonType(a -> Double, Tags -> PDouble) => Tags -> PDouble
+        ///     WidestCommonType(Double -> a, PDouble -> b) => Double -> a
+        /// </summary>
+        /// <param name="t0"></param>
+        /// <param name="t1"></param>
+        /// <returns></returns>
+        public static (Type, Dictionary<string, Type> substitutionTable)? SmallestCommonType(Type t0, Type t1)
+        {
+            if (t0 is Curry c0 && t1 is Curry c1) {
+                var arg = WidestCommonType(c0.ArgType, c1.ArgType);
+                var result = SmallestCommonType(c0.ResultType, c1.ResultType);
+                if (arg == null) {
+                    return null;
+                }
+                var (argT, subs0) = arg.Value;
+
+                if (result == null) {
+                    return null;
+                }
+                var (resultT, subs1) = result.Value;
+                return (new Curry(argT, resultT), MergeDicts(subs0, subs1));
+            }
+            
+            
+            if (t0 is Var v) {
+                return (t1, new Dictionary<string, Type> {{v.Name, t1}});
+            }
+
+            if (t1 is Var v1) {
+                return (t0, new Dictionary<string, Type> {{v1.Name, t1}});
+            }
+
+            if (t0 == t1 || t0.Equals(t1)) {
+                return (t0, null);
+            }
+            
+            var t0IsSuperT1 = t0.IsSuperSet(t1);
+            var t1IsSuperT0 = t1.IsSuperSet(t0);
+            if (t0IsSuperT1 && !t1IsSuperT0) {
+                return (t0, null);
+            }
+
+            if (t1IsSuperT0 && !t0IsSuperT1) {
+                return (t1, null);
+            }
+
+            return null;
         }
     }
 }

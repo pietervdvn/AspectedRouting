@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AspectedRouting.Language.Typ;
 using Type = AspectedRouting.Language.Typ.Type;
 
@@ -43,6 +44,16 @@ namespace AspectedRouting.Language.Functions
             }
 
             return new Parameter(unified, ParamName);
+        }
+        
+        public IExpression PruneTypes(System.Func<Type, bool> allowedTypes)
+        {
+            var passedTypes = this.Types.Where(allowedTypes);
+            if (!passedTypes.Any()) {
+                return null;
+            }
+
+            return new Parameter(passedTypes, this.ParamName);
         }
 
         public IExpression Optimize()

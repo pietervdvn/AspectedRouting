@@ -12,35 +12,49 @@ namespace AspectedRouting.IO.jsonParser
     {
         private static IExpression ParseProfileProperty(JsonElement e, Context c, string property)
         {
-            if (!e.TryGetProperty(property, out var prop))
-            {
+            if (!e.TryGetProperty(property, out var prop)) {
                 throw new ArgumentException("Not a valid profile: the declaration expression for '" + property +
                                             "' is missing");
             }
 
-            try
-            {
+            try {
                 var expr = ParseExpression(prop, c);
-                if (!expr.Types.Any())
-                {
+                if (!expr.Types.Any()) {
                     throw new Exception($"Could not parse field {property}, no valid typing for expression found");
                 }
 
                 expr = expr.Optimize();
                 expr = Funcs.Either(Funcs.Id, Funcs.Const, expr);
-
                 var specialized = expr.Specialize(new Curry(Typs.Tags, new Var("a")));
-                if (specialized == null)
-                {
+
+                if (specialized == null) {
                     throw new ArgumentException("The expression for " + property +
                                                 " hasn't the right type of 'Tags -> a'; it has types " +
                                                 string.Join(",", expr.Types) + "\n" + expr.TypeBreakdown());
                 }
 
-                return specialized.Optimize();
+                var pruned = specialized.PruneTypes(type => {
+                    if (!(type is Curry c)) {
+                        return false;
+                    }
+
+                    if (!Equals(c.ArgType, Typs.Tags)) {
+                        return false;
+                    }
+                    if (c.ResultType is Curry) {
+                        return false;
+                    }
+                    return true;
+                });
+                if (pruned.SpecializeToSmallestType().Types.Count() != 1) {
+                    throw new ArgumentException("The expression for " + property +
+                                                " hasn't the right type of 'Tags -> a'; it has multiple types " +
+                                                string.Join(",", pruned.Types) + "\n" + pruned.TypeBreakdown());
+                }
+
+                return pruned.Optimize();
             }
-            catch (Exception exc)
-            {
+            catch (Exception exc) {
                 throw new Exception("While parsing the property " + property, exc);
             }
         }
@@ -48,24 +62,20 @@ namespace AspectedRouting.IO.jsonParser
         private static Dictionary<string, IExpression> ParseParameters(this JsonElement e)
         {
             var ps = new Dictionary<string, IExpression>();
-            foreach (var obj in e.EnumerateObject())
-            {
+            foreach (var obj in e.EnumerateObject()) {
                 var nm = obj.Name.TrimStart('#');
-                if (nm == "")
-                {
+                if (nm == "") {
                     // This is a comment - not a parameter!
                     continue;
                 }
-                switch (obj.Value.ValueKind)
-                {
+
+                switch (obj.Value.ValueKind) {
                     case JsonValueKind.String:
                         var v = obj.Value.ToString();
-                        if (v.Equals("yes") || v.Equals("no"))
-                        {
+                        if (v.Equals("yes") || v.Equals("no")) {
                             ps[nm] = new Constant(Typs.Bool, v);
                         }
-                        else
-                        {
+                        else {
                             ps[nm] = new Constant(v);
                         }
 
@@ -96,8 +106,7 @@ namespace AspectedRouting.IO.jsonParser
 
         private static string Get(this JsonElement json, string key)
         {
-            if (json.TryGetProperty(key, out var p))
-            {
+            if (json.TryGetProperty(key, out var p)) {
                 return p.GetString();
             }
 
@@ -106,8 +115,7 @@ namespace AspectedRouting.IO.jsonParser
 
         private static string TryGet(this JsonElement json, string key)
         {
-            if (json.TryGetProperty(key, out var p))
-            {
+            if (json.TryGetProperty(key, out var p)) {
                 return p.GetString();
             }
 

@@ -53,6 +53,20 @@ namespace AspectedRouting.Language.Expression
             LastChange = lastChange;
             DefaultParameters = defaultParameters;
             Behaviours = behaviours;
+
+            CheckTypes(Access, "access");
+            CheckTypes(Oneway, "oneway");
+            CheckTypes(Speed, "speed");
+            
+        }
+
+        private static void CheckTypes(IExpression e, string name)
+        {
+            if (e.Types.Count() == 1) {
+                return;
+            }
+
+            throw new Exception("Insufficient specialization: " + name + " has multiple types left, namely " + e.Types.Pretty());
         }
 
         public List<IExpression> AllExpressions(Context ctx)
