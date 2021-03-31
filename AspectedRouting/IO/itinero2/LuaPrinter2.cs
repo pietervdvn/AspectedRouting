@@ -99,7 +99,7 @@ namespace AspectedRouting.IO.itinero2
                 "",
                 "test_all()",
                 "if (not failed_tests and not failed_profile_tests and print ~= nil) then",
-                "    print(\"Tests OK\")",
+                $"    print(\"Tests OK ({_profile.Name}.{_behaviourName})\")",
                 "end"
             };
 
