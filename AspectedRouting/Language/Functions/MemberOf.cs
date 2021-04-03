@@ -1,12 +1,22 @@
 using System.Collections.Generic;
 using AspectedRouting.Language.Expression;
 using AspectedRouting.Language.Typ;
-using Type = AspectedRouting.Language.Typ.Type;
 
 namespace AspectedRouting.Language.Functions
 {
     public class MemberOf : Function
     {
+        public MemberOf() : base(
+            "memberOf", true,
+            new[] {
+                new Curry(
+                    new Curry(Typs.Tags, Typs.Bool),
+                    new Curry(Typs.Tags, Typs.Bool))
+            }
+        ) { }
+
+        public MemberOf(IEnumerable<Type> types) : base("memberOf", types) { }
+
         public override string Description { get; } =
             "This function returns true, if the way is member of a relation matching the specified function.\n" +
             "\n" +
@@ -23,44 +33,51 @@ namespace AspectedRouting.Language.Functions
             "\n\n" +
             "In the test.csv, one can simply use `_relation:<aspect_name>=yes` to mimic relations in your tests";
 
-        public override List<string> ArgNames { get; } = new List<string>
-        {
-            "f","tags"
+        public override List<string> ArgNames { get; } = new List<string> {
+            "f", "tags"
         };
-
-        public MemberOf() : base(
-            "memberOf", true,
-            new[]
-            {
-                new Curry(
-                    new Curry(Typs.Tags, Typs.Bool),
-                    new Curry(Typs.Tags, Typs.Bool))
-            }
-        )
-        {
-        }
-
-        public MemberOf(IEnumerable<Type> types) : base("memberOf", types)
-        {
-        }
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var tags =(Dictionary<string, string>) arguments[1].Evaluate(c);
+            var tags = (Dictionary<string, string>) arguments[1].Evaluate(c);
             var name = c.AspectName.TrimStart('$');
-            
-            if(tags.TryGetValue("_relation:"+name, out var v))
-            {
+
+            if (tags.TryGetValue("_relation:" + name, out var v)) {
                 return v;
             }
+
+            // In the case of tests, relations might be added with "_relation:1:<key>"
+            // So, we create this table as dictionary
+            var relationTags = new Dictionary<string, Dictionary<string, string>>();
+            foreach (var tag in tags) {
+                if (tag.Key.StartsWith("_relation:")) {
+                    var keyParts = tag.Key.Split(":");
+                    if (keyParts.Length != 3) {
+                        continue;
+                    }
+                    var relationName = keyParts[1];
+                    if (!relationTags.ContainsKey(relationName)) {
+                        relationTags.Add(relationName, new Dictionary<string, string>());
+                    }
+
+                    relationTags[relationName].Add(keyParts[2], tag.Value);
+                }
+            }
+
+            foreach (var relationTagging in relationTags) {
+                var result = arguments[0].Evaluate(c, new Constant(relationTagging.Value));
+                if (result.Equals("yes")) {
+                    return "yes";
+                }
+            }
+
             return "no";
         }
 
         public override IExpression Specialize(IEnumerable<Type> allowedTypes)
         {
             var unified = Types.SpecializeTo(allowedTypes);
-            if (unified == null)
-            {
+            if (unified == null) {
                 return null;
             }
 

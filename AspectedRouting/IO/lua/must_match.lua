@@ -22,16 +22,34 @@ Arguments:
 - table which is the table to match
 
 ]]
-function must_match(tags, result, needed_keys, table)
+function must_match(needed_keys, table, tags, result)
     for _, key in ipairs(needed_keys) do
         local v = tags[key]
         if (v == nil) then
             -- a key is missing...
-            return false
+
+            -- this probably means that we must return false... unless the mapping returns something for null!
+            local mappng = table[key]
+            if (mappng ~= nil) then
+                -- there is a mapping! We might be in luck...
+                local resultValue = mappng[v]
+                if (resultValue == nil or resultValue == false) then
+                    -- nope, no luck after all
+                    return false
+                end
+                if (resultValue == true or resultValue == "yes") then
+                    return true
+                end
+            else
+                return false
+            end
         end
 
         local mapping = table[key]
-        if (type(mapping) == "table") then
+        if (mapping == nil) then
+            -- the mapping is nil! That is fine, the key is present anyway
+            -- we ignore
+        elseif (type(mapping) == "table") then
             -- we have to map the value with a function:
             local resultValue = mapping[v]
             if (resultValue ~= nil or -- actually, having nil for a mapping is fine for this function!.
@@ -50,15 +68,19 @@ function must_match(tags, result, needed_keys, table)
                 error("MustMatch got a string value it can't handle: " .. bool)
             end
         elseif (type(mapping) == "boolean") then
-            if(not mapping) then
+            if (not mapping) then
                 return false
             end
         else
-            error("The mapping is not a table. This is not supported. We got " .. tostring(mapping) .. " (" .. type(mapping)..")")
+            error("The mapping is not a table. This is not supported. We got " .. tostring(mapping) .. " (" .. type(mapping) .. ")")
         end
     end
 
-    -- Now that we know for sure that every key matches, we add them all
+    -- Now that we know for sure that every key matches, we add them all to the 'attributes_to_keep'
+    if (result == nil) then
+        -- euhm, well, seems like we don't are about the attributes_to_keep; early return!
+        return true
+    end
     for _, key in ipairs(needed_keys) do
         local v = tags[key] -- this is the only place where we use the original tags
         if (v ~= nil) then

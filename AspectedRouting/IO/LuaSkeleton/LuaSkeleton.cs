@@ -45,6 +45,10 @@ namespace AspectedRouting.IO.LuaSkeleton
             if (name.StartsWith("mapping")) {
                 throw new Exception("A mapping was added as dependency - this is a bug");
             }
+
+            if (name.Contains("stringToTags")) {
+                AddDep("table_to_list");
+            }
             _dependencies.Add(name);
         }
 

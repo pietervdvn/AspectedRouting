@@ -89,8 +89,12 @@ namespace AspectedRouting.Language.Functions
 
             var key = (string) s;
             var otherARgs = arguments.ToList().GetRange(1, arguments.Length - 1);
-            if (!StringToResultFunctions.TryGetValue(key, out var resultFunction))
-            {
+            if (!StringToResultFunctions.ContainsKey(key)) { // This is really roundabout, but it has to be
+                return null;
+            }
+
+            var resultFunction = StringToResultFunctions[key];
+            if (resultFunction == null) {
                 return null;
             }
 

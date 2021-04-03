@@ -7,7 +7,7 @@ namespace AspectedRouting.Language.Functions
 {
     public class MustMatch : Function
     {
-        public MustMatch() : base("mustMatch", true,
+        public MustMatch() : base("must_match", true,
             new[] {
                 // [String] -> (Tags -> [string]) -> Tags -> bool
                 Curry.ConstructFrom(Typs.Bool, // Result type on top!
@@ -15,9 +15,12 @@ namespace AspectedRouting.Language.Functions
                     new Curry(Typs.Tags, new ListType(Typs.String)), // The function to execute on every key
                     Typs.Tags // The tags to apply this on
                 )
-            }) { }
+            })
+        {
+            Funcs.AddBuiltin(this, "mustMatch");
+        }
 
-        private MustMatch(IEnumerable<Type> types) : base("mustMatch", types) { }
+        private MustMatch(IEnumerable<Type> types) : base("must_match", types) { }
 
         public override string Description { get; } = Utils.Lines(
             "Checks that every specified key is present and gives a non-false value.\n",
@@ -64,7 +67,18 @@ namespace AspectedRouting.Language.Functions
                 }
 
                 if (!tags.ContainsKey(tagKey)) {
-                    // A required key is missing: return 'no'
+                    // A required key is missing
+                    // Normally, we return no; but there is a second chance
+                    // IF the mapping returns 'yes' on null, we make an exception and ignore it
+                    var applied = function.Evaluate(c, new Constant(new Dictionary<string, string> {
+                        {tagKey, ""}
+                    }));
+                    if (applied == null) {
+                        return "no";
+                    }
+                    if (applied.Equals("yes") || (applied is IEnumerable<object> l && l.Count() > 0 && l.ToList()[0].Equals("yes")) ) {
+                        continue; // We ignore the absence of the key
+                    }
                     return "no";
                 }
             }

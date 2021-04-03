@@ -34,6 +34,9 @@ namespace AspectedRouting.Language.Functions
         {
             var f = arguments[0];
             var tags = (Dictionary<string, string>) arguments[1].Evaluate(c);
+            if (tags == null) {
+                return null;
+            }
             var result = new List<object>();
             foreach (var (k, v) in tags)
             {

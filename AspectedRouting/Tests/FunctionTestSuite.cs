@@ -60,7 +60,7 @@ namespace AspectedRouting.Tests
             var testCase = 0;
             foreach (var test in Tests) {
                 testCase++;
-                var context = new Context();
+                var context = new Context().WithAspectName("unittest");
                 foreach (var (key, value) in test.tags) {
                     if (key.StartsWith("#")) {
                         context.AddParameter(key, value);

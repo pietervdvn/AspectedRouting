@@ -1,4 +1,7 @@
-function first_match_of(tags, result, order_of_keys, table)
+function first_match_of(order_of_keys, table, tags, result)
+    if (result == nil) then
+        result = { attributes_to_keep = {} }
+    end
     for _, key in pairs(order_of_keys) do
         local v = tags[key]
         if (v ~= nil) then

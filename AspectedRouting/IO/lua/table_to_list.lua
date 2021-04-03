@@ -1,5 +1,8 @@
 function table_to_list(tags, result, factor_table)
     local list = {}
+    if(tags == nil) then
+        return list
+    end
     for key, mapping in pairs(factor_table) do
         local v = tags[key]
         if (v ~= nil) then

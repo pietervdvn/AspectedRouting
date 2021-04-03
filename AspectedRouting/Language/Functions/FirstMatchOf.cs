@@ -12,7 +12,7 @@ namespace AspectedRouting.Language.Functions
                                                       "E.g. `$firstMatchOf ['maxspeed','highway'] {'maxspeed' --> $parse, 'highway' --> {residential --> 30, tertiary --> 50}}` applied on `{maxspeed=70, highway=tertiary}` will yield `70` as that is the first key in the list; `{highway=residential}` will yield `30`.";
         public override List<string> ArgNames { get; } = new List<string> {"s"};
 
-        public FirstMatchOf() : base("firstMatchOf", true,
+        public FirstMatchOf() : base("first_match_of", true,
             new[]
             {
                 // [String] -> (Tags -> [a]) -> Tags -> a
@@ -23,9 +23,10 @@ namespace AspectedRouting.Language.Functions
                 )
             })
         {
+            Funcs.AddBuiltin( this,"firstMatchOf");
         }
 
-        private FirstMatchOf(IEnumerable<Type> types) : base("firstMatchOf", types)
+        private FirstMatchOf(IEnumerable<Type> types) : base("first_match_of", types)
         {
         }
 

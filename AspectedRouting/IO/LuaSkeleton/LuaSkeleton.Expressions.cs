@@ -28,10 +28,10 @@ namespace AspectedRouting.IO.LuaSkeleton
                     Assign(collectedMapping))
             ).Invoke(bare)) {
                 AddDep(Funcs.FirstOf.Name);
-                return "first_match_of(tags, result, \n" +
-                       "        " + ToLua(order.First(), key) + "," +
+                return "first_match_of(\n" +
+                       "        " + ToLua(order.First(), key) + ",\n" +
                        ("\n" + MappingToLua((Mapping) collectedMapping.First())).Indent().Indent() +
-                       ")";
+                       ",\n        tags, result)";
             }
 
             if (UnApply(
@@ -43,10 +43,10 @@ namespace AspectedRouting.IO.LuaSkeleton
                     Assign(collectedMapping))
             ).Invoke(bare)) {
                 AddDep(Funcs.MustMatch.Name);
-                return "must_match(tags, result, \n" +
+                return "must_match(" +
                        "        " + ToLua(order.First(), key) + "," +
                        ("\n" + MappingToLua((Mapping) collectedMapping.First())).Indent().Indent() +
-                       ")";
+                       ",\n        tags, result)";
             }
 
             if (UnApply(
@@ -124,7 +124,14 @@ namespace AspectedRouting.IO.LuaSkeleton
             var fArgs = bare.DeconstructApply();
             if (fArgs != null) {
                 var (f, args) = fArgs.Value;
-                var baseFunc = (Function) f;
+                
+                if(f is Constant constant) {
+                    return ConstantToLua(constant);
+                }
+                
+                if (!(f is Function baseFunc)) {
+                    throw new ArgumentException("Not a function: " + f);
+                }
 
                 if (baseFunc.Name.Equals(Funcs.Id.Name)) {
                     // This is an ugly hack
