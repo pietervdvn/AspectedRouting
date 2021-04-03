@@ -43,7 +43,7 @@ namespace AspectedRouting.Tests
                 var tags = new Dictionary<string, string>();
                 for (var i = 0; i < keys.Count; i++) {
                     if (i < vals.Count && !string.IsNullOrEmpty(vals[i])) {
-                        tags[keys[i]] = vals[i];
+                        tags[keys[i]] = vals[i].Trim(new []{'"'}).Replace("\"","\\\"");
                     }
                 }
 

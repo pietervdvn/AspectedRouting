@@ -12,10 +12,10 @@
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a6a74f48_002D8456_002D43c7_002Dbbee_002Dd3da33a8a4be/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Integration_TestExamples" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a6a74f48_002D8456_002D43c7_002Dbbee_002Dd3da33a8a4be/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Integration_TestExamples" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Project Location="/home/pietervdvn/git/AspectedRouting/AspectedRouting.Test" Presentation="&amp;lt;AspectedRouting.Test&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=d2e3d58f_002Debff_002D4fb5_002D8d18_002Deafe85f4773d/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="SpecializeToCommonTypes_ValueAndFuncType_ShouldFail" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=d2e3d58f_002Debff_002D4fb5_002D8d18_002Deafe85f4773d/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="SpecializeToCommonTypes_ValueAndFuncType_ShouldFail" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Project Location="/home/pietervdvn/git/AspectedRouting/AspectedRouting.Test" Presentation="&amp;lt;AspectedRouting.Test&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
 	</wpf:ResourceDictionary>

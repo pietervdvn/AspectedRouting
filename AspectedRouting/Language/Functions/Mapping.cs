@@ -7,6 +7,13 @@ using Type = AspectedRouting.Language.Typ.Type;
 
 namespace AspectedRouting.Language.Functions
 {
+    /// <summary>
+    /// The constructor takes a dictionary "key --> expression".
+    /// If a string is given as argument, the respective argument is returned. If the key is not found, 'null' is returned
+    /// 
+    /// If a table/dictionary/collection of tags is given, the key of the arguments is used and the expression is used as function on every respective value of the argument.
+    /// If the key is not found, null is returned for this expression instead.
+    /// </summary>
     public class Mapping : Function
     {
         public readonly Dictionary<string, IExpression> StringToResultFunctions;

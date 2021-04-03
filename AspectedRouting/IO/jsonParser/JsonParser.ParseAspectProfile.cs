@@ -301,6 +301,9 @@ namespace AspectedRouting.IO.jsonParser
                 return new Constant(s);
             }
 
+            if (e.ValueKind == JsonValueKind.Null) {
+                return new Constant(new Var("a"), null);
+            }
 
             throw new Exception("Could not parse " + e);
         }

@@ -97,7 +97,7 @@ namespace AspectedRouting.Tests
                         {
                             if (i < vals.Count && !string.IsNullOrEmpty(vals[i]))
                             {
-                                tags[keys[i]] = vals[i];
+                                tags[keys[i]] = vals[i].Trim(new []{'\"'}).Replace("\"","\\\"");
                             }
                         }
 

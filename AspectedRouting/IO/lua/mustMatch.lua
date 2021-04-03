@@ -15,18 +15,26 @@ When applied on the tags {"a" : "X"}, this yields the table {"a":"yes", "b":"yes
 MustMatch checks that every key in this last table yields yes - even if it is not in the original tags!
 
 
+Arguments:
+- The tags of the feature
+- The result table, where 'attributes_to_keep' might be set
+- needed_keys which indicate which keys must be present in 'tags'
+- table which is the table to match
+
 ]]
 function must_match(tags, result, needed_keys, table)
     for _, key in ipairs(needed_keys) do
-        local v = table[key] -- use the table here, as a tag that must _not_ match might be 'nil' in the tags
+        local v = tags[key]
         if (v == nil) then
+            -- a key is missing...
             return false
         end
 
         local mapping = table[key]
         if (type(mapping) == "table") then
+            -- we have to map the value with a function:
             local resultValue = mapping[v]
-            if (resultValue == nil or
+            if (resultValue ~= nil or -- actually, having nil for a mapping is fine for this function!.
                     resultValue == false or
                     resultValue == "no" or
                     resultValue == "false") then

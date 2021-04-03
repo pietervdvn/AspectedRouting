@@ -2,47 +2,44 @@ using System.Collections.Generic;
 using System.Linq;
 using AspectedRouting.Language.Expression;
 using AspectedRouting.Language.Typ;
-using Type = AspectedRouting.Language.Typ.Type;
 
 namespace AspectedRouting.Language.Functions
 {
     public class MustMatch : Function
     {
-        public override string Description { get; } =
-            "Checks that every specified key is present and gives a non-false value\n." +
-            "" +
-            "\n" +
-            "If, on top, a value is present with a mapping, every key/value will be executed and must return a value that is not 'no' or 'false'\n" +
-            "Note that this is a privileged builtin function, as the parser will automatically inject the keys used in the called function.";
-
-        public override List<string> ArgNames { get; } = new List<string>
-        {
-            "neededKeys (filled in by parser)",
-            "f"
-        };
-
         public MustMatch() : base("mustMatch", true,
-            new[]
-            {
+            new[] {
                 // [String] -> (Tags -> [string]) -> Tags -> bool
                 Curry.ConstructFrom(Typs.Bool, // Result type on top!
                     new ListType(Typs.String), // List of keys to check for
                     new Curry(Typs.Tags, new ListType(Typs.String)), // The function to execute on every key
                     Typs.Tags // The tags to apply this on
                 )
-            })
-        {
-        }
+            }) { }
 
-        private MustMatch(IEnumerable<Type> types) : base("mustMatch", types)
-        {
-        }
+        private MustMatch(IEnumerable<Type> types) : base("mustMatch", types) { }
+
+        public override string Description { get; } = Utils.Lines(
+            "Checks that every specified key is present and gives a non-false value.\n",
+            "If, on top, a value is present with a mapping, every key/value will be executed and must return a value that is not 'no' or 'false'. Note that 'null' is considered as true here too!",
+            "Note that this is a privileged builtin function, as the parser will automatically inject the keys used in the called function.\n",
+            "",
+            "Usage example",
+            "-------------",
+            "",
+            "`\'mustMatchKeys\': { \"highway\": { \"proposed\": \"no\", \"undefined\":null }}`",
+            "which will return 'yes' for {highway=residential}, {highway=living_street}, ..., but return 'no' for {highway=proposed}, but also for {some_other_key=xxx}",
+            "Also note that {highway=undefined} will return (somewhat surprisingly) 'yes' too - as null-values are considered as true here too!");
+
+        public override List<string> ArgNames { get; } = new List<string> {
+            "neededKeys (do not specify in source code -added automatically by the parser)",
+            "f"
+        };
 
         public override IExpression Specialize(IEnumerable<Type> allowedTypes)
         {
             var unified = Types.SpecializeTo(allowedTypes);
-            if (unified == null)
-            {
+            if (unified == null) {
                 return null;
             }
 
@@ -51,36 +48,38 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var neededKeys = (IEnumerable<object>) arguments[0].Evaluate(c); 
+            var neededKeys = (IEnumerable<object>) arguments[0].Evaluate(c);
             var function = arguments[1];
 
             var tags = (Dictionary<string, string>) arguments[2].Evaluate(c);
 
-            foreach (var oo in neededKeys)
-            {
+            foreach (var oo in neededKeys) {
                 var o = oo;
-                while (o is IExpression e)
-                {
+                while (o is IExpression e) {
                     o = e.Evaluate(c);
                 }
-                if (!(o is string tagKey))
-                {
+
+                if (!(o is string tagKey)) {
                     continue;
                 }
 
-                if (!tags.ContainsKey(tagKey)) return "no";
+                if (!tags.ContainsKey(tagKey)) {
+                    // A required key is missing: return 'no'
+                    return "no";
+                }
             }
 
             var result = (IEnumerable<object>) function.Evaluate(c, new Constant(tags));
 
-            if (!result.Any(o =>
+            if (result.Any(o =>
                 o == null ||
-                (o is string s && (s.Equals("no") || s.Equals("false")))))
-            {
-                return "yes";
+                o is string s && (s.Equals("no") || s.Equals("false")))) {
+                // The mapped function is executed. If the mapped function gives 'no', null or 'false' for any value, "no" is returned
+                return "no";
             }
 
-            return "no";
+            return "yes";
+
         }
     }
 }
