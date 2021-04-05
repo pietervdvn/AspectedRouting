@@ -40,7 +40,7 @@ namespace AspectedRouting.IO.itinero1
                 "    result.attributes_to_keep = {}",
                 "",
                 "    local access = " + access,
-                "    if (access == nil or access == \"no\") then",
+                "    if (access == nil or access == \"no\" or access == false) then",
                 "         return",
                 "    end",
                 "    tags.access = access",

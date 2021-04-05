@@ -53,6 +53,23 @@ namespace AspectedRouting.Tests
             return new AspectTestSuite(function, tests);
         }
 
+        /// <summary>
+        /// Returns a test suite where no tests are kept which contain keys of the scheme '_relation:<name>:<key>'
+        /// </summary>
+        /// <returns></returns>
+        public AspectTestSuite WithoutRelationTests()
+        {
+            var newTests = new List<(string expected, Dictionary<string, string> tags)>();
+            foreach (var (expected, tags) in Tests) {
+                if (tags.Keys.Any(key => key.StartsWith("_relation") && key.Split(":").Length ==3)) {
+                    continue;
+                }
+                newTests.Add((expected, tags));
+            }
+
+            return new AspectTestSuite(FunctionToApply, newTests);
+        }
+
 
         public bool Run()
         {

@@ -4,6 +4,7 @@ using System.Linq;
 using AspectedRouting.Language;
 using AspectedRouting.Language.Expression;
 using AspectedRouting.Language.Functions;
+using AspectedRouting.Language.Typ;
 
 namespace AspectedRouting.IO.LuaSnippets
 {
@@ -17,10 +18,12 @@ namespace AspectedRouting.IO.LuaSnippets
                 new SumSnippet(),
                 new MaxSnippet(),
                 new MinSnippet(),
+                new IfThenElseSnippet(),
                 new IfThenElseDottedSnippet(),
                 new InvSnippet(),
                 new HeadSnippet(),
-                new MemberOfSnippet()
+                new MemberOfSnippet(),
+            //    new MustMatchSnippet()
             };
 
         private static readonly Dictionary<string, LuaSnippet> SnippetsIndex = AllSnippets.ToDictionary(
@@ -31,7 +34,10 @@ namespace AspectedRouting.IO.LuaSnippets
         {
 
             var opt  = e.Optimize();
-            if (!Equals(e.Types.First(), opt.Types.First())) {
+            // Note that optimization might optimize to a _subtype_ of the original expresion - which is fine!
+            var origType = e.Types.First();
+            var optType = opt.Types.First();
+            if (!origType.Equals(optType) && !origType.IsSuperSet(optType)) {
                 throw new Exception("Optimization went wrong!");
             }
             e = opt;

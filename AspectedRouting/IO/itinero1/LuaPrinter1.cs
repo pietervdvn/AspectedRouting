@@ -24,7 +24,8 @@ namespace AspectedRouting.IO.itinero1
         {
             _profile = profile;
             _context = context;
-            _aspectTestSuites = aspectTestSuites;
+            _aspectTestSuites = aspectTestSuites?.Where(suite => suite != null)
+                ?.Select(testSuite => testSuite.WithoutRelationTests())?.ToList();
             _profileTests = profileTests;
             _skeleton = new LuaSkeleton.LuaSkeleton(context, false);
             _parameterPrinter = new LuaParameterPrinter(profile, _skeleton);

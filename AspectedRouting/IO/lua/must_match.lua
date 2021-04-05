@@ -25,28 +25,29 @@ Arguments:
 function must_match(needed_keys, table, tags, result)
     for _, key in ipairs(needed_keys) do
         local v = tags[key]
+        local mapping = table[key]
+
         if (v == nil) then
             -- a key is missing...
-
             -- this probably means that we must return false... unless the mapping returns something for null!
-            local mappng = table[key]
-            if (mappng ~= nil) then
-                -- there is a mapping! We might be in luck...
-                local resultValue = mappng[v]
+            -- note that the mapping might already be executed
+            if (mapping == true or mapping == "yes") then
+                -- The function for this key returned "true" despite being fed 'nil'
+                -- So, we can safely assume that the absence of this key is fine!
+                -- PASS
+            elseif (type(mapping) == "table") then
+                -- there is a mapping! We might be in luck... What does it have for 'nil'?
+                local resultValue = mapping[v]
                 if (resultValue == nil or resultValue == false) then
                     -- nope, no luck after all
                     return false
-                end
-                if (resultValue == true or resultValue == "yes") then
-                    return true
                 end
             else
                 return false
             end
         end
 
-        local mapping = table[key]
-        if (mapping == nil) then
+       if (mapping == nil) then
             -- the mapping is nil! That is fine, the key is present anyway
             -- we ignore
         elseif (type(mapping) == "table") then
