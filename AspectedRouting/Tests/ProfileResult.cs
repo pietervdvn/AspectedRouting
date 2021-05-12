@@ -18,15 +18,28 @@ namespace AspectedRouting.Tests
             PriorityExplanation = priorityExplanation;
         }
 
+        private static string str(string s)
+        {
+            if (s == null) {
+                return "<null>";
+            }
+
+            if (s == "") {
+                return "<empty string>";
+            }
+
+            return s;
+        } 
+        
         public override string ToString()
         {
 
             return string.Join("\n  ",
-                "access "+Access,
-                "oneway "+Oneway,
+                "  access "+str(Access),
+                "oneway "+str(Oneway),
                 "speed "+Speed,
                 "priority "+Priority,
-                "because \n  "+PriorityExplanation
+                "because \n  "+str(PriorityExplanation)
                 );
         }
     }

@@ -93,7 +93,7 @@ namespace AspectedRouting
 
         private static void Repl(Context c, Dictionary<string, ProfileMetaData> profiles)
         {
-            var profile = profiles["bicycle"];
+            var profile = profiles["emergency_vehicle"];
             var behaviour = profile.Behaviours.Keys.First();
             do
             {
@@ -130,12 +130,13 @@ namespace AspectedRouting
                     if (beh.Contains("."))
                     {
                         var profileName = beh.Split(".")[0];
-                        if (!profiles.TryGetValue(profileName, out profile))
+                        if (!profiles.TryGetValue(profileName, out var newProfile))
                         {
                             Console.Error.WriteLine("Profile " + profileName + " not found, ignoring");
                             continue;
                         }
 
+                        profile = newProfile;
                         beh = beh.Substring(beh.IndexOf(".") + 1);
                     }
 
