@@ -56,7 +56,6 @@ namespace AspectedRouting.IO.itinero2
             var header =
                 new List<string> {
                     $"name = \"{_profile.Name}.{_behaviourName}\"",
-                    $"generationDate = \"{_lastChangeTime:s}\"",
                     $"description = \"{profileDescr} ({_profile.Description})\""
                 };
 

@@ -63,7 +63,6 @@ namespace AspectedRouting.IO.LuaSkeleton
                 "",
                 "Unit: " + meta.Unit,
                 "Created by " + meta.Author,
-                "Originally defined in " + meta.Filepath,
                 "Uses tags: " + string.Join(", ", possibleTags.Keys),
                 "Used parameters: " + string.Join(", ", usedParams),
                 "Number of combintations: " + numberOfCombinations,

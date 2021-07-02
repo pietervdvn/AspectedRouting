@@ -27,7 +27,6 @@ namespace AspectedRouting.IO.itinero1
                 "Comfort is calculated as well, based on the parameters which are padded in",
                 "",
                 "Created by " + _profile.Author,
-                "Originally defined in " + _profile.Filename,
                 "]]",
                 "function " + _profile.Name + "(parameters, tags, result)",
                 "",
