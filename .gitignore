@@ -4,3 +4,14 @@
 .~lock.*
 output/*
 AspectedRouting.sln.DotSettings
+
+#Visual Studio Code
+.vscode
+
+# Node Modules
+*/node_modules
+
+.fake
+.ionide
+
+*/.routeExamples
