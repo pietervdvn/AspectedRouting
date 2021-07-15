@@ -1,4 +1,12 @@
-import interpret from "./interpret.mjs";
-import RuleSet from "./RuleSet.mjs";
+import interpret from './interpret.js';
+import RuleSet from './RuleSet.js';
 
-export { interpret, RuleSet };
+const printMsg = () => {
+    console.log("BE-StressMap has been installed successfully!")
+}
+
+export { 
+    interpret, 
+    RuleSet, 
+    printMsg,
+};

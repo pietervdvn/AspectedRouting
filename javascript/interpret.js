@@ -2,7 +2,7 @@
  * Import packages
  */
 import fs from 'fs';
-import RuleSet from './RuleSet.mjs';
+import RuleSet from './RuleSet.js';
 
 
 /**
@@ -22,15 +22,21 @@ const tags2 = {
 
 const tags3 = {
     "cyclestreet": "yes",
-    "highway":"residential",
-    "maxspeed":"30",
-    "surface":"asphalt"
+    "highway": "residential",
+    "maxspeed": "30",
+    "surface": "asphalt"
 }
 
 const tags4 = {
     "highway": "track",
     "surface": "asphalt",
     "incline": "10%"
+}
+
+const tags5 = {
+    "access": "no",
+    "bicycle": "official",
+    "area": "yes"
 }
 
 /**
@@ -42,18 +48,18 @@ const interpret = (definitionFile, tags) => {
     const rawData = fs.readFileSync(definitionFile);
     const ruleSet = JSON.parse(rawData);
 
-    const { name, unit, $default, $multiply, value} = ruleSet;
+    const { name, $default, $multiply, value} = ruleSet;
 
     if (!!value) {
-        const currentSet = new RuleSet(name, $default, unit, value);
-        currentSet.getScore(tags);
+        const currentSet = new RuleSet(name, $default, value);
+        console.log(currentSet.runProgram(tags));
     } else {
-        const currentSet = new RuleSet(name, $default, unit, {$multiply});
-        currentSet.toString();
-        currentSet.getScore(tags);
+        const currentSet = new RuleSet(name, $default, {$multiply});
+        // currentSet.toString();
+        console.log(currentSet.runProgram(tags));
     }
 }; 
-
+/* 
 console.info('Comfort')
 interpret("../Examples/bicycle/aspects/bicycle.comfort.json", tags1);
 interpret("../Examples/bicycle/aspects/bicycle.comfort.json", tags2);
@@ -66,23 +72,24 @@ interpret("../Examples/bicycle/aspects/bicycle.safety.json", tags1);
 interpret("../Examples/bicycle/aspects/bicycle.safety.json", tags2);
 interpret("../Examples/bicycle/aspects/bicycle.safety.json", tags3);
 interpret("../Examples/bicycle/aspects/bicycle.safety.json", tags4);
-console.log('*******************')
+console.log('*******************') */
 
 console.info('Legal Access')
 interpret("../Examples/bicycle/aspects/bicycle.legal_access.json", tags1);
 interpret("../Examples/bicycle/aspects/bicycle.legal_access.json", tags2);
 interpret("../Examples/bicycle/aspects/bicycle.legal_access.json", tags3);
 interpret("../Examples/bicycle/aspects/bicycle.legal_access.json", tags4);
+interpret("../Examples/bicycle/aspects/bicycle.legal_access.json", tags5);
 
 // !TODO: Add default value = "no" as a fallback. Fix logic
 
 console.log('*******************')
 
-console.info('Speed Factor')
+/* console.info('Speed Factor')
 interpret("./.routeExamples/bicycle.speed_factor.json", tags1);
 interpret("./.routeExamples/bicycle.speed_factor.json", tags2);
 interpret("./.routeExamples/bicycle.speed_factor.json", tags3);
 interpret("./.routeExamples/bicycle.speed_factor.json", tags4);
-console.log('*******************')
+console.log('*******************') */
 
 export default interpret;
