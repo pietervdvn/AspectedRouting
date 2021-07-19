@@ -1,3 +1,4 @@
+
 /**
  * RuleSet Class
  * Constructor
@@ -30,6 +31,7 @@ class RuleSet {
         const [
             [program, keys], values
         ] = Object.entries(initValues);
+        console.log(program)
 
         if (program === '$multiply') {
             this.scoreValues = keys;
@@ -41,6 +43,16 @@ class RuleSet {
             this.order = keys;
             const match = this.getFirstMatchScore(tags);
             return `"${this.name.slice(8)}":"${match}"`;
+
+        } else if (program === '$min') {
+            this.scoreValues = keys;
+            const minVal = this.getMinValue(tags);
+            return `"${this.name.slice(8)}":"${minVal}"`;
+
+        } else if (program === '$max') {
+            this.scoreValues = keys;
+            const maxVal = this.getMaxValue(tags);
+            return `"${this.name.slice(8)}":"${maxVal}"`;
             
         } else {
             console.error(`Error: Program ${program} is not implemented yet. ${JSON.stringify(keys)}`);
@@ -74,8 +86,10 @@ class RuleSet {
     getFirstMatchScore (tags) {
         let matchFound = false;
         let match = "";
+        let i = 0;
 
         for (let key of this.order) {
+            i++;
             for (let entry of Object.entries(tags)) {
                 const [tagKey, tagValue] = entry;
 
@@ -111,6 +125,47 @@ class RuleSet {
         return null;
     }
 
+    getMinValue (tags) {
+        const minArr = this.scoreValues.map(part => {
+            if (typeof(part) === 'object') {
+                return this.getMin(part, tags)
+            } else {
+                return parseInt(part);
+            }
+        });
+        let absMin = Math.min(...minArr);
+        return absMin;
+    }
+
+    getMin (part, tags) {
+        let min;
+        const [ group ] = Object.entries(part);
+        const [,compareVals] = group;
+        const minArr = Object.values(compareVals).map(v => parseInt(v));
+        min = Math.min(...minArr);
+        return min;
+    }
+
+    getMaxValue (tags) {
+        const maxArr = this.scoreValues.map(part => {
+            if (typeof(part) === 'object') {
+                return this.getMax(part, tags)
+            } else {
+                return parseInt(part);
+            }
+        });
+        let absMax = Math.max(...maxArr);
+        return absMax;
+    }
+
+    getMax (part, tags) {
+        let max;
+        const [ group ] = Object.entries(part);
+        const [,compareVals] = group;
+        const maxArr = Object.values(compareVals).map(v => parseInt(v));
+        max = Math.max(...maxArr);
+        return max;
+    }
 
 }
 
