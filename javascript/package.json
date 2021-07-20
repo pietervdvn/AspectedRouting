@@ -1,5 +1,5 @@
 {
-  "name": "js-interpreter",
+  "name": "mapcomplete-stressmap",
   "version": "1.0.0",
   "description": "Calculate bicycle route stress score to display on MapComplete/OSM.",
   "main": "index.js",

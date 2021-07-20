@@ -66,8 +66,9 @@ class RuleSet {
     multiplyScore (tags) {
         let number = this.defaultValue;
 
-        Object.entries(tags).forEach(tag => {
+        Object.entries(JSON.parse(tags)).forEach(tag => {
             const [key, value] = tag;
+            console.log(key, value)
         
             Object.entries(this.scoreValues).forEach(property => {
                 const [propKey, propValues] = property;
@@ -81,6 +82,7 @@ class RuleSet {
                 }
             })
         });
+        console.log(number)
         return number.toFixed(2);
     }
     getFirstMatchScore (tags) {
@@ -90,7 +92,7 @@ class RuleSet {
 
         for (let key of this.order) {
             i++;
-            for (let entry of Object.entries(tags)) {
+            for (let entry of Object.entries(JSON.parse(tags))) {
                 const [tagKey, tagValue] = entry;
 
                 if (key === tagKey) {
@@ -128,7 +130,7 @@ class RuleSet {
     getMinValue (tags) {
         const minArr = this.scoreValues.map(part => {
             if (typeof(part) === 'object') {
-                return this.getMin(part, tags)
+                return this.getMin(part, JSON.parse(tags))
             } else {
                 return parseInt(part);
             }
@@ -149,7 +151,7 @@ class RuleSet {
     getMaxValue (tags) {
         const maxArr = this.scoreValues.map(part => {
             if (typeof(part) === 'object') {
-                return this.getMax(part, tags)
+                return this.getMax(part, JSON.parse(tags))
             } else {
                 return parseInt(part);
             }

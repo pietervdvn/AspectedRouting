@@ -2,7 +2,8 @@ import interpret from './interpret.js';
 import RuleSet from './RuleSet.js';
 
 const printMsg = () => {
-    console.log("BE-StressMap has been installed successfully!")
+    console.info("BE-StressMap has been installed successfully!")
+    console.info("View the README file for instructors on how to use this module.")
 }
 
 export { 
