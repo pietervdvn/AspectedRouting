@@ -33,7 +33,7 @@ To call a function in an aspect, one creates a hash in the JSON where exactly on
 }
 ```
 
-Interpreting the above expression will aways yield `no` when evaluating, as the parameters have different values. The type of the above expression is thus `Bool`.
+Interpreting the above expression will always yield `no` when evaluating, as the parameters have different values. The type of the above expression is thus `Bool`.
 
 If no key has a function invocation (thus no key starts with `$`), the hash is interpreted as a mapping:
 
