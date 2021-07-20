@@ -1,4 +1,3 @@
-
 /**
  * RuleSet Class
  * Constructor
@@ -12,14 +11,14 @@ class RuleSet {
         this.defaultValue = defaultValue;
         this.values = values;
         this.score = this.defaultValue;
-        this.scoreValues = null;
         this.order = null;
     }
+
     /**
      * toString
      * Returns constructor values in string for display in the console
      */
-    toString () {
+    toString() {
         return `${this.name} | ${this.defaultValue} | ${this.values}`;
     }
 
@@ -27,65 +26,109 @@ class RuleSet {
      * getScore calculates a score for the RuleSet
      * @param tags {object} Active tags to compare against
      */
-    runProgram (tags, initValues = this.values) {
-        const [
-            [program, keys], values
-        ] = Object.entries(initValues);
-        console.log(program)
+    runProgram(tags, program = this.values) {
+        console.log("Running program", program)
+        if(typeof program !== "object"){
+            return program;
+        }
+        
+        let functionName /*: string*/ = undefined;
+        let functionArguments /*: any */= undefined    
+        let otherValues = {}
+        Object.entries(program).forEach(
+            entry => {
+                const [key, value] = entry
+                if (key.startsWith("$")) {
+                    functionName = key
+                    functionArguments = value
+                }else{
+                    otherValues[key] = value
+                }
+            }
+        )
 
-        if (program === '$multiply') {
-            this.scoreValues = keys;
-            this.score = this.multiplyScore(tags);
+        if(functionName === undefined){
+            return this.interpretAsDictionary(program, tags)
+        }
+        
+        
+        console.log(program)
+        if (functionName === '$multiply') {
+            this.score = this.multiplyScore(tags, functionArguments);
             return `"${this.name.slice(8)}":"${this.score}"`;
 
-        } else if (program === '$firstMatchOf') {
-            this.scoreValues = values;
+        } else if (functionName === '$firstMatchOf') {
             this.order = keys;
             const match = this.getFirstMatchScore(tags);
             return `"${this.name.slice(8)}":"${match}"`;
 
-        } else if (program === '$min') {
-            this.scoreValues = keys;
-            const minVal = this.getMinValue(tags);
+        } else if (functionName === '$min') {
+            const minVal = this.getMinValue(tags, functionArguments);
             return `"${this.name.slice(8)}":"${minVal}"`;
 
-        } else if (program === '$max') {
-            this.scoreValues = keys;
-            const maxVal = this.getMaxValue(tags);
+        } else if (functionName === '$max') {
+            const maxVal = this.getMaxValue(tags, functionArguments);
             return `"${this.name.slice(8)}":"${maxVal}"`;
-            
+
         } else {
-            console.error(`Error: Program ${program} is not implemented yet. ${JSON.stringify(keys)}`);
+            console.error(`Error: Program ${functionName} is not implemented yet. ${JSON.stringify(program)}`);
         }
     }
+
+    /**
+     * Given a 'program' without function invocation, interprets it as a dictionary
+     *
+     * E.g., given the program
+     *
+     * {
+     *     highway: {
+     *         residential: 30,
+     *         living_street: 20
+     *     },
+     *     surface: {
+     *         sett : 0.9
+     *     }
+     *     
+     * }
+     *
+     * in combination with the tags {highway: residential},
+     *
+     * the result should be [30, undefined];
+     *
+     * For the tags {highway: residential, surface: sett} we should get [30, 0.9]
+     *
+     *
+     * @param program
+     * @param tags
+     * @return {(undefined|*)[]}
+     */
+    interpretAsDictionary(program, tags) {
+        return Object.entries(tags).map(tag => {
+            const [key, value] = tag;
+            const propertyValue = program[key]
+            if (propertyValue === undefined) {
+                return undefined
+            }
+            if(typeof propertyValue !== "object"){
+                return propertyValue
+            }
+            return propertyValue[value]
+        });
+    }
+
     /**
      * Multiplies the default score with the proper values
      * @param tags {object} the active tags to check against
+     * @param subprogram which should generate a list of values
      * @returns score after multiplication
      */
-    multiplyScore (tags) {
-        let number = this.defaultValue;
-
-        Object.entries(JSON.parse(tags)).forEach(tag => {
-            const [key, value] = tag;
-            console.log(key, value)
-        
-            Object.entries(this.scoreValues).forEach(property => {
-                const [propKey, propValues] = property;
-        
-                if (key === propKey) {
-                    for (let propEntry of Object.entries(propValues)) {
-                        const [propValueKey, propValue] = propEntry;
-
-                        if (value === propValueKey) number *= propValue;
-                    }
-                }
-            })
-        });
-        console.log(number)
+    multiplyScore(tags, subprogram) {
+        let number = 1
+        this.runProgram(tags, subprogram).filter(r => r !== undefined).forEach(r => number *= parseFloat(r))
         return number.toFixed(2);
     }
-    getFirstMatchScore (tags) {
+
+    getFirstMatchScore(tags) {
         let matchFound = false;
         let match = "";
         let i = 0;
@@ -113,11 +156,11 @@ class RuleSet {
         }
     }
 
-    checkValues (tag) {
+    checkValues(tag) {
         const [tagKey, tagValue] = tag;
         const options = Object.entries(this.scoreValues[1])
 
-        for (let option of options) {           
+        for (let option of options) {
             const [optKey, optValues] = option;
 
             if (optKey === tagKey) {
@@ -127,48 +170,29 @@ class RuleSet {
         return null;
     }
 
-    getMinValue (tags) {
-        const minArr = this.scoreValues.map(part => {
-            if (typeof(part) === 'object') {
-                return this.getMin(part, JSON.parse(tags))
+    getMinValue(tags, subprogram) {
+        console.log("Running min with", tags, subprogram)
+        const minArr = subprogram.map(part => {
+            if (typeof (part) === 'object') {
+                const calculatedValue = this.runProgram(tags, part)
+                return parseFloat(calculatedValue)
             } else {
-                return parseInt(part);
+                return parseFloat(part);
             }
-        });
-        let absMin = Math.min(...minArr);
-        return absMin;
+        }).filter(v => !isNaN(v));
+        return Math.min(...minArr);
     }
 
-    getMin (part, tags) {
-        let min;
-        const [ group ] = Object.entries(part);
-        const [,compareVals] = group;
-        const minArr = Object.values(compareVals).map(v => parseInt(v));
-        min = Math.min(...minArr);
-        return min;
-    }
-
-    getMaxValue (tags) {
-        const maxArr = this.scoreValues.map(part => {
-            if (typeof(part) === 'object') {
-                return this.getMax(part, JSON.parse(tags))
+    getMaxValue(tags, subprogram) {
+        const maxArr = subprogram.map(part => {
+            if (typeof (part) === 'object') {
+                return parseFloat(this.runProgram(tags, part))
             } else {
-                return parseInt(part);
+                return parseFloat(part);
             }
-        });
-        let absMax = Math.max(...maxArr);
-        return absMax;
+        }).filter(v => !isNaN(v));
+        return Math.max(...maxArr);
     }
-
-    getMax (part, tags) {
-        let max;
-        const [ group ] = Object.entries(part);
-        const [,compareVals] = group;
-        const maxArr = Object.values(compareVals).map(v => parseInt(v));
-        max = Math.max(...maxArr);
-        return max;
-    }
-
 }
 
 

@@ -22,6 +22,7 @@ const app = {
      * @param tags {any} OSM tags as key/value pairs
      */
     interpret (definitionFile, tags) {
+        tags = JSON.parse(tags)
         const rawData = fs.readFileSync(definitionFile);
         const ruleSet = JSON.parse(rawData);
         const { name, $default, $multiply, $min, value} = ruleSet;
