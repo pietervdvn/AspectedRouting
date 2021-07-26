@@ -1,7 +1,7 @@
 {
-  "name": "mapcomplete-stressmap",
-  "version": "1.0.0",
-  "description": "Calculate bicycle route stress score to display on MapComplete/OSM.",
+  "name": "aspected-routing",
+  "version": "0.2.0",
+  "description": "Calculates a score based on a .Json-file which contains an Aspected-Routing function. This is a (partial) javascript port",
   "main": "index.js",
   "type": "module",
   "scripts": {

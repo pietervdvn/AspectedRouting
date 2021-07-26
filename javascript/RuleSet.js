@@ -6,34 +6,25 @@
  * @param values {object} Main data object
  */
 class RuleSet {
-    constructor(name, defaultValue = 1, values) {
-        this.name = name;
-        this.defaultValue = defaultValue;
-        this.values = values;
-        this.score = this.defaultValue;
-        this.order = null;
+    constructor(config) {
+        delete config["name"]
+        delete config["unit"]
+        delete config["description"]
+        this.program = config
     }
 
-    /**
-     * toString
-     * Returns constructor values in string for display in the console
-     */
-    toString() {
-        return `${this.name} | ${this.defaultValue} | ${this.values}`;
-    }
 
     /**
      * getScore calculates a score for the RuleSet
      * @param tags {object} Active tags to compare against
      */
-    runProgram(tags, program = this.values) {
-        console.log("Running program", program)
-        if(typeof program !== "object"){
+    runProgram(tags, program = this.program) {
+        if (typeof program !== "object") {
             return program;
         }
-        
+
         let functionName /*: string*/ = undefined;
-        let functionArguments /*: any */= undefined    
+        let functionArguments /*: any */ = undefined
         let otherValues = {}
         Object.entries(program).forEach(
             entry => {
@@ -41,35 +32,27 @@ class RuleSet {
                 if (key.startsWith("$")) {
                     functionName = key
                     functionArguments = value
-                }else{
+                } else {
                     otherValues[key] = value
                 }
             }
         )
 
-        if(functionName === undefined){
+        if (functionName === undefined) {
             return this.interpretAsDictionary(program, tags)
         }
-        
-        
-        console.log(program)
-        if (functionName === '$multiply') {
-            this.score = this.multiplyScore(tags, functionArguments);
-            return `"${this.name.slice(8)}":"${this.score}"`;
 
+        if (functionName === '$multiply') {
+            return this.multiplyScore(tags, functionArguments);
         } else if (functionName === '$firstMatchOf') {
             this.order = keys;
-            const match = this.getFirstMatchScore(tags);
-            return `"${this.name.slice(8)}":"${match}"`;
-
+            return this.getFirstMatchScore(tags);
         } else if (functionName === '$min') {
-            const minVal = this.getMinValue(tags, functionArguments);
-            return `"${this.name.slice(8)}":"${minVal}"`;
-
+           return this.getMinValue(tags, functionArguments);
         } else if (functionName === '$max') {
-            const maxVal = this.getMaxValue(tags, functionArguments);
-            return `"${this.name.slice(8)}":"${maxVal}"`;
-
+            return this.getMaxValue(tags, functionArguments);
+        } else if (functionName === '$default') {
+            return this.defaultV(functionArguments, otherValues, tags)
         } else {
             console.error(`Error: Program ${functionName} is not implemented yet. ${JSON.stringify(program)}`);
         }
@@ -109,11 +92,20 @@ class RuleSet {
             if (propertyValue === undefined) {
                 return undefined
             }
-            if(typeof propertyValue !== "object"){
+            if (typeof propertyValue !== "object") {
                 return propertyValue
             }
             return propertyValue[value]
         });
+    }
+
+    defaultV(subProgram, otherArgs, tags) {
+        const normalProgram = Object.entries(otherArgs)[0][1]
+        const value = this.runProgram(tags, normalProgram)
+        if (value !== undefined) {
+            return value;
+        }
+        return this.runProgram(tags, subProgram)
     }
 
     /**
