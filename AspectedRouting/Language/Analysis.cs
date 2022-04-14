@@ -338,6 +338,12 @@ namespace AspectedRouting.Language
         }
 
 
+        /**
+         * Returns all possible tags which are used in the given expression.
+         *
+         * If a tag might match a wildcard, an explicit '*' will be added to the collection.
+         * This is different from the _other_ possibleTags, which will return an empty set.
+         */
         public static Dictionary<string, HashSet<string>> PossibleTags(this IEnumerable<IExpression> exprs)
         {
             var usedTags = new Dictionary<string, HashSet<string>>();
@@ -353,14 +359,20 @@ namespace AspectedRouting.Language
                 {
                     if (!usedTags.TryGetValue(key, out var collection))
                     {
+                        // This is the first time we see this collection
                         collection = new HashSet<string>();
                         usedTags[key] = collection;
+                       
                     }
-
                     foreach (var v in values)
                     {
                         collection.Add(v);
                     }
+
+                    if (values.Count == 0) {
+                        collection.Add("*");
+                    }
+                   
                 }
             }
 

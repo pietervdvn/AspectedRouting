@@ -306,6 +306,9 @@ namespace AspectedRouting
             File.WriteAllText($"{outputDir}/ProfileMetadata.json",
                 Utils.GenerateExplanationJson(profiles.Select(p => p.profile), context)
             );
+            File.WriteAllText($"{outputDir}/UsedTags.json",
+                Utils.GenerateTagsOverview(profiles.Select(p => p.profile), context)
+            );
 
             if (!args.Contains("--no-repl"))
                 Repl(context, profiles
