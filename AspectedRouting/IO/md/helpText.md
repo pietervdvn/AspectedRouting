@@ -7,6 +7,7 @@
 - string
 - tags
 - bool
+
 ## Builtin functions
 
 - eq
@@ -37,7 +38,6 @@
 - eitherFunc
 - stringToTags
 
-
 ### Function overview
 
 #### eq
@@ -48,8 +48,6 @@ $a | $a | bool |
 $a | $a | string |
 
 Returns 'yes' if both values _are_ the same
-
-
 
 Lua implementation:
 
@@ -64,7 +62,6 @@ end
 
 ````
 
-
 #### notEq
 
 a | b | returns |
@@ -74,8 +71,6 @@ $a | $a | string |
 bool | bool |
 
 OVerloaded function, either boolean not or returns 'yes' if the two passed in values are _not_ the same;
-
-
 
 Lua implementation:
 
@@ -92,7 +87,6 @@ function notEq(a, b)
     end
 end
 ````
-
 
 #### not
 
@@ -104,8 +98,6 @@ bool | bool |
 
 OVerloaded function, either boolean not or returns 'yes' if the two passed in values are _not_ the same;
 
-
-
 Lua implementation:
 
 ````lua
@@ -122,7 +114,6 @@ function notEq(a, b)
 end
 ````
 
-
 #### inv
 
 d | returns |
@@ -132,8 +123,6 @@ double | double |
 
 Calculates `1/d`
 
-
-
 Lua implementation:
 
 ````lua
@@ -142,7 +131,6 @@ function inv(n)
 end
 ````
 
-
 #### default
 
 defaultValue | f | returns |
@@ -150,8 +138,6 @@ defaultValue | f | returns |
 $a | $b -> $a | $b | $a |
 
 Calculates function `f` for the given argument. If the result is `null`, the default value is returned instead
-
-
 
 Lua implementation:
 
@@ -164,7 +150,6 @@ function default(defaultValue, realValue)
 end
 ````
 
-
 #### parse
 
 s | returns |
@@ -173,8 +158,6 @@ string | double |
 string | pdouble |
 
 Parses a string into a numerical value
-
-
 
 Lua implementation:
 
@@ -208,7 +191,6 @@ function parse(string)
 end
 ````
 
-
 #### to_string
 
 obj | returns |
@@ -216,8 +198,6 @@ obj | returns |
 $a | string |
 
 Converts a value into a human readable string
-
-
 
 Lua implementation:
 
@@ -227,7 +207,6 @@ function to_string(o)
 end
 ````
 
-
 #### concat
 
 a | b | returns |
@@ -235,8 +214,6 @@ a | b | returns |
 string | string | string |
 
 Concatenates two strings
-
-
 
 Lua implementation:
 
@@ -246,7 +223,6 @@ function concat(a, b)
 end
 ````
 
-
 #### containedIn
 
 list | a | returns |
@@ -254,8 +230,6 @@ list | a | returns |
 list ($a) | $a | bool |
 
 Given a list of values, checks if the argument is contained in the list.
-
-
 
 Lua implementation:
 
@@ -271,7 +245,6 @@ function containedIn(list, a)
 end
 ````
 
-
 #### min
 
 list | returns |
@@ -283,8 +256,6 @@ list (double) | double |
 list (bool) | bool |
 
 Out of a list of values, gets the smallest value. IN case of a list of bools, this acts as `and`
-
-
 
 Lua implementation:
 
@@ -302,7 +273,6 @@ function min(list)
     return min;
 end
 ````
-
 
 #### and
 
@@ -316,8 +286,6 @@ list (bool) | bool |
 
 Out of a list of values, gets the smallest value. IN case of a list of bools, this acts as `and`
 
-
-
 Lua implementation:
 
 ````lua
@@ -335,7 +303,6 @@ function min(list)
 end
 ````
 
-
 #### max
 
 list | returns |
@@ -347,8 +314,6 @@ list (double) | double |
 list (bool) | bool |
 
 Returns the biggest value in the list. For a list of booleans, this acts as 'or'
-
-
 
 Lua implementation:
 
@@ -366,7 +331,6 @@ function max(list)
     return max;
 end
 ````
-
 
 #### or
 
@@ -380,8 +344,6 @@ list (bool) | bool |
 
 Returns the biggest value in the list. For a list of booleans, this acts as 'or'
 
-
-
 Lua implementation:
 
 ````lua
@@ -399,7 +361,6 @@ function max(list)
 end
 ````
 
-
 #### sum
 
 list | returns |
@@ -411,8 +372,6 @@ list (double) | double |
 list (bool) | int |
 
 Sums all the numbers in the given list. If the list contains bool, `yes` or `true` will be considered to equal `1`
-
-
 
 Lua implementation:
 
@@ -429,7 +388,6 @@ function sum(list)
 end
 ````
 
-
 #### multiply
 
 list | returns |
@@ -441,8 +399,6 @@ list (double) | double |
 list (bool) | bool |
 
 Multiplies all the values in a given list. On a list of booleans, this acts as 'and' or 'all'
-
-
 
 Lua implementation:
 
@@ -456,7 +412,6 @@ function multiply(list)
 end
 ````
 
-
 #### firstMatchOf
 
 s | returns |
@@ -464,8 +419,6 @@ s | returns |
 list (string) | tags -> list ($a) | tags | $a |
 
 Parses a string into a numerical value
-
-
 
 Lua implementation:
 
@@ -492,18 +445,15 @@ function first_match_of(tags, result, order_of_keys, table)
 end
 ````
 
-
 #### mustMatch
 
 neededKeys (filled in by parser) | f | returns |
 --- | --- | --- |
 list (string) | tags -> list (bool) | tags | bool |
 
-Every key that is used in the subfunction must be present.
-If, on top, a value is present with a mapping, every key/value will be executed and must return a value that is not 'no' or 'false'
-Note that this is a privileged builtin function, as the parser will automatically inject the keys used in the called function.
-
-
+Every key that is used in the subfunction must be present. If, on top, a value is present with a mapping, every
+key/value will be executed and must return a value that is not 'no' or 'false' Note that this is a privileged builtin
+function, as the parser will automatically inject the keys used in the called function.
 
 Lua implementation:
 
@@ -572,7 +522,6 @@ function must_match(tags, result, needed_keys, table)
 end
 ````
 
-
 #### memberOf
 
 f | tags | returns |
@@ -586,14 +535,17 @@ In order to use this for itinero 1.0, the membership _must_ be the top level exp
 Conceptually, when the aspect is executed for a way, every relation will be used as argument in the subfunction `f`
 If this subfunction returns 'true', the entire aspect will return true.
 
-In the lua implementation for itinero 1.0, this is implemented slightly different: a flag `_relation:<aspect_name>="yes"` will be set if the aspect matches on every way for where this aspect matches.
-However, this plays poorly with parameters (e.g.: what if we want to cycle over a highway which is part of a certain cycling network with a certain `#network_name`?) Luckily, parameters can only be simple values. To work around this problem, an extra tag is introduced for _every single profile_:`_relation:<profile_name>:<aspect_name>=yes'. The subfunction is thus executed `countOr(relations) * countOf(profiles)` time, yielding `countOf(profiles)` tags. The profile function then picks the tags for himself and strips the `<profile_name>:` away from the key.
-
-
+In the lua implementation for itinero 1.0, this is implemented slightly different: a
+flag `_relation:<aspect_name>="yes"` will be set if the aspect matches on every way for where this aspect matches.
+However, this plays poorly with parameters (e.g.: what if we want to cycle over a highway which is part of a certain
+cycling network with a certain `#network_name`?) Luckily, parameters can only be simple values. To work around this
+problem, an extra tag is introduced for _every single
+profile_:`_relation:<profile_name>:<aspect_name>=yes'. The subfunction is thus executed `countOr(relations) * countOf(
+profiles)` time, yielding `countOf(
+profiles)` tags. The profile function then picks the tags for himself and strips the `<profile_name>:` away from the
+key.
 
 In the test.csv, one can simply use `_relation:<aspect_name>=yes` to mimic relations in your tests
-
-
 
 Lua implementation:
 
@@ -610,7 +562,6 @@ function member_of(calledIn, parameters, tags, result)
 end
 ````
 
-
 #### if_then_else
 
 condition | then | else | returns |
@@ -618,9 +569,8 @@ condition | then | else | returns |
 bool | $a | $a | $a |
 bool | $a | $a |
 
-Selects either one of the branches, depending on the condition.If the `else` branch is not set, `null` is returned in the condition is false.
-
-
+Selects either one of the branches, depending on the condition.If the `else` branch is not set, `null` is returned in
+the condition is false.
 
 Lua implementation:
 
@@ -633,7 +583,6 @@ function if_then_else(condition, thn, els)
     end
 end
 ````
-
 
 #### if
 
@@ -642,9 +591,8 @@ condition | then | else | returns |
 bool | $a | $a | $a |
 bool | $a | $a |
 
-Selects either one of the branches, depending on the condition.If the `else` branch is not set, `null` is returned in the condition is false.
-
-
+Selects either one of the branches, depending on the condition.If the `else` branch is not set, `null` is returned in
+the condition is false.
 
 Lua implementation:
 
@@ -657,7 +605,6 @@ function if_then_else(condition, thn, els)
     end
 end
 ````
-
 
 #### id
 
@@ -667,8 +614,6 @@ $a | $a |
 
 Returns the argument unchanged - the identity function. Seems useless at first sight, but useful in parsing
 
-
-
 Lua implementation:
 
 ````lua
@@ -676,7 +621,6 @@ function id(v)
     return v
 end
 ````
-
 
 #### const
 
@@ -686,8 +630,6 @@ $a | $b | $a |
 
 Small utility function, which takes two arguments `a` and `b` and returns `a`. Used extensively to insert freedom
 
-
-
 Lua implementation:
 
 ````lua
@@ -695,7 +637,6 @@ function const(a, b)
     return a
 end
 ````
-
 
 #### constRight
 
@@ -705,14 +646,11 @@ $a | $b | $b |
 
 Small utility function, which takes two arguments `a` and `b` and returns `b`. Used extensively to insert freedom
 
-
-
 Lua implementation:
 
 ````lua
 
 ````
-
 
 #### dot
 
@@ -720,9 +658,8 @@ f | g | a | returns |
 --- | --- | --- | --- |
 $b -> $c | $a -> $b | $a | $c |
 
-Higher order function: converts `f (g a)` into `(dot f g) a`. In other words, this fuses `f` and `g` in a new function, which allows the argument to be lifted out of the expression 
-
-
+Higher order function: converts `f (g a)` into `(dot f g) a`. In other words, this fuses `f` and `g` in a new function,
+which allows the argument to be lifted out of the expression
 
 Lua implementation:
 
@@ -730,16 +667,14 @@ Lua implementation:
 
 ````
 
-
 #### listDot
 
 list | a | returns |
 --- | --- | --- |
 list ($a -> $b) | $a | list ($b) |
 
-Listdot takes a list of functions `[f, g, h]` and and an argument `a`. It applies the argument on every single function.It conveniently lifts the argument out of the list.
-
-
+Listdot takes a list of functions `[f, g, h]` and and an argument `a`. It applies the argument on every single
+function.It conveniently lifts the argument out of the list.
 
 Lua implementation:
 
@@ -748,7 +683,6 @@ Lua implementation:
 -- listDot
 ````
 
-
 #### eitherFunc
 
 f | g | a | returns |
@@ -756,20 +690,23 @@ f | g | a | returns |
 $a -> $b | $c -> $d | $a | $b |
 $a -> $b | $c -> $d | $c | $d |
 
-EitherFunc is a small utility function, mostly used in the parser. It allows the compiler to choose a function, based on the types.
+EitherFunc is a small utility function, mostly used in the parser. It allows the compiler to choose a function, based on
+the types.
 
-Consider the mapping `{'someKey':'someValue'}`. Under normal circumstances, this acts as a pointwise-function, converting the string `someKey` into `someValue`, just like an ordinary dictionary would do. However, in the context of `mustMatch`, we would prefer this to act as a _check_, that the highway _has_ a key `someKey` which is `someValue`, thus acting as `{'someKey': {'$eq':'someValue'}}. Both behaviours are automatically supported in parsing, by parsing the string as `(eitherFunc id eq) 'someValue'`. The type system is then able to figure out which implementation is needed.
+Consider the mapping `{'someKey':'someValue'}`. Under normal circumstances, this acts as a pointwise-function,
+converting the string `someKey` into `someValue`, just like an ordinary dictionary would do. However, in the context
+of `mustMatch`, we would prefer this to act as a _check_, that the highway _has_ a key `someKey` which is `someValue`,
+thus acting
+as `{'someKey': {'$eq':'someValue'}}. Both behaviours are automatically supported in parsing, by parsing the string as `(
+eitherFunc id eq) 'someValue'`. The type system is then able to figure out which implementation is needed.
 
 Disclaimer: _you should never ever need this in your profiles_
-
-
 
 Lua implementation:
 
 ````lua
 
 ````
-
 
 #### stringToTags
 
@@ -778,8 +715,6 @@ f | tags | returns |
 string -> string -> $a | tags | list ($a) |
 
 stringToTags converts a function `string -> string -> a` into a function `tags -> [a]`
-
-
 
 Lua implementation:
 

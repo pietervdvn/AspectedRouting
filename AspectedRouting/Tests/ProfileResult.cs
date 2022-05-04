@@ -42,5 +42,13 @@ namespace AspectedRouting.Tests
                 "because \n  "+str(PriorityExplanation)
                 );
         }
+
+        public override bool Equals(object? obj)
+        {
+            if (!(obj is ProfileResult other)) {
+                return false;
+            }
+            return other.Access == this.Access && other.Oneway == this.Oneway && other.Priority == this.Priority && other.Speed == this.Speed;
+        }
     }
 }

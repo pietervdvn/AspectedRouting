@@ -18,11 +18,10 @@ namespace AspectedRouting.Test
                 "{\"name\": \"legal_maxspeed_be\",\"description\": \"Gives, for each type of highway, which the default legal maxspeed is in Belgium. This file is intended to be reused for in all vehicles, from pedestrian to car. In some cases, a legal maxspeed is not really defined (e.g. on footways). In that case, a socially acceptable speed should be taken (e.g.: a bicycle on a pedestrian path will go say around 12km/h)\",\"unit\": \"km/h\",\"$max\": {\"maxspeed\": \"$parse\",\"highway\": {\"residential\": 30},\"ferry\":5}}";
 
             var aspect = JsonParser.AspectFromJson(null, json, null);
-            var tags = new Dictionary<string, string>
-            {
-                {"maxspeed", "42"},
-                {"highway", "residential"},
-                {"ferry", "yes"}
+            var tags = new Dictionary<string, string> {
+                { "maxspeed", "42" },
+                { "highway", "residential" },
+                { "ferry", "yes" }
             };
 
             Assert.Equal("tags -> pdouble", string.Join(", ", aspect.Types));
@@ -40,11 +39,10 @@ namespace AspectedRouting.Test
             var aspect = JsonParser.AspectFromJson(null, json, null);
 
             Assert.Equal(
-                new Dictionary<string, HashSet<string>>
-                {
-                    {"maxspeed", new HashSet<string>()},
-                    {"highway", new HashSet<string> {"residential"}},
-                    {"ferry", new HashSet<string>()}
+                new Dictionary<string, HashSet<string>> {
+                    { "maxspeed", new HashSet<string>() },
+                    { "highway", new HashSet<string> { "residential" } },
+                    { "ferry", new HashSet<string>() }
                 },
                 aspect.PossibleTags());
         }
@@ -79,7 +77,7 @@ namespace AspectedRouting.Test
         public void EitherFunc_SpecializeToString_Const()
         {
             var a = new Constant("a");
-            
+
             var mconst = new Apply(new Apply(Funcs.EitherFunc, Funcs.Id), Funcs.Const);
             var specialized = new Apply(mconst, a).Specialize(Typs.String);
 
@@ -125,7 +123,7 @@ namespace AspectedRouting.Test
         public void MaxTest()
         {
             var ls = new Constant(new ListType(Typs.Double),
-                new[] {1.1, 2.0, 3.0}.Select(d => (object) d));
+                new[] { 1.1, 2.0, 3.0 }.Select(d => (object)d));
             Assert.Equal("[1.1, 2, 3] : list (double)",
                 ls.Evaluate(null).Pretty() + " : " + string.Join(", ", ls.Types));
             var mx = Funcs.Max.Apply(ls);
@@ -164,7 +162,7 @@ namespace AspectedRouting.Test
         [Fact]
         public void TestStringGeneration()
         {
-            var v = Var.Fresh(new HashSet<string> {"$a", "$b"});
+            var v = Var.Fresh(new HashSet<string> { "$a", "$b" });
             Assert.Equal("$c", v.Name);
         }
 
@@ -176,9 +174,9 @@ namespace AspectedRouting.Test
             var app = new Apply(
                 new Apply(
                     new Apply(Funcs.Id, Funcs.Id), Funcs.Id), a);
-            var (f, args ) = app.DeconstructApply().Value;
-            Assert.Equal(Funcs.Id.Name, ((Function) f).Name);
-            Assert.Equal(new List<IExpression> {Funcs.Id, Funcs.Id, a}.Select(e => e.ToString()),
+            var (f, args) = app.DeconstructApply().Value;
+            Assert.Equal(Funcs.Id.Name, ((Function)f).Name);
+            Assert.Equal(new List<IExpression> { Funcs.Id, Funcs.Id, a }.Select(e => e.ToString()),
                 args.Select(e => e.ToString()));
         }
 
