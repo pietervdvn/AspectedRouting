@@ -182,7 +182,7 @@ namespace AspectedRouting.IO.md
         {
             var p = _profile;
             var b = _profile.Behaviours[_behaviour];
-            md.AddTitle(_profile.Name + "." + _behaviour, 1);
+            md.AddTitle($"[{_profile.Name}](./{_profile.Name}.md).{_behaviour}", 1);
 
             md.Add(p.Description);
 

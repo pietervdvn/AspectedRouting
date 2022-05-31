@@ -341,7 +341,7 @@ namespace AspectedRouting
                     File.WriteAllText(
                         $"{outputDir}/profile-documentation/{profile.Name}.{behaviourName}.md",
                         behaviourMd.ToString());
-                    profileMd.AddTitle($"[{behaviourName}](./{behaviourName}.md)", 2);
+                    profileMd.AddTitle($"[{behaviourName}](./{profile.Name}.{behaviourName}.md)", 2);
                     profileMd.Add(vars["description"].Evaluate(context).ToString());
                     profileMd.Add(behaviourMd.MainFormula());
                 }
