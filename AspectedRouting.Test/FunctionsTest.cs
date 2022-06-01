@@ -11,6 +11,21 @@ namespace AspectedRouting.Test
 {
     public class FunctionsTest
     {
+        private readonly string constString = "{\"$const\": \"a\"}";
+
+        private readonly string IfDottedConditionJson
+            = "{" +
+              "\"$ifdotted\": {\"$eq\": \"yes\"}," +
+              "\"then\":{\"$const\": \"a\"}," +
+              "\"else\": {\"$const\": \"b\"}" +
+              "}";
+
+        private readonly string IfSimpleConditionJson
+            = "{" +
+              "\"$if\": true," +
+              "\"then\":\"thenResult\"," +
+              "\"else\": \"elseResult\"}";
+
         private IExpression MustMatchJson()
         {
             var json = "{" +
@@ -32,10 +47,9 @@ namespace AspectedRouting.Test
         [Fact]
         public void TestAll_AllTags_Yes()
         {
-            var tagsAx = new Dictionary<string, string>
-            {
-                {"a", "b"},
-                {"x", "y"}
+            var tagsAx = new Dictionary<string, string> {
+                { "a", "b" },
+                { "x", "y" }
             };
 
             var expr = new Apply(MustMatchJson(), new Constant(tagsAx)).Optimize();
@@ -46,9 +60,8 @@ namespace AspectedRouting.Test
         [Fact]
         public void TestAll_NoMatch_No()
         {
-            var tagsAx = new Dictionary<string, string>
-            {
-                {"a", "b"},
+            var tagsAx = new Dictionary<string, string> {
+                { "a", "b" }
             };
 
             var expr = new Apply(MustMatchJson(), new Constant(tagsAx)).Optimize();
@@ -59,29 +72,15 @@ namespace AspectedRouting.Test
         [Fact]
         public void TestAll_NoMatchDifferent_No()
         {
-            var tagsAx = new Dictionary<string, string>
-            {
-                {"a", "b"},
-                {"x", "someRandomValue"}
+            var tagsAx = new Dictionary<string, string> {
+                { "a", "b" },
+                { "x", "someRandomValue" }
             };
 
             var expr = new Apply(MustMatchJson(), new Constant(tagsAx)).Optimize();
             var result = expr.Evaluate(new Context());
             Assert.Equal("no", result);
         }
-
-        private string IfDottedConditionJson
-            = "{" +
-              "\"$ifdotted\": {\"$eq\": \"yes\"}," +
-              "\"then\":{\"$const\": \"a\"}," +
-              "\"else\": {\"$const\": \"b\"}" +
-              "}";
-
-        private string IfSimpleConditionJson
-            = "{" +
-              "\"$if\": true," +
-              "\"then\":\"thenResult\"," +
-              "\"else\": \"elseResult\"}";
 
         [Fact]
         public void TestParsing_SimpleIf_CorrectExpression()
@@ -128,9 +127,6 @@ namespace AspectedRouting.Test
             Assert.Equal("a", resultT);
             Assert.Equal("b", resultF);
         }
-
-
-        private string constString = "{\"$const\": \"a\"}";
 
         [Fact]
         public void Parse_ConstString_TypeIsFree()
@@ -231,8 +227,7 @@ namespace AspectedRouting.Test
 
             var e = new Var("e");
             var f = new Var("f");
-            var newTypes = Funcs.Const.Types.RenameVars(new[]
-            {
+            var newTypes = Funcs.Const.Types.RenameVars(new[] {
                 new Curry(e, e),
                 new Curry(new Curry(b, f), new Curry(new Curry(a, b), new Curry(a, f)))
             }).ToList();
@@ -308,9 +303,9 @@ namespace AspectedRouting.Test
             var unifB = tags2pdouble.Unify(tags2double, true);
             Assert.NotNull(unifB);
 
-            var unifC = tags2double.Unify(tags2pdouble, false);
+            var unifC = tags2double.Unify(tags2pdouble);
             Assert.NotNull(unifC);
-            var unifD = tags2pdouble.Unify(tags2double, false);
+            var unifD = tags2pdouble.Unify(tags2double);
             Assert.Null(unifD);
         }
 
@@ -323,7 +318,7 @@ namespace AspectedRouting.Test
                 Typs.String,
                 new Curry(Typs.String, Typs.Bool));
             var f0 = f.Specialize(strstrb);
-            Assert.Equal(new[] {strstrb}, f0.Types);
+            Assert.Equal(new[] { strstrb }, f0.Types);
 
             var strstrstr = new Curry(
                 Typs.String,
@@ -331,7 +326,7 @@ namespace AspectedRouting.Test
 
             var f1 = f.Specialize(strstrstr);
 
-            Assert.Equal(new[] {strstrb, strstrstr}, f1.Types);
+            Assert.Equal(new[] { strstrb, strstrstr }, f1.Types);
         }
 
         [Fact]
@@ -341,11 +336,11 @@ namespace AspectedRouting.Test
             var p1 = Funcs.Const.Apply(new Constant(1.0)).Specialize(
                 new Curry(new Var("a"), Typs.Double));
 
-            var exprs = new[] {p0, p1};
+            var exprs = new[] { p0, p1 };
             var newTypes = exprs.SpecializeToCommonTypes(out var _);
             Assert.Single(newTypes);
 
-            exprs = new[] {p1, p0};
+            exprs = new[] { p1, p0 };
             newTypes = exprs.SpecializeToCommonTypes(out var _);
             Assert.Single(newTypes);
         }
@@ -360,7 +355,7 @@ namespace AspectedRouting.Test
 
             Assert.Null(result);
         }
-        
+
         [Fact]
         public void ParseFunction_Duration_TotalMinutes()
         {
@@ -376,10 +371,8 @@ namespace AspectedRouting.Test
         {
             var e = new Apply(new Apply(Funcs.Default, new Constant("a")), Funcs.Id);
             Assert.Single(e.Types);
-            
+
             Assert.Equal("string -> string", e.Types.First().ToString());
-            
         }
-        
     }
 }

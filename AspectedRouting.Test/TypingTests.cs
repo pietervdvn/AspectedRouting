@@ -52,8 +52,8 @@ namespace AspectedRouting.Test
                 new Curry(Typs.Tags, Typs.Double), x
             );
         }
-        
-        
+
+
         [Fact]
         public void WidestCommonGround_StringAndString_String()
         {

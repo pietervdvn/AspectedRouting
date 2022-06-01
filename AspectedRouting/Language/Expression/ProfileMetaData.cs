@@ -96,14 +96,8 @@ namespace AspectedRouting.Language.Expression
         }
 
 
-        public ProfileResult Run(Context c, string behaviour, Dictionary<string, string> tags)
+        public Dictionary<string, IExpression> ParametersFor(string behaviour)
         {
-            if (!Behaviours.ContainsKey(behaviour))
-            {
-                throw new ArgumentException(
-                    $"Profile {Name} does not contain the behaviour {behaviour}\nTry one of {string.Join(",", Behaviours.Keys)}");
-            }
-
             var parameters = new Dictionary<string, IExpression>();
 
             foreach (var (k, v) in DefaultParameters)
@@ -116,7 +110,18 @@ namespace AspectedRouting.Language.Expression
                 parameters[k.TrimStart('#')] = v;
             }
 
-            c = c.WithParameters(parameters)
+            return parameters;
+        }
+
+        public ProfileResult Run(Context c, string behaviour, Dictionary<string, string> tags)
+        {
+            if (!Behaviours.ContainsKey(behaviour))
+            {
+                throw new ArgumentException(
+                    $"Profile {Name} does not contain the behaviour {behaviour}\nTry one of {string.Join(",", Behaviours.Keys)}");
+            }
+
+            c = c.WithParameters(ParametersFor(behaviour))
                 .WithAspectName(this.Name);
             tags = new Dictionary<string, string>(tags);
             var canAccess = Access.Run(c, tags);

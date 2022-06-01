@@ -4,6 +4,7 @@ using System.Linq;
 using AspectedRouting.IO.itinero1;
 using AspectedRouting.Language;
 using AspectedRouting.Language.Expression;
+using AspectedRouting.Language.Functions;
 using AspectedRouting.Tests;
 
 namespace AspectedRouting.IO.itinero2
@@ -56,7 +57,10 @@ namespace AspectedRouting.IO.itinero2
             var header =
                 new List<string> {
                     $"name = \"{_profile.Name}.{_behaviourName}\"",
-                    $"description = \"{profileDescr} ({_profile.Description})\""
+                    $"description = \"{profileDescr} ({_profile.Description})\"",
+                    "",
+                    "-- The hierarchy of types that this vehicle is; mostly used to check access restrictions",
+                    $"vehicle_types = "+_skeleton.ToLua(new Constant( _profile.VehicleTyps.Select(v => new Constant(v)).ToArray()))
                 };
 
             var testPrinter = new LuaTestPrinter(_skeleton,
@@ -71,6 +75,8 @@ namespace AspectedRouting.IO.itinero2
                 GenerateMainFunction(),
                 "",
                 GenerateFactorFunction(),
+                "",
+                GenerateTurnCostFunction(),
                 "",
                 _parameterPrinter.GenerateDefaultParameters(),
                 "",

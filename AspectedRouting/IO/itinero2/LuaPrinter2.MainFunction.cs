@@ -75,6 +75,23 @@ namespace AspectedRouting.IO.itinero2
             return code.Lined();
         }
 
+        private string GenerateTurnCostFunction()
+        {
+            var vehicleTypes = _profile.VehicleTyps;
+            _skeleton.AddDep("containedIn");
+            _skeleton.AddDep("str_split");
+            _skeleton.AddDep("calculate_turn_cost_factor");
+            
+            var code = new List<string> {
+                "--[[ Function called by itinero2 on every turn restriction relation"," ]]",
+                "function turn_cost_factor(attributes, result)",
+                "  result.factor = calculate_turn_cost_factor(attributes, vehicle_types)" ,
+                "end",
+                "",
+            };
+            return code.Lined();
+        }
+        
         private string GenerateMainFunction()
         {
             var parameters = _profile.Behaviours[_behaviourName];
@@ -85,6 +102,7 @@ namespace AspectedRouting.IO.itinero2
 
             _skeleton.AddDep("eq");
             _skeleton.AddDep("remove_relation_prefix");
+            _skeleton.AddDep("debug_table");
             var code = new List<string>
             {
                 "--[[",

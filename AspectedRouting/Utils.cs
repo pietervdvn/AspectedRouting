@@ -50,6 +50,34 @@ namespace AspectedRouting
             return data.SubArray(index, data.Length - index);
         }
 
+        public static string Quoted(this string s)
+        {
+            return "\"" + s + "\"";
+        }
+        
+        public static string GenerateTagsOverview(IEnumerable<ProfileMetaData> profiles, Context context)
+        {
+            var allExpressions = new List<IExpression>();
+            foreach (var profile in profiles) {
+                foreach (var behaviour in profile.Behaviours) {
+                    allExpressions.AddRange(profile.AllExpressions(context));
+                }
+            }
+
+            var explanations = new List<string>();
+            foreach (var tag in allExpressions.PossibleTags()) {
+                var values = new List<string>(tag.Value);
+                values.Sort();
+                explanations.Add(tag.Key.Quoted() + ": [" +
+                                 string.Join(", ", values.Select(v => v.Quoted()))
+                                 + "]");
+            }
+            explanations.Sort();
+            
+            
+            return "{\n    "+ String.Join(",\n    ", explanations)+"\n}";
+        }
+
         /// <summary>
         ///     Generates a JSON file where all the profiles are listed, together with descriptions and other metadata.
         ///     Useful for other apps, e.g. the routing api to have
@@ -60,6 +88,7 @@ namespace AspectedRouting
         /// <returns></returns>
         public static string GenerateExplanationJson(IEnumerable<ProfileMetaData> profiles, Context context)
         {
+            
             var metaItems = new List<string>();
 
             foreach (var profile in profiles) {
@@ -71,19 +100,22 @@ namespace AspectedRouting
                 foreach (var behaviour in profile.Behaviours) {
                     var behaviourDescription = behaviour.Value["description"].Evaluate(new Context()) as string;
                     behaviourDescription ??= "";
-                    var keys = string.Join(", ",
-                        profile.AllExpressions(context).PossibleTags().Select(tag => $"\"{tag.Key}\"")
-                    );
+                    var keys = new List<string>();
+                    foreach (var tag in profile.AllExpressions(context).PossibleTags()) {
+                        keys.Add(tag.Key.Quoted());
+                    }
+
                     var meta = new Dictionary<string, string> {
                         {"name", behaviour.Key},
                         {"type", profileName},
                         {"author", author},
                         {"description", behaviourDescription + " (" + profileDescription + ")"}
                     };
-
                     var json = string.Join(",", meta.Select(d =>
                         $"\"{d.Key}\": \"{d.Value}\""));
-                    metaItems.Add("{" + json + ", \"usedKeys\": [" + keys + "] }\n");
+                    
+                    metaItems.Add($"{{{json}, " +
+                                  $"\"usedKeys\": [{string.Join(", ",keys)}] }}\n");
                 }
             }
 

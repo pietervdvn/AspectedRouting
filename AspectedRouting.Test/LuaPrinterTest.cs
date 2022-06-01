@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using AspectedRouting.IO.itinero1;
 using AspectedRouting.IO.LuaSkeleton;
 using AspectedRouting.Language;
 using AspectedRouting.Language.Functions;
@@ -13,12 +12,11 @@ namespace AspectedRouting.Test
         public void ToLua_SimpleMapping_Table()
         {
             var mapping = new Mapping(
-                new[] {"a", "b", "c"},
-                new[]
-                {
+                new[] { "a", "b", "c" },
+                new[] {
                     new Constant(5),
                     new Constant(6),
-                    new Constant(7),
+                    new Constant(7)
                 }
             );
 
@@ -34,13 +32,11 @@ namespace AspectedRouting.Test
         public void ToLua_NestedMapping_Table()
         {
             var mapping = new Mapping(
-                new[] {"a"},
-                new[]
-                {
-                    new Mapping(new[] {"b"},
-                        new[]
-                        {
-                            new Constant(42),
+                new[] { "a" },
+                new[] {
+                    new Mapping(new[] { "b" },
+                        new[] {
+                            new Constant(42)
                         }
                     )
                 }
@@ -54,10 +50,8 @@ namespace AspectedRouting.Test
         public void Sanity_EveryBasicFunction_HasDescription()
         {
             var missing = new List<string>();
-            foreach (var (_, f) in Funcs.Builtins)
-            {
-                if (string.IsNullOrEmpty(f.Description))
-                {
+            foreach (var (_, f) in Funcs.Builtins) {
+                if (string.IsNullOrEmpty(f.Description)) {
                     missing.Add(f.Name);
                 }
             }
@@ -65,15 +59,13 @@ namespace AspectedRouting.Test
             Assert.True(0 == missing.Count,
                 "These functions do not have a description: " + string.Join(", ", missing));
         }
-        
+
         [Fact]
         public void Sanity_EveryBasicFunction_HasArgNames()
         {
             var missing = new List<string>();
-            foreach (var (_, f) in Funcs.Builtins)
-            {
-                if (f.ArgNames == null)
-                {
+            foreach (var (_, f) in Funcs.Builtins) {
+                if (f.ArgNames == null) {
                     missing.Add(f.Name);
                 }
             }

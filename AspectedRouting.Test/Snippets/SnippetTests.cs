@@ -43,7 +43,7 @@ namespace AspectedRouting.Test.Snippets
             var func = new Apply(
                 Funcs.StringStringToTags,
                 new Mapping(
-                    new[] {"bicycle", "access"},
+                    new[] { "bicycle", "access" },
                     new IExpression[] {
                         Funcs.Id,
                         Funcs.Id
@@ -51,7 +51,7 @@ namespace AspectedRouting.Test.Snippets
                 )
             );
 
-            var tags = new LuaLiteral(new[] {Typs.Tags}, "tags");
+            var tags = new LuaLiteral(new[] { Typs.Tags }, "tags");
 
             var code = gen.Convert(lua, "result",
                 new List<IExpression> {
@@ -71,7 +71,7 @@ namespace AspectedRouting.Test.Snippets
         public void SimpleMappingSnippet_SimpleMapping_GeneratesLua()
         {
             var mapping = new Mapping(
-                new[] {"1", "-1"},
+                new[] { "1", "-1" },
                 new IExpression[] {
                     new Constant("with"),
                     new Constant("against")
@@ -86,6 +86,5 @@ namespace AspectedRouting.Test.Snippets
                 "local v\nv = tags.oneway\n\nif (v == \"1\") then\n    result = \"with\"\nelseif (v == \"-1\") then\n    result = \"against\"\nend";
             Assert.Equal(expected, code);
         }
-
     }
 }
