@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using AspectedRouting.Language;
 using AspectedRouting.Language.Expression;
@@ -106,9 +107,11 @@ namespace AspectedRouting.Tests
                         continue;
                     }
 
-                    if (!actual.ToString().Equals(test.expected) &&
-                        !(actual is double actualD && Math.Abs(double.Parse(test.expected) - actualD) < 0.0001)
-                    ) {
+
+                    var doesMatch = (actual is double d && Math.Abs(double.Parse(test.expected) - d) < 0.0001)
+                                    || actual.ToString().Equals(test.expected);
+
+                    if (!doesMatch) {
                         failed = true;
                         Console.WriteLine(
                             $"[{FunctionToApply.Name}] Line {testCase + 1} failed:\n   Expected: {test.expected}\n   actual: {actual}\n   tags: {test.tags.Pretty()}\n");
