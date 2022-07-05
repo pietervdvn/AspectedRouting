@@ -10,8 +10,9 @@ namespace AspectedRouting.Language.Functions
         private static Var b = new Var("b");
 
         public override string Description { get; } = "Selects either one of the branches, depending on the condition." +
-                                                      " The 'then' branch is returned if the condition returns the string `yes` or `true`. Otherwise, the `else` branch is taken (including if the condition returns `null`)" +
-                                                      "If the `else` branch is not set, `null` is returned in the condition is false.";
+                                                      " The 'then' branch is returned if the condition returns the string `yes` or `true`." +
+                                                      " Otherwise, the `else` branch is taken (including if the condition returns `null`)" +
+                                                      "If the `else` branch is not set, `null` is returned if the condition evaluates to false.";
         public override List<string> ArgNames { get; } = new List<string> {"condition", "then", "else"};
 
         public If() : base("if_then_else", true,

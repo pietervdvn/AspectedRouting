@@ -28,7 +28,7 @@ namespace AspectedRouting.Language.Functions
             " a flag `_relation:<aspect_name>=\"yes\"` will be set if the aspect matches on every way for where this aspect matches.\n" +
             "However, this plays poorly with parameters (e.g.: what if we want to cycle over a highway which is part of a certain cycling network with a certain `#network_name`?) " +
             "Luckily, parameters can only be simple values. To work around this problem, an extra tag is introduced for _every single profile_:" +
-            "`_relation:<profile_name>:<aspect_name>=yes'. The subfunction is thus executed `countOr(relations) * countOf(profiles)` time, yielding `countOf(profiles)` tags." +
+            "`_relation:<profile_name>:<aspect_name>=yes'. The subfunction is thus executed `countOf(relations) * countOf(profiles)` time, yielding `countOf(profiles)` tags." +
             " The profile function then picks the tags for himself and strips the `<profile_name>:` away from the key.\n\n" +
             "\n\n" +
             "In the test.csv, one can simply use `_relation:<aspect_name>=yes` to mimic relations in your tests";
@@ -49,19 +49,23 @@ namespace AspectedRouting.Language.Functions
             // In the case of tests, relations might be added with "_relation:1:<key>"
             // So, we create this table as dictionary
             var relationTags = new Dictionary<string, Dictionary<string, string>>();
-            foreach (var tag in tags) {
-                if (tag.Key.StartsWith("_relation:")) {
-                    var keyParts = tag.Key.Split(":");
-                    if (keyParts.Length != 3) {
-                        continue;
-                    }
-                    var relationName = keyParts[1];
-                    if (!relationTags.ContainsKey(relationName)) {
-                        relationTags.Add(relationName, new Dictionary<string, string>());
-                    }
-
-                    relationTags[relationName].Add(keyParts[2], tag.Value);
+            foreach (var tag in tags)
+            {
+                if (!tag.Key.StartsWith("_relation:"))
+                {
+                    continue;
                 }
+
+                var keyParts = tag.Key.Split(":");
+                if (keyParts.Length != 3) {
+                    continue;
+                }
+                var relationName = keyParts[1];
+                if (!relationTags.ContainsKey(relationName)) {
+                    relationTags.Add(relationName, new Dictionary<string, string>());
+                }
+
+                relationTags[relationName].Add(keyParts[2], tag.Value);
             }
 
             foreach (var relationTagging in relationTags) {
