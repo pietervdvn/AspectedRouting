@@ -697,7 +697,7 @@ Consider the mapping `{'someKey':'someValue'}`. Under normal circumstances, this
 converting the string `someKey` into `someValue`, just like an ordinary dictionary would do. However, in the context
 of `mustMatch`, we would prefer this to act as a _check_, that the highway _has_ a key `someKey` which is `someValue`,
 thus acting
-as `{'someKey': {'$eq':'someValue'}}. Both behaviours are automatically supported in parsing, by parsing the string as `(
+as `{'someKey': {'$eq':'someValue'}}`. Both behaviours are automatically supported in parsing, by parsing the string as `(
 eitherFunc id eq) 'someValue'`. The type system is then able to figure out which implementation is needed.
 
 Disclaimer: _you should never ever need this in your profiles_

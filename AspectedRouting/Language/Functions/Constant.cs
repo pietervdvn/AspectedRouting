@@ -245,7 +245,7 @@ namespace AspectedRouting.Language.Functions
 
         public override string ToString()
         {
-            return _o.Pretty();
+            return ObjectExtensions.Pretty(_o);
         }
     }
 
@@ -254,6 +254,7 @@ namespace AspectedRouting.Language.Functions
         public static string Pretty(this object o, Context context = null)
         {
             switch (o) {
+                case null: return "null";
                 case Dictionary<string, string> d:
                     var txt = "";
                     foreach (var (k, v) in d) {

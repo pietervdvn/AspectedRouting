@@ -183,6 +183,14 @@ namespace AspectedRouting.Tests
                 success = false;
             }
 
+            if (actual.Priority >= 100 || actual.Priority <= -100)
+            {
+                Err($"priority is not within range of -100 and +100. This is needed due to a bug in Itinero2.0, see https://github.com/itinero/routing2/issues/30",
+                     actual.Priority + " < 100 && -100 < "+actual.Priority,
+                    actual.Priority);
+                success = false;
+            }
+
 
             if (!success)
             {

@@ -13,9 +13,9 @@ namespace AspectedRouting.Language.Functions
             "" +
             "Consider the mapping `{'someKey':'someValue'}`. Under normal circumstances, this acts as a pointwise-function, converting the string `someKey` into `someValue`, just like an ordinary dictionary would do. " +
             "However, in the context of `mustMatch`, we would prefer this to act as a _check_, that the highway _has_ a key `someKey` which is `someValue`, thus acting as " +
-            "`{'someKey': {'$eq':'someValue'}}. " +
-            "Both behaviours are automatically supported in parsing, by parsing the string as `(eitherFunc id eq) 'someValue'`. " +
-            "The type system is then able to figure out which implementation is needed.\n\n" +
+            "`{'someKey': {'$eq':'someValue'}}`. " +
+            "Both behaviours are automatically supported in parsing, by parsing all string as `(eitherFunc id eq) 'someValue'`. " +
+            "The type system is then able to figure out which implementation is needed an discards the unneeded implementations.\n\n" +
             "Disclaimer: _you should never ever need this in your profiles_";
 
         public override List<string> ArgNames { get; } = new List<string>{"f","g","a"};

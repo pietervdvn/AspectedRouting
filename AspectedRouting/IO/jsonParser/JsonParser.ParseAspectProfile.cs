@@ -163,11 +163,9 @@ namespace AspectedRouting.IO.jsonParser
             );
         }
 
-        private static readonly IExpression _mconst =
-            new Apply(new Apply(Funcs.EitherFunc, Funcs.Id), Funcs.Const);
+        private static readonly IExpression _mconst = Funcs.EitherFunc.Apply( Funcs.Id, Funcs.Const);
 
-        private static readonly IExpression _mappingWrapper =
-            new Apply(new Apply(Funcs.EitherFunc, Funcs.Id), Funcs.StringStringToTags);
+        private static readonly IExpression _mappingWrapper = Funcs.EitherFunc.Apply( Funcs.Id, Funcs.StringStringToTags);
 
         private static IExpression ParseMapping(IEnumerable<JsonProperty> allArgs, Context context)
         {
@@ -201,7 +199,7 @@ namespace AspectedRouting.IO.jsonParser
             {
                 var simpleMapping = new Mapping(keys, exprs);
 
-                var wrapped = (IExpression) new Apply(_mappingWrapper, simpleMapping);
+                var wrapped = _mappingWrapper.Apply(simpleMapping);
                 if (keys.Count == 1)
                 {
                     // We can interpret this directly without going through a list

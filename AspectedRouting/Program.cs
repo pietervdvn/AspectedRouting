@@ -195,7 +195,7 @@ namespace AspectedRouting
 
         private static void PrintUsedTags(ProfileMetaData profile, Context context)
         {
-            Console.WriteLine("\n\n\n---------- " + profile.Name + " --------------");
+            Console.WriteLine("\n\n\n---------- " + profile.Name +" : used tags and corresponding values --------------");
             foreach (var (key, values) in profile.AllExpressions(context).PossibleTags()) {
                 var vs = "*";
                 if (values.Any()) {
@@ -230,6 +230,7 @@ namespace AspectedRouting
             }
 
             MdPrinter.GenerateHelpText(outputDir + "helpText.md");
+            Console.WriteLine("Written helptext to "+outputDir);
 
 
             var files = Directory.EnumerateFiles(inputDir, "*.json", SearchOption.AllDirectories)
