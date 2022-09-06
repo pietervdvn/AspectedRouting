@@ -33,7 +33,11 @@ namespace AspectedRouting.Language.Expression
             Types = types;
         }
 
-        public object Evaluate(Context c, params IExpression[] arguments)
+        public FunctionCall(string name, Type type): this(name, new []{type}){
+            
+    }
+
+    public object Evaluate(Context c, params IExpression[] arguments)
         {
             
             var func = c.GetFunction(_name);
@@ -62,8 +66,9 @@ namespace AspectedRouting.Language.Expression
             return new FunctionCall(this._name, passedTypes);
         }
 
-        public IExpression Optimize()
+        public IExpression Optimize(out bool somethingChanged)
         {
+            somethingChanged = false;
             return this;
         }
 
@@ -85,6 +90,21 @@ namespace AspectedRouting.Language.Expression
         public void Visit(Func<IExpression, bool> f)
         {
             f(this);
+        }
+
+        public bool Equals(IExpression other)
+        {
+            if (other is FunctionCall fc)
+            {
+                return fc._name.Equals(this._name);
+            }
+
+            return false;
+        }
+
+        public string Repr()
+        {
+            return "new FunctionCall(\"" + this._name + "\")";
         }
 
         public override string ToString()

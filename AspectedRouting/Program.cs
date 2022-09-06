@@ -165,10 +165,18 @@ namespace AspectedRouting
                         continue;
                     }
 
-                    var strSplit = str.Split("=");
-                    var k = strSplit[0].Trim();
-                    var v = strSplit[1].Trim();
-                    tags[k] = v;
+                    try
+                    {
+
+                        var strSplit = str.Split("=");
+                        var k = strSplit[0].Trim();
+                        var v = strSplit[1].Trim();
+                        tags[k] = v;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Error.WriteLine("Could not parse tag: "+str);
+                    }
                 }
 
                 try {

@@ -14,7 +14,7 @@ namespace AspectedRouting.Language.Expression
         public string Author { get; }
         public string Filename { get; }
         public List<string> VehicleTyps { get; }
-        
+
         /*
          * Which tags are included in the routerdb but are _not_ used for routeplanning?
          * Typically these are tags that are useful for navigation (name of the road, is this a tunnel, ...)
@@ -29,6 +29,7 @@ namespace AspectedRouting.Language.Expression
         public IExpression Oneway { get; }
         public IExpression Speed { get; }
         public Dictionary<string, IExpression> Priority { get; }
+
         /**
          * Moment of last change of any upstream file
          */
@@ -45,9 +46,9 @@ namespace AspectedRouting.Language.Expression
             Author = author;
             Filename = filename;
             VehicleTyps = vehicleTyps;
-            Access = access.Optimize();
-            Oneway = oneway.Optimize();
-            Speed = speed.Optimize();
+            Access = access.Optimize(out var _);
+            Oneway = oneway.Optimize(out var _);
+            Speed = speed.Optimize(out var _);
             Priority = priority;
             Metadata = metadata;
             LastChange = lastChange;
@@ -57,21 +58,22 @@ namespace AspectedRouting.Language.Expression
             CheckTypes(Access, "access");
             CheckTypes(Oneway, "oneway");
             CheckTypes(Speed, "speed");
-            
         }
 
         private static void CheckTypes(IExpression e, string name)
         {
-            if (e.Types.Count() == 1) {
+            if (e.Types.Count() == 1)
+            {
                 return;
             }
 
-            throw new Exception("Insufficient specialization: " + name + " has multiple types left, namely " + e.Types.Pretty());
+            throw new Exception("Insufficient specialization: " + name + " has multiple types left, namely " +
+                                e.Types.Pretty());
         }
 
         public List<IExpression> AllExpressions(Context ctx)
         {
-            var l = new List<IExpression> {Access, Oneway, Speed};
+            var l = new List<IExpression> { Access, Oneway, Speed };
             l.AddRange(DefaultParameters.Values);
             l.AddRange(Behaviours.Values.SelectMany(b => b.Values));
             l.AddRange(Priority.Values);
@@ -88,6 +90,7 @@ namespace AspectedRouting.Language.Expression
                         var called = ctx.GetFunction(fc.CalledFunctionName);
                         allExpr.Add(called);
                     }
+
                     return true;
                 });
             }
@@ -95,6 +98,41 @@ namespace AspectedRouting.Language.Expression
             return allExpr;
         }
 
+        public List<IExpression> AllExpressionsFor(string behaviourName, Context context)
+        {
+            var allExpressions = new List<IExpression>();
+            allExpressions.Add(Access);
+            allExpressions.Add(Oneway);
+            allExpressions.Add(Speed);
+
+            var behaviourContext = new Context(context);
+            var behaviourParameters = ParametersFor(behaviourName);
+
+
+            foreach (var (paramName, valueexpression) in Priority)
+            {
+                var weightingFactor = behaviourParameters[paramName].Evaluate(behaviourContext);
+                if (weightingFactor is double d)
+                {
+                    if (d == 0.0)
+                    {
+                        continue;
+                    }
+                }
+
+                if (weightingFactor is int i)
+                {
+                    if (i == 0)
+                    {
+                        continue;
+                    }
+                }
+
+                allExpressions.Add(valueexpression);
+            }
+
+            return allExpressions;
+        }
 
         public Dictionary<string, IExpression> ParametersFor(string behaviour)
         {
@@ -122,11 +160,11 @@ namespace AspectedRouting.Language.Expression
             }
 
             c = c.WithParameters(ParametersFor(behaviour))
-                .WithAspectName(this.Name);
+                .WithAspectName(Name);
             tags = new Dictionary<string, string>(tags);
             var canAccess = Access.Run(c, tags);
             tags["access"] = "" + canAccess;
-            var speed = (double) Speed.Run(c, tags);
+            var speed = (double)Speed.Run(c, tags);
             tags["speed"] = "" + speed;
             var oneway = Oneway.Run(c, tags);
             tags["oneway"] = "" + oneway;
@@ -143,7 +181,7 @@ namespace AspectedRouting.Language.Expression
             var weightExplanation = new List<string>();
             foreach (var (paramName, expression) in Priority)
             {
-                var aspectInfluence = (double) c.Parameters[paramName].Evaluate(c);
+                var aspectInfluence = (double)c.Parameters[paramName].Evaluate(c);
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (aspectInfluence == 0)
                 {
@@ -193,8 +231,16 @@ namespace AspectedRouting.Language.Expression
                 canAccess = "no";
             }
 
-            return new ProfileResult((string) canAccess, (string) oneway, speed, priority,
-                string.Join("\n  ", weightExplanation));
+            if (canAccess is string canAccessString && oneway is string onewayString)
+            {
+                return new ProfileResult(canAccessString, onewayString, speed, priority,
+                    string.Join("\n  ", weightExplanation));
+            }
+            else
+            {
+                throw new Exception("CanAccess or oneway are not strings but " + canAccess.GetType().ToString() +
+                                    " and " + (oneway?.GetType()?.ToString() ?? "<null>"));
+            }
         }
 
 

@@ -36,6 +36,7 @@ namespace AspectedRouting.Language.Functions
         {
             if (arguments.Count() <= 2)
             {
+                
             }
 
             var f0 = arguments[0];

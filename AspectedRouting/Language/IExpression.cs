@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using AspectedRouting.Language.Functions;
 using AspectedRouting.Language.Typ;
@@ -31,20 +32,33 @@ namespace AspectedRouting.Language
         ///     Optimize a single expression, eventually recursively (e.g. a list can optimize all the contents)
         /// </summary>
         /// <returns></returns>
-        IExpression Optimize();
+        IExpression Optimize(out bool somethingChanged);
 
         /// <summary>
         ///     Optimize with the given argument, e.g. listdot can become a list of applied arguments.
-        ///     By default, this should return 'this.Apply(argument)'
         /// </summary>
         /// <param name="argument"></param>
         /// <returns></returns>
         //  IExpression OptimizeWithArgument(IExpression argument);
         void Visit(Func<IExpression, bool> f);
+
+        bool Equals(IExpression other);
+
+        /**
+         * Builds a string representation that can be used to paste into C# test programs
+         */
+        string Repr();
+        
+        
     }
 
     public static class ExpressionExtensions
     {
+        
+        public static void PrintRepr(this IExpression e)
+        {
+            Console.WriteLine(e.Repr()+"\n\n-----------\n");
+        }
         public static object Run(this IExpression e, Context c, Dictionary<string, string> tags)
         {
             try {
@@ -111,7 +125,7 @@ namespace AspectedRouting.Language
 
             foreach (var expr in exprs) {
                 if (specializedTypes == null) {
-                    specializedTypes = expr.Types;
+                    specializedTypes = expr.Types; // This is t
                 }
                 else {
                     var newlySpecialized = Typs.WidestCommonTypes(specializedTypes, expr.Types);

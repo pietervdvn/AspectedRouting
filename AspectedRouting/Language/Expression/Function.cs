@@ -44,8 +44,9 @@ namespace AspectedRouting.Language.Expression
             return new FunctionCall(this.Name, passedTypes);
         }
 
-        public virtual IExpression Optimize()
+        public virtual IExpression Optimize(out bool somethingChanged)
         {
+            somethingChanged = false;
             return this;
         }
 
@@ -99,6 +100,21 @@ namespace AspectedRouting.Language.Expression
             }
 
             return dict;
+        }
+        
+        public bool Equals(IExpression other)
+        {
+            if (other is Function f)
+            {
+                return f.Name.Equals(this.Name);
+            }
+
+            return false;
+        }
+
+        public string Repr()
+        {
+            return "Funcs."+this.Name;
         }
     }
 }

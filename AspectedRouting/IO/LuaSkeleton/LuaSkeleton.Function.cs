@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AspectedRouting.IO.itinero1;
@@ -35,17 +36,21 @@ namespace AspectedRouting.IO.LuaSkeleton
                 return true;
             });
 
-            var expression = meta.ExpressionImplementation;
+            var expression = Funcs.Either(Funcs.Id, Funcs.Const, meta.ExpressionImplementation)
+                .Apply(new LuaLiteral(Typs.Tags, "tags"))
+                .PruneTypes(t => !(t is Curry))
+                .SpecializeToSmallestType()
+                .Optimize(out _);
+            if (!expression.Types.Any())
+            {
+                throw new Exception("Could not optimize expression with applied tags");
+            }
 
             var ctx = Context;
             _context = _context.WithAspectName(meta.Name);
 
             var body = "";
             if (_useSnippets) {
-                if (expression.Types.First() is Curry c) {
-                    expression = expression.Apply(new LuaLiteral(Typs.Tags, "tags"));
-                }
-
                 body = Utils.Lines(
                     "    local r = nil",
                     "    " + Snippets.Convert(this, "r", expression).Indent(),
@@ -55,7 +60,6 @@ namespace AspectedRouting.IO.LuaSkeleton
             else {
                 body = "    return " + ToLua(expression);
             }
-
 
             var impl = Utils.Lines(
                 "--[[",
@@ -68,7 +72,7 @@ namespace AspectedRouting.IO.LuaSkeleton
                 "Number of combintations: " + numberOfCombinations,
                 "Returns values: ",
                 "]]",
-                "function " + meta.Name.AsLuaIdentifier() + "(parameters, tags, result)" + funcNameDeclaration,
+                "function " + meta.Name.AsLuaIdentifier() + "(tags, parameters)" + funcNameDeclaration,
                 body,
                 "end"
             );

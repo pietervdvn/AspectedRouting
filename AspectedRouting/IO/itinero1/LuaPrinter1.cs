@@ -27,18 +27,19 @@ namespace AspectedRouting.IO.itinero1
             _aspectTestSuites = aspectTestSuites?.Where(suite => suite != null)
                 ?.Select(testSuite => testSuite.WithoutRelationTests())?.ToList();
             _profileTests = profileTests;
-            _skeleton = new LuaSkeleton.LuaSkeleton(context, false);
+            _skeleton = new LuaSkeleton.LuaSkeleton(context, true);
             _parameterPrinter = new LuaParameterPrinter(profile, _skeleton);
         }
 
         public string ToLua()
         {
-           _skeleton.AddDep("spoken_instructions");
+            _skeleton.AddDep("spoken_instructions");
 
             var (membershipFunction, extraKeys) = GenerateMembershipPreprocessor();
             var (profileOverview, behaviourFunctions) = GenerateProfileFunctions();
             var mainFunction = GenerateMainProfileFunction();
-            var tests = new LuaTestPrinter(_skeleton, new List<string>{"unitTest","unitTestProfile"}).GenerateFullTestSuite(_profileTests, _aspectTestSuites);
+            var tests = new LuaTestPrinter(_skeleton, new List<string> { "unitTest", "unitTestProfile" })
+                .GenerateFullTestSuite(_profileTests, _aspectTestSuites);
 
 
             var keys = _profile.AllExpressions(_context).PossibleTags().Keys
@@ -62,7 +63,15 @@ namespace AspectedRouting.IO.itinero1
                 "",
                 profileOverview,
                 "",
-                _parameterPrinter.GenerateDefaultParameters()
+                _parameterPrinter.GenerateDefaultParameters(),
+                "",
+                "function create_set(list)",
+                "  local set = {}",
+                "    for _, l in ipairs(list) do " +
+                "      set[l] = true" +
+                "    end",
+                "  return set",
+                "end"
             };
 
 
@@ -106,7 +115,7 @@ namespace AspectedRouting.IO.itinero1
             var behaviourImplementations = new List<string>();
             foreach (var (behaviourName, behaviourParameters) in _profile.Behaviours)
             {
-                var (functionName, implementation ) = GenerateBehaviourFunction(behaviourName, behaviourParameters);
+                var (functionName, implementation) = GenerateBehaviourFunction(behaviourName, behaviourParameters);
                 behaviourImplementations.Add(implementation);
                 profiles.Add(
                     string.Join(",\n    ",

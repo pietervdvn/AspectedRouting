@@ -57,7 +57,7 @@ namespace AspectedRouting.IO.itinero1
                 func.Add("");
                 func.Add("    subresult.attributes_to_keep = {}");
                 func.Add("    parameters = default_parameters()");
-                func.Add($"    matched = {preProcName}(parameters, relation_tags, subresult)");
+                func.Add($"    matched = {preProcName}(relation_tags, parameters)");
                 func.Add("    if (matched) then");
                 var tagKey = "_relation:" + calledInFunction.AsLuaIdentifier();
                 extraKeys.Add(tagKey);
@@ -90,7 +90,7 @@ namespace AspectedRouting.IO.itinero1
                     func.Add("    parameters = default_parameters()");
                     func.Add(_parameterPrinter.DeclareParametersFor(parameters.Where(kv => usedParameters.Contains(kv.Key))
                         .ToDictionary(kv => kv.Key, kv => kv.Value)));
-                    func.Add($"    matched = {preProcName}(parameters, relation_tags, subresult)");
+                    func.Add($"    matched = {preProcName}(relation_tags, parameters)");
                     func.Add("    if (matched) then");
                     tagKey = "_relation:" + behaviourName.AsLuaIdentifier() + ":" + calledInFunction.AsLuaIdentifier();
                     extraKeys.Add(tagKey);

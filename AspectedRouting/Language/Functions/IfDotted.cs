@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using AspectedRouting.Language.Expression;
 using AspectedRouting.Language.Typ;
+using Type = AspectedRouting.Language.Typ.Type;
 
 namespace AspectedRouting.Language.Functions
 {
@@ -11,7 +13,7 @@ namespace AspectedRouting.Language.Functions
         
         public override string Description { get; } = "An if_then_else, but one which takes an extra argument and applies it on the condition, then and else.\n" +
                                                       "Consider `fc`, `fthen` and `felse` are all functions taking an `a`, then:\n" +
-                                                      "`(ifDotted fc fthen felse) a` === `(if (fc a) (fthen a) (felse a)" +
+                                                      "`(ifDotted fc fthen felse) a` === `(if (fc a) (fthen a) (felse a)`" +
                                                       "Selects either one of the branches, depending on the condition." +
                                                       " The 'then' branch is returned if the condition returns the string `yes` or `true` or the boolean `true`" +
                                                       "If the `else` branch is not set, `null` is returned in the condition is false." +

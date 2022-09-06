@@ -33,7 +33,7 @@ namespace AspectedRouting.IO.LuaSnippets
         public static string Convert(LuaSkeleton.LuaSkeleton lua, string assignTo, IExpression e)
         {
 
-            var opt  = e.Optimize();
+            var opt  = e.Optimize(out _);
             // Note that optimization might optimize to a _subtype_ of the original expresion - which is fine!
             var origType = e.Types.First();
             var optType = opt.Types.First();

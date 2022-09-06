@@ -32,7 +32,6 @@ namespace AspectedRouting.Language.Expression
 
         public object Evaluate(Context c, params IExpression[] arguments)
         {
-          
             return ExpressionImplementation.Evaluate(c, arguments);
         }
 
@@ -43,20 +42,29 @@ namespace AspectedRouting.Language.Expression
                 Name, Description, Author, Unit, Filepath);
         }
 
-        public IExpression PruneTypes(System.Func<Type, bool> allowedTypes)
+        public IExpression PruneTypes(Func<Type, bool> allowedTypes)
         {
             var e = ExpressionImplementation.PruneTypes(allowedTypes);
-            if (e == null) {
+            if (e == null)
+            {
                 return null;
             }
+
             return new AspectMetadata(e, Name, Description, Author, Unit,
                 Filepath, ProfileInternal);
         }
 
-        public IExpression Optimize()
+        public IExpression Optimize(out bool somethingChanged)
         {
-            return new AspectMetadata(ExpressionImplementation.Optimize(),
-                Name, Description, Author, Unit, Filepath);
+            var optE = ExpressionImplementation.Optimize(out var sc);
+            somethingChanged = sc;
+            if (sc)
+            {
+                return new AspectMetadata(optE,
+                    Name, Description, Author, Unit, Filepath);
+            }
+
+            return this;
         }
 
         public void Visit(Func<IExpression, bool> f)
@@ -73,6 +81,21 @@ namespace AspectedRouting.Language.Expression
         public override string ToString()
         {
             return $"# {Name}; {Unit} by {Author}\n\n#   by {Author}\n#   {Description}\n{ExpressionImplementation}";
+        }
+
+        public bool Equals(IExpression other)
+        {
+            if (other is AspectMetadata amd)
+            {
+                return amd.ExpressionImplementation.Equals(ExpressionImplementation);
+            }
+
+            return false;
+        }
+
+        public string Repr()
+        {
+            return "Aspect_" + Name;
         }
     }
 }

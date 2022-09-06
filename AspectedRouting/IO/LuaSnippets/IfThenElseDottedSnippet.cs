@@ -11,7 +11,7 @@ namespace AspectedRouting.IO.LuaSnippets
 
         public override string Convert(LuaSkeleton.LuaSkeleton lua, string assignTo, List<IExpression> args)
         {
-            var fCond = args[0].Optimize();
+            var fCond = args[0].Optimize(out _);
             var fValue = args[1];
             IExpression fElse = null;
             var arg = args[2];

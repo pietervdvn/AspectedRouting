@@ -43,6 +43,7 @@ namespace AspectedRouting.IO.LuaSkeleton
         internal void AddDep(string name)
         {
             if (name.StartsWith("mapping")) {
+                Console.Error.WriteLine(">>>");
                 throw new Exception("A mapping was added as dependency - this is a bug");
             }
 

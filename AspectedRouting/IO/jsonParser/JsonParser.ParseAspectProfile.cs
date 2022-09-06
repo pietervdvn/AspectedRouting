@@ -24,9 +24,12 @@ namespace AspectedRouting.IO.jsonParser
                     return null;
                 }
 
-                Console.WriteLine("Parsing " + fileName);
+                Console.Write("Parsing " + fileName+"... ");
 
-                return doc.RootElement.ParseAspect(fileName, c);
+                var aspect= doc.RootElement.ParseAspect(fileName, c);
+                
+                Console.WriteLine($"\rAspect {aspect.Name} has type {string.Join(",", aspect.ExpressionImplementation.Types)}");
+                return aspect;
             }
             catch (Exception e)
             {
@@ -90,15 +93,26 @@ namespace AspectedRouting.IO.jsonParser
                     filepath + " is not a valid profile; it does not contain the obligated parameter " + name);
             }
 
+            var defaultParameters = e.GetProperty("defaults").ParseParameters();
+
+            var contextWithParameters = new Context(context);
+            foreach (var (paramName, paramExpression) in defaultParameters)
+            {
+                if (!context.Parameters.TryGetValue(paramName, out var previousParam))
+                {
+                    contextWithParameters.AddParameter(paramName, paramExpression);
+                }
+            }
+
             var vehicleTypes = GetTopProperty("vehicletypes").EnumerateArray().Select(
                 el => el.GetString()).ToList();
             var metadata = GetTopProperty("metadata").EnumerateArray().Select(
                 el => el.GetString()).ToList();
 
 
-            var access = ParseProfileProperty(e, context, "access").Finalize();
-            var oneway = ParseProfileProperty(e, context, "oneway").Finalize();
-            var speed = ParseProfileProperty(e, context, "speed").Finalize();
+            var access = ParseProfileProperty(e, contextWithParameters, "access").Finalize();
+            var oneway = ParseProfileProperty(e, contextWithParameters, "oneway").Finalize();
+            var speed = ParseProfileProperty(e, contextWithParameters, "speed").Finalize();
 
 
             IExpression TagsApplied(IExpression x)
@@ -152,7 +166,7 @@ namespace AspectedRouting.IO.jsonParser
                 author,
                 filepath?.DirectoryName ?? "unknown",
                 vehicleTypes,
-                e.GetProperty("defaults").ParseParameters(),
+                defaultParameters,
                 profiles,
                 access,
                 oneway,
@@ -293,6 +307,12 @@ namespace AspectedRouting.IO.jsonParser
                 if (s.StartsWith("#"))
                 {
                     // This is a parameter, the type of it is free
+                    if (context.Parameters.TryGetValue(s.Substring(1), out var param))
+                    {  
+                        return new Parameter(s).Specialize(param.Types);
+                        
+                    }
+                    
                     return new Parameter(s);
                 }
 
@@ -511,7 +531,6 @@ namespace AspectedRouting.IO.jsonParser
                 }
             }
 
-            Console.WriteLine($"Aspect {name} has type {string.Join(",", expr.Types)}");
             return new AspectMetadata(
                 expr,
                 name,

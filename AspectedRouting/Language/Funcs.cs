@@ -19,6 +19,7 @@ namespace AspectedRouting.Language
         public static readonly Function Eq = new Eq();
         public static readonly Function NotEq = new NotEq();
         public static readonly Function Inv = new Inv();
+        public static readonly Function IsNull = new IsNull();
 
         public static readonly Function Default = new Default();
 
@@ -94,7 +95,7 @@ namespace AspectedRouting.Language
 
             // TODO FIX THIS so that it works
             // An argument 'optimizes' it's types from 'string -> bool' to 'string -> string'
-            var eOpt = eSmallest.Optimize();
+            var eOpt = eSmallest.Optimize(out _);
             if (eOpt == null || eOpt.Types.Count() == 0)
             {
                 throw new Exception("Could not optimize " + eSmallest);
@@ -106,6 +107,10 @@ namespace AspectedRouting.Language
 
         public static IExpression SpecializeToSmallestType(this IExpression e)
         {
+            if (e == null)
+            {
+                throw new Exception("Cannot specialize null to a smallest type");
+            }
             if (e.Types.Count() == 1)
             {
                 return e;
@@ -160,7 +165,8 @@ namespace AspectedRouting.Language
 
             var lastArg = args[args.Count - 1];
             var firstArgs = args.GetRange(0, args.Count - 1);
-            return new Apply(Apply(function, firstArgs), lastArg);
+            var applied = Apply(function, firstArgs);
+            return new Apply(applied, lastArg);
         }
     }
 }

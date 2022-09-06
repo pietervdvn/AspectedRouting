@@ -54,7 +54,7 @@ public class FunctionsTest
             { "x", "y" }
         };
 
-        var expr = new Apply(MustMatchJson(), new Constant(tagsAx)).Optimize();
+        var expr = new Apply(MustMatchJson(), new Constant(tagsAx)).Optimize(out _);
         var result = expr.Evaluate(new Context());
         Assert.Equal("yes", result);
     }
@@ -67,7 +67,7 @@ public class FunctionsTest
             { "a", "b" }
         };
 
-        var expr = new Apply(MustMatchJson(), new Constant(tagsAx)).Optimize();
+        var expr = new Apply(MustMatchJson(), new Constant(tagsAx)).Optimize(out var _);
         var result = expr.Evaluate(new Context());
         Assert.Equal("no", result);
     }
@@ -81,7 +81,7 @@ public class FunctionsTest
             { "x", "someRandomValue" }
         };
 
-        var expr = new Apply(MustMatchJson(), new Constant(tagsAx)).Optimize();
+        var expr = new Apply(MustMatchJson(), new Constant(tagsAx)).Optimize(out _);
         var result = expr.Evaluate(new Context());
         Assert.Equal("no", result);
     }
@@ -97,7 +97,7 @@ public class FunctionsTest
 
         var resultT = ifExpr.Evaluate(c);
         Assert.Equal("thenResult", resultT);
-        resultT = ifExpr.Optimize().Evaluate(c);
+        resultT = ifExpr.Optimize(out _).Evaluate(c);
         Assert.Equal("thenResult", resultT);
     }
 
@@ -123,7 +123,7 @@ public class FunctionsTest
     {
         var c = new Context();
         var ifExpr = JsonParser.ParseExpression(c, IfDottedConditionJson);
-        ifExpr = ifExpr.Optimize();
+        ifExpr = ifExpr.Optimize(out _);
         var resultT = ifExpr.Evaluate(c,
             new Constant(Typs.String, "yes"));
         var resultF = ifExpr.Evaluate(c,
@@ -393,8 +393,8 @@ public class FunctionsTest
         var o = f.Evaluate(new Context(), tags0);
         Assert.Equal(50.0, o);
     }
-    
-    
+
+
     [Fact]
     public void ApplyFirstMatchOf_FirstMatchIsTaken_ResidentialDefault()
     {
@@ -407,7 +407,7 @@ public class FunctionsTest
         var o = f.Evaluate(new Context(), tags0);
         Assert.Equal(30, o);
     }
-    
+
     [Fact]
     public void ApplyFirstMatchOf_NoMatchIfFound_Null()
     {
@@ -444,4 +444,36 @@ public class FunctionsTest
             );
         return Funcs.FirstOf.Apply(order, mapping);
     }
+
+    [Fact]
+    /**
+     * Regression test for a misbehaving ifDotted
+     */
+    public void IfDotted_CorrectExpression()
+    {
+         var e = Funcs.IfDotted.Apply(
+            Funcs.Const.Apply(new Parameter("follow_restrictions")),
+         Funcs.Head.Apply( Funcs.StringStringToTags.Apply( new Mapping(new[] { "oneway" }, new[] { Funcs.Id }))),
+            Funcs.Const.Apply(new Constant("dont-care"))
+        );
+         
+         var c = new Context();
+         c.AddParameter("follow_restrictions", "yes");
+
+         var tags = new Dictionary<string, string>();
+         tags["oneway"] = "with";
+         
+         var r = e.Evaluate(c, new Constant(tags));
+         Assert.Equal("with", r);
+         
+         var c0 = new Context();
+         c0.AddParameter("follow_restrictions", "no");
+
+         
+         var r0 = e.Evaluate(c0, new Constant(tags));
+         Assert.Equal("dont-care", r0);
+
+
+    }
+
 }
