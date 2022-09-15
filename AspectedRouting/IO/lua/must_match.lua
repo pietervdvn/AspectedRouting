@@ -79,7 +79,7 @@ function must_match(needed_keys, table, tags, result)
 
     -- Now that we know for sure that every key matches, we add them all to the 'attributes_to_keep'
     if (result == nil) then
-        -- euhm, well, seems like we don't are about the attributes_to_keep; early return!
+        -- euhm, well, seems like we don't care about the attributes_to_keep; early return!
         return true
     end
     for _, key in ipairs(needed_keys) do

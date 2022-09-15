@@ -206,7 +206,7 @@ namespace AspectedRouting.Language
             if (diff.Any()) {
                 throw new ArgumentException("No default value set for parameter: " + MetaList(diff));
             }
-
+            
             var unused = defaultParameters.Except(usedParameters);
             if (unused.Any()) {
                 Console.WriteLine("[WARNING] A default value is set for parameter, but it is unused: " +
@@ -254,6 +254,7 @@ namespace AspectedRouting.Language
                 Console.WriteLine(
                     $"[{pmd.Name}] WARNING: Some parameters only have a default value: {string.Join(", ", defaultOnly)}");
             }
+            
         }
 
         public static void SanityCheck(this IExpression e)

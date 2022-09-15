@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AspectedRouting.IO.LuaSkeleton;
 using AspectedRouting.Language;
 using AspectedRouting.Language.Typ;
 
@@ -39,23 +40,22 @@ namespace AspectedRouting.IO.itinero2
 
                 // The expression might still have multiple typings,
                 // which take inputs different from 'Tags', so we specialize the expr first
-                var exprSpecialized = expr;
-                var resultType = expr.Types.First();
-                if (exprSpecialized.Types.Count() >=2) {
-                    exprSpecialized = expr.Specialize(new Curry(Typs.Tags, new Var("a")));
-                    if (exprSpecialized == null) {
-                        throw new Exception("Could not specialize expression to type tags -> $a");
-                    }
-                    resultType = (exprSpecialized.Types.First() as Curry).ResultType;
+                var appliedExpr = Funcs.Either(Funcs.Id, Funcs.Const, expr)
+                    .Apply(new LuaLiteral(Typs.Tags, "tags").SpecializeToSmallestType())
+                    .PruneTypes(tp => !(tp is Curry));
+                var exprSpecialized = appliedExpr.Optimize(out _);
+
+                if (exprSpecialized.Types.First().Equals(Typs.Bool) || exprSpecialized.Types.First().Equals(Typs.String))
+                {
+                    _skeleton.AddDep("parse");
+                    exprSpecialized = Funcs.Parse.Apply(exprSpecialized);
                 }
 
                 var exprInLua = _skeleton.ToLua(exprSpecialized);
-                if (resultType.Equals(Typs.Bool) || resultType.Equals(Typs.String))
+                if (exprInLua.Contains("constRight") || exprInLua.Contains("firstArg"))
                 {
-                    _skeleton.AddDep("parse");
-                    exprInLua = "parse(" + exprInLua + ")";
+                    throw new Exception("Not optimized properly:" + exprSpecialized.Repr());
                 }
-
                 aspects.Add(weight + " * " + exprInLua);
             }
 
@@ -126,7 +126,7 @@ namespace AspectedRouting.IO.itinero2
                 "    local parameters = default_parameters()",
                 _parameterPrinter.DeclareParametersFor(parameters),
                 "",
-                "    local oneway = " + _skeleton.ToLua(_profile.Oneway),
+                "    local oneway = " + _skeleton.ToLuaWithTags(_profile.Oneway).Indent(),
                 "    tags.oneway = oneway",
                 "    -- An aspect describing oneway should give either 'both', 'against' or 'width'",
 
@@ -134,7 +134,7 @@ namespace AspectedRouting.IO.itinero2
                 "",
                 "    -- forward calculation. We set the meta tag '_direction' to 'width' to indicate that we are going forward. The other functions will pick this up",
                 "    tags[\"_direction\"] = \"with\"",
-                "    local access_forward = " + _skeleton.ToLua(_profile.Access),
+                "    local access_forward = " + _skeleton.ToLuaWithTags(_profile.Access).Indent(),
                 "    if(oneway == \"against\") then",
                 "        -- no 'oneway=both' or 'oneway=with', so we can only go back over this segment",
                 "        -- we overwrite the 'access_forward'-value with no; whatever it was...",
@@ -142,7 +142,7 @@ namespace AspectedRouting.IO.itinero2
                 "    end",
                 "    if(access_forward ~= nil and access_forward ~= \"no\" and access_forward ~= false) then",
                 "        tags.access = access_forward -- might be relevant, e.g. for 'access=dismount' for bicycles",
-                "        result.forward_speed = " + _skeleton.ToLua(_profile.Speed).Indent(),
+                "        result.forward_speed = " + _skeleton.ToLuaWithTags(_profile.Speed).Indent(),
                 "        tags.speed = result.forward_speed",
                 "        local priority = calculate_priority(parameters, tags, result, access_forward, oneway, result.forward_speed)",
                 "        if (priority <= 0) then",
@@ -154,7 +154,7 @@ namespace AspectedRouting.IO.itinero2
                 "",
                 "    -- backward calculation",
                 "    tags[\"_direction\"] = \"against\" -- indicate the backward direction to priority calculation",
-                "    local access_backward = " + _skeleton.ToLua(_profile.Access),
+                "    local access_backward = " + _skeleton.ToLuaWithTags(_profile.Access).Indent(),
                 "    if(oneway == \"with\") then",
                 "        -- no 'oneway=both' or 'oneway=against', so we can only go forward over this segment",
                 "        -- we overwrite the 'access_forward'-value with no; whatever it was...",
@@ -162,7 +162,7 @@ namespace AspectedRouting.IO.itinero2
                 "    end",
                 "    if(access_backward ~= nil and access_backward ~= \"no\" and access_backward ~= false) then",
                 "        tags.access = access_backward",
-                "        result.backward_speed = " + _skeleton.ToLua(_profile.Speed).Indent(),
+                "        result.backward_speed = " + _skeleton.ToLuaWithTags(_profile.Speed).Indent(),
                 "        tags.speed = result.backward_speed",
                 "        local priority = calculate_priority(parameters, tags, result, access_backward, oneway, result.backward_speed)",
                 "        if (priority <= 0) then",

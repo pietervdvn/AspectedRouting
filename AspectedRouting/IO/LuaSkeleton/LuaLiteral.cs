@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AspectedRouting.Language;
+using AspectedRouting.Language.Typ;
 using Type = AspectedRouting.Language.Typ.Type;
 
 namespace AspectedRouting.IO.LuaSkeleton
@@ -40,14 +41,35 @@ namespace AspectedRouting.IO.LuaSkeleton
             return null;
         }
 
-        public IExpression Optimize()
+        public IExpression Optimize(out bool somethingChanged)
         {
+            somethingChanged = false;
             return this;
         }
 
         public void Visit(Func<IExpression, bool> f)
         {
-            throw new NotImplementedException();
+            f(this);
+        }
+        
+        public bool Equals(IExpression other)
+        {
+            if (other is LuaLiteral ll)
+            {
+                return ll.Lua.Equals(this.Lua);
+            }
+
+            return false;
+        }
+
+        public string Repr()
+        {
+            if (this.Types.Count() == 1 && this.Types.First() == Typs.Tags)
+            {
+                 return $"new LuaLiteral(Typs.Tags, \"{this.Lua}\")";
+            } 
+            
+            return $"new LuaLiteral(\"{this.Lua}\")";
         }
     }
 }

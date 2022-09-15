@@ -47,6 +47,19 @@ namespace AspectedRouting.Language
             };
         }
 
+        public static Func<IExpression, bool> IsConstant(List<Constant> collect)
+        {
+            return e =>
+            {
+                if (!(e is Constant c))
+                {
+                    return false;
+                }
+
+                collect.Add(c);
+                return true;
+            };
+        }
 
         public static Func<IExpression, bool> Assign(List<IExpression> collect)
         {
@@ -64,6 +77,19 @@ namespace AspectedRouting.Language
                 }
 
                 return f.Name.Equals(fe.Name);
+            };
+        }
+        
+        
+        public static Func<IExpression, bool> IsFunctionCall(List<string> names)
+        {
+            return e => {
+                if (!(e is FunctionCall fc)) {
+                    return false;
+                }
+
+                names.Add(fc.CalledFunctionName);
+                return true;
             };
         }
 
@@ -93,7 +119,7 @@ namespace AspectedRouting.Language
                     }
                     else {
                         if (!doesMatch) {
-                            // All must match - otherwise we might have registered a wrong collectiin
+                            // All must match - otherwise we might have registered a wrong collection
                             return false;
                         }
                     }

@@ -1,16 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using AspectedRouting.Language;
 using AspectedRouting.Language.Functions;
 using AspectedRouting.Language.Typ;
 
+[assembly: InternalsVisibleTo("AspectedRouting.Test")]
 namespace AspectedRouting.IO.jsonParser
 {
     public static partial class JsonParser
     {
-        private static IExpression ParseProfileProperty(JsonElement e, Context c, string property)
+        internal static IExpression ParseProfileProperty(JsonElement e, Context c, string property)
         {
             if (!e.TryGetProperty(property, out var prop)) {
                 throw new ArgumentException("Not a valid profile: the declaration expression for '" + property +
@@ -23,7 +25,7 @@ namespace AspectedRouting.IO.jsonParser
                     throw new Exception($"Could not parse field {property}, no valid typing for expression found");
                 }
 
-                expr = expr.Optimize();
+                expr = expr.Optimize(out _);
                 expr = Funcs.Either(Funcs.Id, Funcs.Const, expr);
                 var specialized = expr.Specialize(new Curry(Typs.Tags, new Var("a")));
 
@@ -52,7 +54,7 @@ namespace AspectedRouting.IO.jsonParser
                                                 string.Join(",", pruned.Types) + "\n" + pruned.TypeBreakdown());
                 }
 
-                return pruned.Optimize();
+                return pruned.Optimize(out _);
             }
             catch (Exception exc) {
                 throw new Exception("While parsing the property " + property, exc);

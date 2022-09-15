@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AspectedRouting.IO.LuaSkeleton;
@@ -14,9 +15,9 @@ namespace AspectedRouting.IO.itinero1
         private string GenerateMainProfileFunction()
         {
 
-            var access = _skeleton.ToLua(_profile.Access);
-            var oneway = _skeleton.ToLua(_profile.Oneway);
-            var speed = _skeleton.ToLua(_profile.Speed);
+            var access = _skeleton.ToLuaWithTags(_profile.Access);
+            var oneway = _skeleton.ToLuaWithTags(_profile.Oneway);
+            var speed = _skeleton.ToLuaWithTags(_profile.Speed);
             
             var impl = string.Join("\n",
                 "",
@@ -58,13 +59,16 @@ namespace AspectedRouting.IO.itinero1
                 var paramInLua = _skeleton.ToLua(new Parameter(parameterName));
 
 
-                var exprInLua = _skeleton.ToLua(expression.Optimize(), forceFirstArgInDot: true);
-                var resultTypes = expression.Types.Select(t => t.Uncurry().Last());
-                if (resultTypes.Any(t => t.Name.Equals(Typs.Bool.Name)))
+                var expr = Funcs.Either(Funcs.Id, Funcs.Const, expression).Apply(new LuaLiteral(Typs.Tags, "tags"))
+                    .SpecializeToSmallestType()
+                    .PruneTypes(t => !(t is Curry))
+                    .Optimize(out _);
+                
+                if (expr.Types.Any(t => t.Name.Equals(Typs.Bool.Name)))
                 {
-                   _skeleton. AddDep("parse");
-                    exprInLua = "parse(" + exprInLua + ")";
+                    expr = Funcs.Parse.Apply(expr).SpecializeToSmallestType();
                 }
+                var exprInLua = _skeleton.ToLua(expr);
 
                 impl += "\n    " + string.Join("\n    ",
                             $"if({paramInLua} ~= 0) then",
@@ -108,9 +112,15 @@ namespace AspectedRouting.IO.itinero1
             var functionName = referenceName.AsLuaIdentifier();
             behaviourParameters.TryGetValue("description", out var description);
 
+            _skeleton.AddDep("copy_tags");
+            var usedkeys = _profile.AllExpressionsFor(behaviourName, _context)
+                .PossibleTagsRecursive(_context)
+                .Select(t => "\""+ t.Key+"\"")
+                .ToHashSet();
+
             _skeleton.AddDep("remove_relation_prefix");
             var impl = string.Join("\n",
-                "",
+                "behaviour_"+functionName+"_used_keys = create_set({"+ string.Join(", " , usedkeys) + "})",
                 "--[[",
                 description,
                 "]]",
@@ -124,6 +134,7 @@ namespace AspectedRouting.IO.itinero1
             impl += _parameterPrinter.DeclareParametersFor(behaviourParameters);
 
             impl += "    " + _profile.Name + "(parameters, tags, result)\n";
+            impl += "    copy_tags(tags, result.attributes_to_keep, behaviour_" + functionName + "_used_keys)\n";
             impl += "end\n";
             return (functionName, impl);
         }

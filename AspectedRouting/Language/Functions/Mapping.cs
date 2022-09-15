@@ -101,18 +101,18 @@ namespace AspectedRouting.Language.Functions
             return resultFunction.Evaluate(c, otherARgs.ToArray());
         }
 
-        public override IExpression Optimize()
+        public override IExpression Optimize(out bool somethingChanged)
         {
             var optimizedFunctions = new Dictionary<string, IExpression>();
-
+            somethingChanged = false;
             foreach (var (k, e) in StringToResultFunctions)
             {
-                var opt = e.Optimize();
-
-                var typeOptStr = string.Join(";", opt.Types);
-                var typeEStr = string.Join("; ", e.Types);
+                var opt = e.Optimize(out var sc);
+                somethingChanged |= sc;
                 if (!opt.Types.Any())
                 {
+                    var typeOptStr = string.Join(";", opt.Types);
+                    var typeEStr = string.Join("; ", e.Types);
                     throw new NullReferenceException($"Optimized version is null, has different or empty types: " +
                                                      $"\n{typeEStr}" +
                                                      $"\n{typeOptStr}");
@@ -121,7 +121,13 @@ namespace AspectedRouting.Language.Functions
                 optimizedFunctions[k] = opt;
             }
 
+            if (!somethingChanged)
+            {
+                return this;
+            }
+
             return new Mapping(optimizedFunctions);
+
         }
 
         public static Mapping Construct(params (string key, IExpression e)[] exprs)

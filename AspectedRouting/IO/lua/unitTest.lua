@@ -5,8 +5,7 @@ function unit_test(f, fname, index, expected, parameters, tags)
         failed_tests = true
         return
     end
-    local result = {attributes_to_keep = {}}
-    local actual = f(parameters, tags, result)
+    local actual = f(tags)
     if(expected == "null" and actual == nil) then
         -- OK!
     elseif(tonumber(actual) and tonumber(expected) and math.abs(tonumber(actual) - tonumber(expected)) < 0.1) then

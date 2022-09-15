@@ -33,6 +33,11 @@ namespace AspectedRouting.Language
         {
             Parameters.Add(name, new Constant(value));
         }
+        
+        public void AddParameter(string name, IExpression value)
+        {
+            Parameters.Add(name, value);
+        }
 
         public void AddFunction(string name, AspectMetadata function)
         {

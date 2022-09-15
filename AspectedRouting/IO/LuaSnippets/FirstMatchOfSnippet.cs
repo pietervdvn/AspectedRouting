@@ -63,7 +63,7 @@ namespace AspectedRouting.IO.LuaSnippets
                 result += "end\n";
                 // note: we do not do an 'elseif' as we have to fallthrough
                 if (result.Contains("tags[\"nil\"]")) {
-                    Console.WriteLine("EUHM");
+                    Console.WriteLine("Warning: FirstMatchOf has a 'nil' in the indexes due to expression "+t.ToString());
                 }
             }
 
