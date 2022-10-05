@@ -318,7 +318,10 @@ namespace AspectedRouting
                     aspectTests,
                     profileTests
                 ).ToLua();
-                File.WriteAllText($"{outputDir}/itinero1/" + profile.Name + ".lua", luaProfile);
+                
+                var itinero1ProfileFile = Path.Combine($"{outputDir}/itinero1/" + profile.Name + ".lua");
+                File.WriteAllText(itinero1ProfileFile, luaProfile);
+                Console.WriteLine($"Written {(new FileInfo(itinero1ProfileFile)).FullName}");
 
                 var profileMd = new MarkDownSection();
                 profileMd.AddTitle(profile.Name, 1);
@@ -346,9 +349,11 @@ namespace AspectedRouting
                         lastChange
                     ).ToLua();
 
+                    var itinero2ProfileFile = Path.Combine($"{outputDir}/itinero2/{profile.Name}.{behaviourName}.lua");
                     File.WriteAllText(
-                        $"{outputDir}/itinero2/{profile.Name}.{behaviourName}.lua",
+                        itinero2ProfileFile,
                         lua2behaviour);
+                    Console.WriteLine($"Written {(new FileInfo(itinero2ProfileFile)).FullName}");
 
                     var behaviourMd = new ProfileToMD(profile, behaviourName, context);
 
