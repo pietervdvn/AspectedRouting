@@ -302,6 +302,10 @@ namespace AspectedRouting
                 Directory.CreateDirectory($"{outputDir}/profile-documentation/");
             }
 
+            if (!Directory.Exists($"{outputDir}/itinero1/")) {
+                Directory.CreateDirectory($"{outputDir}/itinero1/");
+            }
+
             if (!Directory.Exists($"{outputDir}/itinero2/")) {
                 Directory.CreateDirectory($"{outputDir}/itinero2/");
             }
@@ -314,7 +318,7 @@ namespace AspectedRouting
                     aspectTests,
                     profileTests
                 ).ToLua();
-                File.WriteAllText(outputDir + "/" + profile.Name + ".lua", luaProfile);
+                File.WriteAllText($"{outputDir}/itinero1/" + profile.Name + ".lua", luaProfile);
 
                 var profileMd = new MarkDownSection();
                 profileMd.AddTitle(profile.Name, 1);
