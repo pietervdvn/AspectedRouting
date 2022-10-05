@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using AspectedRouting.Language;
 using AspectedRouting.Language.Expression;
@@ -68,13 +69,13 @@ namespace AspectedRouting.Tests
                         var speed = 0.0;
                         if (!string.IsNullOrEmpty(testData[2]))
                         {
-                            speed = double.Parse(testData[2]);
+                            speed = double.Parse(testData[2], NumberStyles.Any, CultureInfo.InvariantCulture);
                         }
 
                         var weight = 0.0;
                         if (!string.IsNullOrEmpty(testData[3]))
                         {
-                            weight = double.Parse(testData[3]);
+                            weight = double.Parse(testData[3], NumberStyles.Any, CultureInfo.InvariantCulture);
                         }
 
 

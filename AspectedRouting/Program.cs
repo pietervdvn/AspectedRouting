@@ -216,12 +216,13 @@ namespace AspectedRouting
             Console.WriteLine("\n\n\n------------------------");
         }
 
-        private static void Main(string[] args)
+        private static int Main(string[] args)
         {
             var errMessage = MainWithError(args);
-            if (errMessage != null) {
-                Console.WriteLine(errMessage);
-            }
+            if (errMessage == null) return 0;
+            
+            Console.WriteLine(errMessage);
+            return 1;
         }
 
         public static string MainWithError(string[] args)

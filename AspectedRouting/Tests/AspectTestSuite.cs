@@ -108,7 +108,7 @@ namespace AspectedRouting.Tests
                     }
 
 
-                    var doesMatch = (actual is double d && Math.Abs(double.Parse(test.expected) - d) < 0.0001)
+                    var doesMatch = (actual is double d && Math.Abs(double.Parse(test.expected, NumberStyles.Any, CultureInfo.InvariantCulture) - d) < 0.0001)
                                     || actual.ToString().Equals(test.expected);
 
                     if (!doesMatch) {
