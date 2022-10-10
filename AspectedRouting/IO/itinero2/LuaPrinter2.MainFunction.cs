@@ -82,6 +82,22 @@ namespace AspectedRouting.IO.itinero2
             _skeleton.AddDep("str_split");
             _skeleton.AddDep("calculate_turn_cost_factor");
             
+            
+            /**
+             *  Calculates the turn cost factor for relation attributes or obstacles.
+ Keep in mind that there are no true relations in the routerDB anymore, instead the attributes are copied onto a turn cost object.
+ This turn cost object has a set of sequence of edges and is applied onto the vertex.0
+ 
+ Obstacles such as bollards are converted into a turn cost as well.
+ calculate_turn_cost_factor will be called for this bollard too to calculate the weight.
+
+If result.factor = -1 if passing is not possible - this is more or less equal to an infinite cost
+If result.factor = 0 if no weight/passing is possible
+If result.factor is positive, that is the cost.
+
+There is no forward or backward, so this should always be the same for the same attributes
+             */
+            
             var code = new List<string> {
                 "--[[ Function called by itinero2 on every turn restriction relation"," ]]",
                 "function turn_cost_factor(attributes, result)",

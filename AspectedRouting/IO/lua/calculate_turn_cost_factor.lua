@@ -1,5 +1,11 @@
 --[[ 
- Calculates the turn cost factor for relation attributes, returns '0' if the turn is allowed and '-1' if the turn is forbidden.
+
+  
+ Returns '0' if the turn is allowed and '-1' if the turn is forbidden.
+ Only used by itinero 2.0.
+ 
+ The itinero 2.0 profile outputs a `turn_cost_factor` which immediately calls this one (see LuaPrinter2.MainFunction).
+ 
  Dependencies: str_split, containedIn
 ]]
 function calculate_turn_cost_factor(attributes, vehicle_types)
