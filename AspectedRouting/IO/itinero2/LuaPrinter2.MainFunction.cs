@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AspectedRouting.IO.LuaSkeleton;
+using AspectedRouting.IO.LuaSnippets;
 using AspectedRouting.Language;
+using AspectedRouting.Language.Functions;
 using AspectedRouting.Language.Typ;
 
 namespace AspectedRouting.IO.itinero2
@@ -12,15 +14,9 @@ namespace AspectedRouting.IO.itinero2
         private string GenerateFactorFunction()
         {
             var parameters = new Dictionary<string, IExpression>();
-            foreach (var (name, value) in _profile.DefaultParameters)
-            {
-                parameters[name] = value;
-            }
+            foreach (var (name, value) in _profile.DefaultParameters) parameters[name] = value;
 
-            foreach (var (name, value) in _profile.Behaviours[_behaviourName])
-            {
-                parameters[name] = value;
-            }
+            foreach (var (name, value) in _profile.Behaviours[_behaviourName]) parameters[name] = value;
 
 
             var aspects = new List<string>();
@@ -28,15 +24,9 @@ namespace AspectedRouting.IO.itinero2
             foreach (var (paramName, expr) in _profile.Priority)
             {
                 var weightExpr = parameters[paramName].Evaluate(_context);
-                if (!(weightExpr is double weight))
-                {
-                    continue;
-                }
+                if (!(weightExpr is double weight)) continue;
 
-                if (weight == 0)
-                {
-                    continue;
-                }
+                if (weight == 0) continue;
 
                 // The expression might still have multiple typings,
                 // which take inputs different from 'Tags', so we specialize the expr first
@@ -45,7 +35,8 @@ namespace AspectedRouting.IO.itinero2
                     .PruneTypes(tp => !(tp is Curry));
                 var exprSpecialized = appliedExpr.Optimize(out _);
 
-                if (exprSpecialized.Types.First().Equals(Typs.Bool) || exprSpecialized.Types.First().Equals(Typs.String))
+                if (exprSpecialized.Types.First().Equals(Typs.Bool) ||
+                    exprSpecialized.Types.First().Equals(Typs.String))
                 {
                     _skeleton.AddDep("parse");
                     exprSpecialized = Funcs.Parse.Apply(exprSpecialized);
@@ -53,14 +44,12 @@ namespace AspectedRouting.IO.itinero2
 
                 var exprInLua = _skeleton.ToLua(exprSpecialized);
                 if (exprInLua.Contains("constRight") || exprInLua.Contains("firstArg"))
-                {
                     throw new Exception("Not optimized properly:" + exprSpecialized.Repr());
-                }
                 aspects.Add(weight + " * " + exprInLua);
             }
 
             Console.WriteLine(aspects.Lined());
-            var code = new List<string>()
+            var code = new List<string>
             {
                 "--[[",
                 "Generates the factor according to the priorities and the parameters for this behaviour",
@@ -81,8 +70,8 @@ namespace AspectedRouting.IO.itinero2
             _skeleton.AddDep("containedIn");
             _skeleton.AddDep("str_split");
             _skeleton.AddDep("calculate_turn_cost_factor");
-            
-            
+
+
             /**
              *  Calculates the turn cost factor for relation attributes or obstacles.
  Keep in mind that there are no true relations in the routerDB anymore, instead the attributes are copied onto a turn cost object.
@@ -97,17 +86,32 @@ If result.factor is positive, that is the cost.
 
 There is no forward or backward, so this should always be the same for the same attributes
              */
-            
-            var code = new List<string> {
-                "--[[ Function called by itinero2 on every turn restriction relation"," ]]",
+
+            var tags = new LuaLiteral(Typs.Tags, "attributes");
+            var hasAccess = _profile.ObstacleAccess.Apply(tags).SpecializeToSmallestType().Optimize(out _);
+            var code = new List<string>
+            {
+                "--[[ Function called by itinero2 on every turn restriction relation", " ]]",
                 "function turn_cost_factor(attributes, result)",
-                "  result.factor = calculate_turn_cost_factor(attributes, vehicle_types)" ,
+
+                "local has_access",
+                Snippets.Convert(_skeleton, "has_access", hasAccess),
+                "if ( has_access == \"no\" or has_access == \"false\") then",
+                "    result.factor = -1",
+                "else",
+                Snippets.Convert(_skeleton, "result.factor",  _profile.ObstacleCost.Apply(tags).SpecializeToSmallestType().Optimize(out _)),
                 "end",
-                "",
+
+                "  -- not known by the profile or invalid value - use the default implementation",
+                "  if (result.factor == nil) then",
+                "    result.factor = calculate_turn_cost_factor(attributes, vehicle_types)",
+                "  end",
+                "end",
+                ""
             };
             return code.Lined();
         }
-        
+
         private string GenerateMainFunction()
         {
             var parameters = _profile.Behaviours[_behaviourName];

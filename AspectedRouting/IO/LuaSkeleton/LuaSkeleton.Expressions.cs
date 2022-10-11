@@ -17,6 +17,10 @@ namespace AspectedRouting.IO.LuaSkeleton
 
         internal string ToLuaWithTags(IExpression bare)
         {
+            if (bare == null)
+            {
+                throw new NullReferenceException("bare is null");
+            }
             var opt = bare.Apply(new LuaLiteral(Typs.Tags, "tags")).SpecializeToSmallestType().Optimize(out _);
             return this.ToLua(opt);
         }

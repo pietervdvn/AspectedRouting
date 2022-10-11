@@ -111,7 +111,7 @@ namespace AspectedRouting.Language.Functions
         {
             if (i >= 0)
             {
-                Types = new[] { Typs.Double, Typs.Nat, Typs.Nat, Typs.PDouble };
+                Types = new[] { Typs.Double, Typs.Int, Typs.Nat, Typs.PDouble };
             }
             else
             {

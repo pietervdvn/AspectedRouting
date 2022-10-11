@@ -24,8 +24,10 @@ Aspects can use the following (extra) tags:
  - `oneway` is a field in the vehicle file. It should be an expression returning `both`, `with` or `against`. 
  When calculated, the tag `oneway` is added to the tags for the other aspects to be calculated.
  - `speed`: an expression indicating how fast the vehicle can go there. It should take into account legal, practical and social aspects. An example expression could be `{"$min", ["$legal_maxspeed", "#defaultspeed"]}`
+- `obstacleaccess` and `obstaclecost` are two (optional) expressions that calculate whether an obstacle can be passed and if so, if there is a penalty for this. See detailed explanations below
  
 - `priorities`: a table of `{'#paramName', expression}` determining the priority (1/cost) of a way, per meter. The formula used is `paramName * expression + paramName0 * expression0 + ...` (`speed`, `access` and `oneway` can be used here as tags indicate the earlier defined respective aspects). Use a weight == 1 to get the shortest route or `$speed` to get the fastest route
+
 
 # Calculating oneway and forward/backward speeds
 
@@ -36,6 +38,26 @@ There are two possibilities in order to calculate the possible direction of a tr
 
 Note that `_direction=with` and `_direction=against` are _not_ supported in Itinero1.0 profiles. For maximal compatibility and programming comfort, a mixture of both techniques should be used. For example, one aspect interpreting the legal onewayness in tandem with one aspect determining comfort by direction is optimal.
 
+# Obstacle costs
+
+(Note: this only works with itinero2.0)
+
+Obstacles are objects which are encountered on nodes, e.g. bollards, traffic lights but also turn restrictions.
+
+The first property for this is `obstacleaccess` which calculates wether or not a vehicle can pass the obstacle.
+The possible values are:
+
+- "no" of "false": the current vehicle _cannot_ pass this obstacle and should take a different route
+- "yes" or "true": the current vehicle _can_ pass this obstacle. The turn cost will be calculated
+- `null`: same as 'yes'
+
+If `obstacleaccess` is not `no` or `false`, then `obstaclecost` will be triggered. This possible return values are:
+
+- a positive number, indicating the cost for passing this obstacle
+- 0: there is no cost to cross this obstacle
+- null: this profile has no knowledge of a cost, will be interpreted as `0`
+
+If the resulting cost is null, the default implementation will be used.
 
 # Pitfalls
 

@@ -28,7 +28,12 @@ namespace AspectedRouting.Language.Expression
         public IExpression Access { get; }
         public IExpression Oneway { get; }
         public IExpression Speed { get; }
+
+        public IExpression ObstacleAccess { get; }
+        public IExpression ObstacleCost { get; }
+
         public Dictionary<string, IExpression> Priority { get; }
+
 
         /**
          * Moment of last change of any upstream file
@@ -39,6 +44,7 @@ namespace AspectedRouting.Language.Expression
             List<string> vehicleTyps, Dictionary<string, IExpression> defaultParameters,
             Dictionary<string, Dictionary<string, IExpression>> behaviours,
             IExpression access, IExpression oneway, IExpression speed,
+            IExpression obstacleAccess, IExpression obstacleCost,
             Dictionary<string, IExpression> priority, List<string> metadata, DateTime lastChange)
         {
             Name = name;
@@ -46,9 +52,11 @@ namespace AspectedRouting.Language.Expression
             Author = author;
             Filename = filename;
             VehicleTyps = vehicleTyps;
-            Access = access.Optimize(out var _);
-            Oneway = oneway.Optimize(out var _);
-            Speed = speed.Optimize(out var _);
+            Access = access.Optimize(out _);
+            Oneway = oneway.Optimize(out _);
+            Speed = speed.Optimize(out _);
+            ObstacleAccess = obstacleAccess.Optimize(out _);
+            ObstacleCost = obstacleCost.Optimize(out _);
             Priority = priority;
             Metadata = metadata;
             LastChange = lastChange;
@@ -58,10 +66,16 @@ namespace AspectedRouting.Language.Expression
             CheckTypes(Access, "access");
             CheckTypes(Oneway, "oneway");
             CheckTypes(Speed, "speed");
+            CheckTypes(ObstacleAccess, "obstacleaccess");
+            CheckTypes(ObstacleCost, "obstaclecost");
         }
 
         private static void CheckTypes(IExpression e, string name)
         {
+            if (e == null)
+            {
+                throw new Exception("No expression given for " +name);
+            }
             if (e.Types.Count() == 1)
             {
                 return;
@@ -73,11 +87,11 @@ namespace AspectedRouting.Language.Expression
 
         public List<IExpression> AllExpressions(Context ctx)
         {
-            var l = new List<IExpression> { Access, Oneway, Speed };
+            var l = new List<IExpression> { Access, Oneway, Speed, ObstacleAccess, ObstacleCost };
             l.AddRange(DefaultParameters.Values);
             l.AddRange(Behaviours.Values.SelectMany(b => b.Values));
             l.AddRange(Priority.Values);
-
+            
 
             var allExpr = new List<IExpression>();
             allExpr.AddRange(l);
@@ -100,10 +114,14 @@ namespace AspectedRouting.Language.Expression
 
         public List<IExpression> AllExpressionsFor(string behaviourName, Context context)
         {
-            var allExpressions = new List<IExpression>();
-            allExpressions.Add(Access);
-            allExpressions.Add(Oneway);
-            allExpressions.Add(Speed);
+            var allExpressions = new List<IExpression>
+            {
+                Access,
+                Oneway,
+                Speed,
+                ObstacleAccess,
+                ObstacleCost
+            };
 
             var behaviourContext = new Context(context);
             var behaviourParameters = ParametersFor(behaviourName);

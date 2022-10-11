@@ -12,11 +12,17 @@ namespace AspectedRouting.IO.jsonParser
 {
     public static partial class JsonParser
     {
-        internal static IExpression ParseProfileProperty(JsonElement e, Context c, string property)
+        internal static IExpression ParseProfileProperty(JsonElement e, Context c, string property, IExpression defaultExpression = null)
         {
             if (!e.TryGetProperty(property, out var prop)) {
-                throw new ArgumentException("Not a valid profile: the declaration expression for '" + property +
-                                            "' is missing");
+                if (defaultExpression == null)
+                {
+                    throw new ArgumentException("Not a valid profile: the declaration expression for '" + property +
+                                                "' is missing");
+                }
+
+                Console.Error.WriteLine("WARNING: no expression defined for "+property+", using the default instead");
+                return defaultExpression;
             }
 
             try {
@@ -44,6 +50,11 @@ namespace AspectedRouting.IO.jsonParser
                         return false;
                     }
                     if (c.ResultType is Curry) {
+                        return false;
+                    }
+
+                    if (c.ResultType is ListType)
+                    {
                         return false;
                     }
                     return true;
