@@ -10,11 +10,15 @@ function table_to_list(tags, result, factor_table)
                 local f = mapping[v]
                 if (f ~= nil) then
                     table.insert(list, f);
-                    result.attributes_to_keep[key] = v
+                    if (result.attributes_to_keep ~= nil) then
+                        result.attributes_to_keep[key] = v
+                    end
                 end
             else
                 table.insert(list, mapping);
-                result.attributes_to_keep[key] = v
+                if (result.attributes_to_keep ~= nil) then
+                    result.attributes_to_keep[key] = v
+                end
             end
         end
     end
