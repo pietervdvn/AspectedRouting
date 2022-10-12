@@ -114,7 +114,7 @@ namespace AspectedRouting.IO.jsonParser
             var oneway = ParseProfileProperty(e, contextWithParameters, "oneway").Finalize();
             var speed = ParseProfileProperty(e, contextWithParameters, "speed").Finalize();
             var obstacle_access = ParseProfileProperty(e, contextWithParameters, "obstacleaccess", Funcs.Const.Apply(new Constant(new Var("any"), null))).Finalize();
-            var obstacle_cost = ParseProfileProperty(e, contextWithParameters, "obstaclecost", Funcs.Const.Apply(new Constant(Typs.Double,0))).Finalize();
+            var obstacle_cost = ParseProfileProperty(e, contextWithParameters, "obstaclecost", Funcs.Const.Apply(new Constant(new Var("any0"), null))).Finalize();
 
             IExpression TagsApplied(IExpression x)
             {
