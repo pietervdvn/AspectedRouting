@@ -48,14 +48,13 @@ The first property for this is `obstacleaccess` which calculates wether or not a
 The possible values are:
 
 - "no" of "false": the current vehicle _cannot_ pass this obstacle and should take a different route
-- "yes" or "true": the current vehicle _can_ pass this obstacle. The turn cost will be calculated
-- `null`: same as 'yes'
+- "yes", "true", `null` or any other value: the current vehicle _can_ pass this obstacle. The turn cost will be calculated
 
 If `obstacleaccess` is not `no` or `false`, then `obstaclecost` will be triggered. This possible return values are:
 
 - a positive number, indicating the cost for passing this obstacle
 - 0: there is no cost to cross this obstacle
-- null: this profile has no knowledge of a cost, will be interpreted as `0`
+- null: this profile has no knowledge of a cost. Use the default implementation to check for turn restrictions
 
 If the resulting cost is null, the default implementation will be used.
 
