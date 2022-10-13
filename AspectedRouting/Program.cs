@@ -225,80 +225,11 @@ namespace AspectedRouting
             return 1;
         }
 
-        public static string MainWithError(string[] args)
+        private static void WriteOutputFiles(Context context,
+            List<(AspectMetadata aspect, AspectTestSuite tests)> aspects, string outputDir,
+            List<(ProfileMetaData profile, List<BehaviourTestSuite> profileTests)> profiles, DateTime lastChange)
         {
-            if (args.Length < 2) {
-                return "Usage: <directory where all aspects and profiles can be found> <outputdirectory>";
-            }
-
-            var inputDir = args[0];
-            var outputDir = args[1];
-
-            if (!Directory.Exists(outputDir)) {
-                Directory.CreateDirectory(outputDir);
-            }
-
-            MdPrinter.GenerateHelpText(outputDir + "helpText.md");
-            Console.WriteLine("Written helptext to "+outputDir);
-
-
-            var files = Directory.EnumerateFiles(inputDir, "*.json", SearchOption.AllDirectories)
-                .ToList();
-
-            var tests = Directory.EnumerateFiles(inputDir, "*.csv", SearchOption.AllDirectories)
-                .ToList();
-            tests.Sort();
-
-            foreach (var test in tests) {
-                if (test.EndsWith(".test.csv") || test.EndsWith(".behaviour_test.csv")) {
-                    continue;
-                }
-
-                throw new ArgumentException(
-                    $"Invalid name for csv file ${test}, should end with either '.behaviour_test.csv' or '.test.csv'");
-            }
-
-            var context = new Context();
-
-            var aspects = ParseAspects(files, tests, context);
-
-            foreach (var (aspect, _) in aspects) {
-                context.AddFunction(aspect.Name, aspect);
-            }
-
-            var lastChange = DateTime.UnixEpoch;
-            foreach (var file in files) {
-                var time = new FileInfo(file).LastWriteTimeUtc;
-                if (lastChange < time) {
-                    lastChange = time;
-                }
-            }
-
-            var profiles = ParseProfiles(files, tests, context, lastChange);
-
-
-            // With everything parsed and typechecked, time for tests
-            var testsOk = true;
-            foreach (var (aspect, t) in aspects) {
-                if (t == null) {
-                    Console.WriteLine($"[{aspect.Name}] WARNING: no tests found: please add {aspect.Name}.test.csv");
-                }
-                else {
-                    testsOk &= t.Run();
-                }
-            }
-
-
-            foreach (var (profile, profileTests) in profiles)
-            foreach (var test in profileTests) {
-                testsOk &= test.Run(context);
-            }
-
-            if (!testsOk) {
-                return "Some tests failed, quitting now without generating output";
-            }
-
-            if (!Directory.Exists($"{outputDir}/profile-documentation/")) {
+                   if (!Directory.Exists($"{outputDir}/profile-documentation/")) {
                 Directory.CreateDirectory($"{outputDir}/profile-documentation/");
             }
 
@@ -376,6 +307,81 @@ namespace AspectedRouting
             File.WriteAllText($"{outputDir}/UsedTags.json",
                 Utils.GenerateTagsOverview(profiles.Select(p => p.profile), context)
             );
+        }
+
+        public static string MainWithError(string[] args)
+        {
+            if (args.Length < 2) {
+                return "Usage: <directory where all aspects and profiles can be found> <outputdirectory>";
+            }
+
+            var inputDir = args[0];
+            var outputDir = args[1];
+
+            if (!Directory.Exists(outputDir)) {
+                Directory.CreateDirectory(outputDir);
+            }
+
+            MdPrinter.GenerateHelpText(outputDir + "helpText.md");
+            Console.WriteLine("Written helptext to "+outputDir);
+
+
+            var files = Directory.EnumerateFiles(inputDir, "*.json", SearchOption.AllDirectories)
+                .ToList();
+
+            var tests = Directory.EnumerateFiles(inputDir, "*.csv", SearchOption.AllDirectories)
+                .ToList();
+            tests.Sort();
+
+            foreach (var test in tests) {
+                if (test.EndsWith(".test.csv") || test.EndsWith(".behaviour_test.csv")) {
+                    continue;
+                }
+
+                throw new ArgumentException(
+                    $"Invalid name for csv file ${test}, should end with either '.behaviour_test.csv' or '.test.csv'");
+            }
+
+            var context = new Context();
+
+            var aspects = ParseAspects(files, tests, context);
+
+            foreach (var (aspect, _) in aspects) {
+                context.AddFunction(aspect.Name, aspect);
+            }
+
+            var lastChange = DateTime.UnixEpoch;
+            foreach (var file in files) {
+                var time = new FileInfo(file).LastWriteTimeUtc;
+                if (lastChange < time) {
+                    lastChange = time;
+                }
+            }
+
+            var profiles = ParseProfiles(files, tests, context, lastChange);
+
+
+            // With everything parsed and typechecked, time for tests
+            var testsOk = true;
+            foreach (var (aspect, t) in aspects) {
+                if (t == null) {
+                    Console.WriteLine($"[{aspect.Name}] WARNING: no tests found: please add {aspect.Name}.test.csv");
+                }
+                else {
+                    testsOk &= t.Run();
+                }
+            }
+
+
+            foreach (var (profile, profileTests) in profiles)
+            foreach (var test in profileTests) {
+                testsOk &= test.Run(context);
+            }
+
+            if (testsOk)
+            {
+                WriteOutputFiles(context, aspects, outputDir, profiles, lastChange);
+            }
 
 
             if (!args.Contains("--no-repl")) {
@@ -386,8 +392,7 @@ namespace AspectedRouting
             else {
                 Console.WriteLine("Not starting REPL as --no-repl is specified");
             }
-
-            return null;
+            return !testsOk ? "Some tests failed, quitting now without generating output" : null;
         }
     }
 }

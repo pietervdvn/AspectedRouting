@@ -247,6 +247,7 @@ namespace AspectedRouting.Language.Expression
             if (priority <= 0)
             {
                 canAccess = "no";
+                weightExplanation.Add("WARNING: access has been set to 'no' as priority is < 0");
             }
 
             if (canAccess is string canAccessString && oneway is string onewayString)
