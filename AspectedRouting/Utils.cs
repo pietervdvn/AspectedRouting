@@ -15,7 +15,7 @@ namespace AspectedRouting
 
         public static List<T> InList<T>(this T t)
         {
-            return new List<T> {t};
+            return new List<T> { t };
         }
 
         public static string Lined(this IEnumerable<string> lines)
@@ -31,9 +31,7 @@ namespace AspectedRouting
         public static int Multiply(this IEnumerable<int> ints)
         {
             var factor = 1;
-            foreach (var i in ints) {
-                factor += i;
-            }
+            foreach (var i in ints) factor += i;
 
             return factor;
         }
@@ -54,28 +52,28 @@ namespace AspectedRouting
         {
             return "\"" + s + "\"";
         }
-        
+
         public static string GenerateTagsOverview(IEnumerable<ProfileMetaData> profiles, Context context)
         {
             var allExpressions = new List<IExpression>();
-            foreach (var profile in profiles) {
-                foreach (var behaviour in profile.Behaviours) {
+            foreach (var profile in profiles)
+                foreach (var behaviour in profile.Behaviours)
                     allExpressions.AddRange(profile.AllExpressions(context));
-                }
-            }
 
             var explanations = new List<string>();
-            foreach (var tag in allExpressions.PossibleTags()) {
+            foreach (var tag in allExpressions.PossibleTags())
+            {
                 var values = new List<string>(tag.Value);
                 values.Sort();
                 explanations.Add(tag.Key.Quoted() + ": [" +
                                  string.Join(", ", values.Select(v => v.Quoted()))
                                  + "]");
             }
+
             explanations.Sort();
-            
-            
-            return "{\n    "+ String.Join(",\n    ", explanations)+"\n}";
+
+
+            return "{\n    " + string.Join(",\n    ", explanations) + "\n}";
         }
 
         /// <summary>
@@ -88,38 +86,67 @@ namespace AspectedRouting
         /// <returns></returns>
         public static string GenerateExplanationJson(IEnumerable<ProfileMetaData> profiles, Context context)
         {
-            
             var metaItems = new List<string>();
 
-            foreach (var profile in profiles) {
+            foreach (var profile in profiles)
+            {
                 var profileName = profile.Name;
                 var author = profile.Author;
                 var profileDescription = profile.Description;
 
 
-                foreach (var behaviour in profile.Behaviours) {
+                foreach (var behaviour in profile.Behaviours)
+                {
                     var behaviourDescription = behaviour.Value["description"].Evaluate(new Context()) as string;
                     behaviourDescription ??= "";
                     var keys = new List<string>();
-                    foreach (var tag in profile.AllExpressions(context).PossibleTags()) {
-                        keys.Add(tag.Key.Quoted());
-                    }
+                    foreach (var tag in profile.AllExpressions(context).PossibleTags()) keys.Add(tag.Key.Quoted());
 
-                    var meta = new Dictionary<string, string> {
-                        {"name", behaviour.Key},
-                        {"type", profileName},
-                        {"author", author},
-                        {"description", behaviourDescription + " (" + profileDescription + ")"}
+                    var meta = new Dictionary<string, string>
+                    {
+                        { "name", behaviour.Key },
+                        { "type", profileName },
+                        { "author", author },
+                        { "description", behaviourDescription + " (" + profileDescription + ")" }
                     };
                     var json = string.Join(",", meta.Select(d =>
                         $"\"{d.Key}\": \"{d.Value}\""));
-                    
+
                     metaItems.Add($"{{{json}, " +
-                                  $"\"usedKeys\": [{string.Join(", ",keys)}] }}\n");
+                                  $"\"usedKeys\": [{string.Join(", ", keys)}] }}\n");
                 }
             }
 
             return "[" + string.Join(",\n", metaItems) + "]";
+        }
+
+        /**
+         * Parses an object, converts it to a double.
+         * throws an exception if not a double
+         */
+        public static double AsDouble(object obj, string paramName)
+        {
+            if (obj == null)
+            {
+                throw new Exception($"Invalid value as result for {paramName}: got null");
+            }
+            switch (obj)
+            {
+                case bool b:
+                    return b ? 1.0 : 0.0;
+                case double d:
+                    return d;
+                case int j:
+                    return j;
+                case string s:
+                    if (s.Equals("yes")) return 1.0;
+
+                    if (s.Equals("no")) return 0.0;
+
+                    throw new Exception($"Invalid value as result for {paramName}: got string {s}");
+                default:
+                    throw new Exception($"Invalid value as result for {paramName}: got object {obj}");
+            }
         }
     }
 }

@@ -48,55 +48,67 @@ namespace AspectedRouting.Language
          * Builds a string representation that can be used to paste into C# test programs
          */
         string Repr();
-        
-        
+
+
     }
 
     public static class ExpressionExtensions
     {
-        
+
         public static void PrintRepr(this IExpression e)
         {
-            Console.WriteLine(e.Repr()+"\n\n-----------\n");
+            Console.WriteLine(e.Repr() + "\n\n-----------\n");
         }
         public static object Run(this IExpression e, Context c, Dictionary<string, string> tags)
         {
-            try {
+            try
+            {
                 var result = e.Apply(new Constant(tags)).Evaluate(c);
-                while (result is IExpression ex) {
+                while (result is IExpression ex)
+                {
                     result = ex.Apply(new Constant(tags)).Evaluate(c);
                 }
 
                 return result;
             }
-            catch (Exception err) {
+            catch (Exception err)
+            {
                 throw new Exception($"While evaluating the expression {e} with arguments a list of tags", err);
             }
         }
 
+        public static double EvaluateDouble(this IExpression e, string paramName, Context c, params IExpression[] arguments)
+        {
+            return Utils.AsDouble(e.Evaluate(c, arguments), paramName);
+        }
+
         public static IExpression Specialize(this IExpression e, Type t)
         {
-            if (t == null) {
+            if (t == null)
+            {
                 throw new NullReferenceException("Cannot specialize to null");
             }
 
-            return e.Specialize(new[] {t});
+            return e.Specialize(new[] { t });
         }
 
         public static IExpression Specialize(this IExpression e, Dictionary<string, Type> substitutions)
         {
             var newTypes = new HashSet<Type>();
 
-            foreach (var oldType in e.Types) {
+            foreach (var oldType in e.Types)
+            {
                 var newType = oldType.Substitute(substitutions);
-                if (newType == null) {
+                if (newType == null)
+                {
                     continue;
                 }
 
                 newTypes.Add(newType);
             }
 
-            if (!newTypes.Any()) {
+            if (!newTypes.Any())
+            {
                 return null;
             }
 
@@ -123,23 +135,28 @@ namespace AspectedRouting.Language
             var allExpressions = new HashSet<IExpression>();
             specializedExpressions = allExpressions;
 
-            foreach (var expr in exprs) {
-                if (specializedTypes == null) {
+            foreach (var expr in exprs)
+            {
+                if (specializedTypes == null)
+                {
                     specializedTypes = expr.Types; // This is t
                 }
-                else {
+                else
+                {
                     var newlySpecialized = Typs.WidestCommonTypes(specializedTypes, expr.Types);
-                    if (!newlySpecialized.Any()) {
-                        throw new ArgumentException("Could not find a common ground for types "+specializedTypes.Pretty()+ " and "+expr.Types.Pretty());
+                    if (!newlySpecialized.Any())
+                    {
+                        throw new ArgumentException("Could not find a common ground for types " + specializedTypes.Pretty() + " and " + expr.Types.Pretty());
                     }
 
                     specializedTypes = newlySpecialized;
                 }
 
-                
+
             }
 
-            foreach (var expr in exprs) {
+            foreach (var expr in exprs)
+            {
                 var e = expr.Specialize(specializedTypes);
                 allExpressions.Add(e);
             }
