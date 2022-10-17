@@ -14,7 +14,7 @@ namespace AspectedRouting.Language.Functions
 
         public Parameter(string s)
         {
-            Types = new[] {new Var("parameter") };
+            Types = new[] { new Var("parameter") };
             ParamName = s;
         }
 
@@ -28,7 +28,7 @@ namespace AspectedRouting.Language.Functions
         {
             var paramName = ParamName.TrimStart('#'); // context saves paramnames without '#'
             var value = c?.Parameters?.GetValueOrDefault(paramName, null);
-            if(value is Constant constant)
+            if (value is Constant constant)
             {
                 return constant.Evaluate(c);
             }
@@ -37,11 +37,11 @@ namespace AspectedRouting.Language.Functions
 
         public IExpression Specialize(IEnumerable<Type> allowedTypes)
         {
-         /*   var filtered = allowedTypes.Where(at => !(at is Curry));
-            if (filtered.Count() == 0)
-            {
-                return null;
-            }*/
+            /*   var filtered = allowedTypes.Where(at => !(at is Curry));
+               if (filtered.Count() == 0)
+               {
+                   return null;
+               }*/
             var unified = Types.SpecializeTo(allowedTypes);
             if (unified == null)
             {
@@ -50,11 +50,12 @@ namespace AspectedRouting.Language.Functions
 
             return new Parameter(unified, ParamName);
         }
-        
+
         public IExpression PruneTypes(System.Func<Type, bool> allowedTypes)
         {
             var passedTypes = this.Types.Where(allowedTypes);
-            if (!passedTypes.Any()) {
+            if (!passedTypes.Any())
+            {
                 return null;
             }
 
@@ -66,7 +67,7 @@ namespace AspectedRouting.Language.Functions
             somethingChanged = false;
             return this;
         }
-        
+
         public IExpression OptimizeWithArgument(IExpression arg)
         {
             throw new NotSupportedException("Trying to invoke a parameter");
@@ -81,7 +82,7 @@ namespace AspectedRouting.Language.Functions
         {
             if (other is Parameter p)
             {
-                return p.ParamName.Equals( this.ParamName);
+                return p.ParamName.Equals(this.ParamName);
             }
 
             return false;
@@ -96,7 +97,7 @@ namespace AspectedRouting.Language.Functions
         {
             return ParamName;
         }
-        
-        
+
+
     }
 }

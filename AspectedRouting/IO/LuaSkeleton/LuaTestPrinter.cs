@@ -13,17 +13,17 @@ namespace AspectedRouting.IO.itinero1
             _skeleton = skeleton;
             unitTestRunners.ForEach(_skeleton.AddDep);
         }
-        
-        
+
+
         public string GenerateFullTestSuite(List<BehaviourTestSuite> profileTests, List<AspectTestSuite> aspectTests, bool invertPriority = false)
         {
-            
+
             _skeleton.AddDep("inv");
             _skeleton.AddDep("double_compare");
 
 
             var aspectTestSuite =
-                string.Join("\n\n", 
+                string.Join("\n\n",
                     aspectTests
                     .Where(x => x != null)
                     .Select(
@@ -81,7 +81,8 @@ namespace AspectedRouting.IO.itinero1
             foreach (var key in keysToCheck)
             {
                 var newKey = key.Replace(".", "_");
-                if (newKey == key) {
+                if (newKey == key)
+                {
                     continue;
                 }
                 tags[newKey] = tags[key];
@@ -94,7 +95,8 @@ namespace AspectedRouting.IO.itinero1
             }
 
             var expectedPriority = "" + expected.Priority;
-            if (invertPriority) {
+            if (invertPriority)
+            {
                 expectedPriority = $"inv({expectedPriority})";
             }
 
@@ -118,7 +120,7 @@ namespace AspectedRouting.IO.itinero1
             {
                 return "";
             }
-            
+
             var tests =
                 testSuite.Tests
                     .Select((test, i) => GenerateAspectUnitTestCall(fName, i, test.expected, test.tags))

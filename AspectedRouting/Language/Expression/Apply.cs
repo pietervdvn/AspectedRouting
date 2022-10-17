@@ -68,7 +68,7 @@ namespace AspectedRouting.Language.Expression
                         continue;
                     }
 
-                    
+
                     if (FunctionApplications.ContainsKey(actualResultType))
                     {
                         continue;
@@ -207,10 +207,10 @@ namespace AspectedRouting.Language.Expression
                 return this;
             }
 
-            
+
             // At this point, we know there only is a single type;
             // We can safely assume all the 'assign' will only match a single entry
-            
+
             {
                 // id a => a
                 var arg = new List<IExpression>();
@@ -238,18 +238,18 @@ namespace AspectedRouting.Language.Expression
                         Assign(arg)
                     ).Invoke(this))
                 {
-                      var a = arg.First();
-                      var c = exprs.First();
-                      if (c.Types.All(t => t is ListType))
-                      {
-                          // The constant is a list
-                          var o = (List<IExpression>)c.Get();
-                          somethingChanged = true;
-                          return new Constant(
-                              o.Select(e => e.Apply(a).Optimize(out var _)).ToList()
-                          );
-                      }
-                      // fallthrough!
+                    var a = arg.First();
+                    var c = exprs.First();
+                    if (c.Types.All(t => t is ListType))
+                    {
+                        // The constant is a list
+                        var o = (List<IExpression>)c.Get();
+                        somethingChanged = true;
+                        return new Constant(
+                            o.Select(e => e.Apply(a).Optimize(out var _)).ToList()
+                        );
+                    }
+                    // fallthrough!
                 }
             }
 
@@ -282,7 +282,7 @@ namespace AspectedRouting.Language.Expression
                         );
                 }
             }
-            
+
             {
                 // ifdotted fcondition fthen <null> arg => if (fcondition arg) (fthen arg) (felse arg)
                 var fcondition = new List<IExpression>();
@@ -421,10 +421,10 @@ namespace AspectedRouting.Language.Expression
             somethingChanged = false;
             var f = fRaw.Optimize(out var scf);
             somethingChanged |= scf;
-            
+
             if (f.Types.Count() == 0)
             {
-                throw new ArgumentException("Optimizing " + f + " failed, no types returned. The original expression\n  "+fRaw.ToString()+"has types"+string.Join("\n   ", fRaw.Types));
+                throw new ArgumentException("Optimizing " + f + " failed, no types returned. The original expression\n  " + fRaw.ToString() + "has types" + string.Join("\n   ", fRaw.Types));
             }
 
             a = a.Optimize(out var sca);
@@ -537,24 +537,24 @@ namespace AspectedRouting.Language.Expression
         {
             if (this.Types.Count() == 1)
             {
-            var f = this.F.Repr().Replace("\n", "\n  ");
-            var a = this.A.Repr().Replace("\n", "\n  ");
+                var f = this.F.Repr().Replace("\n", "\n  ");
+                var a = this.A.Repr().Replace("\n", "\n  ");
 
-            return $"new Apply( // {string.Join("    ;    ", this.Types)}\n  {f},\n  {a})";
+                return $"new Apply( // {string.Join("    ;    ", this.Types)}\n  {f},\n  {a})";
             }
 
             var r = "new Apply(";
 
             foreach (var (type, (f, a)) in this.FunctionApplications)
             {
-                r += "\n  // " + type+"\n";
-                r += "  | " + f.Repr().Replace("\n", "\n  | ")+",\n";
-                r += "  | " + a.Repr().Replace("\n", "\n  | ")+"\n";
+                r += "\n  // " + type + "\n";
+                r += "  | " + f.Repr().Replace("\n", "\n  | ") + ",\n";
+                r += "  | " + a.Repr().Replace("\n", "\n  | ") + "\n";
             }
 
             return r;
 
         }
-        
+
     }
 }

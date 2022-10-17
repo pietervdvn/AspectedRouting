@@ -13,7 +13,8 @@ namespace AspectedRouting.Language.Functions
                     new Curry(Typs.Tags, Typs.Bool),
                     new Curry(Typs.Tags, Typs.Bool))
             }
-        ) { }
+        )
+        { }
 
         public MemberOf(IEnumerable<Type> types) : base("memberOf", types) { }
 
@@ -39,10 +40,11 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var tags = (Dictionary<string, string>) arguments[1].Evaluate(c);
+            var tags = (Dictionary<string, string>)arguments[1].Evaluate(c);
             var name = c.AspectName.TrimStart('$');
 
-            if (tags.TryGetValue("_relation:" + name, out var v)) {
+            if (tags.TryGetValue("_relation:" + name, out var v))
+            {
                 return v;
             }
 
@@ -57,20 +59,24 @@ namespace AspectedRouting.Language.Functions
                 }
 
                 var keyParts = tag.Key.Split(":");
-                if (keyParts.Length != 3) {
+                if (keyParts.Length != 3)
+                {
                     continue;
                 }
                 var relationName = keyParts[1];
-                if (!relationTags.ContainsKey(relationName)) {
+                if (!relationTags.ContainsKey(relationName))
+                {
                     relationTags.Add(relationName, new Dictionary<string, string>());
                 }
 
                 relationTags[relationName].Add(keyParts[2], tag.Value);
             }
 
-            foreach (var relationTagging in relationTags) {
+            foreach (var relationTagging in relationTags)
+            {
                 var result = arguments[0].Evaluate(c, new Constant(relationTagging.Value));
-                if (result.Equals("yes")) {
+                if (result.Equals("yes"))
+                {
                     return "yes";
                 }
             }
@@ -81,7 +87,8 @@ namespace AspectedRouting.Language.Functions
         public override IExpression Specialize(IEnumerable<Type> allowedTypes)
         {
             var unified = Types.SpecializeTo(allowedTypes);
-            if (unified == null) {
+            if (unified == null)
+            {
                 return null;
             }
 

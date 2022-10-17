@@ -7,10 +7,10 @@ namespace AspectedRouting.Language.Functions
     public class ToString : Function
     {
         public override string Description { get; } = "Converts a value into a human readable string";
-        public override List<string> ArgNames { get; } = new List<string>{"obj"};
+        public override List<string> ArgNames { get; } = new List<string> { "obj" };
 
         public ToString() : base("to_string", true,
-            new[] {new Curry(new Var("a"), Typs.String)})
+            new[] { new Curry(new Var("a"), Typs.String) })
         {
         }
 

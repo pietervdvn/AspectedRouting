@@ -43,13 +43,16 @@ namespace AspectedRouting.IO.itinero1
         public string DeclareParametersFor(Dictionary<string, IExpression> subParams)
         {
             var impl = "";
-            foreach (var (paramName, value) in subParams) {
-                if (paramName.Equals("description")) {
+            foreach (var (paramName, value) in subParams)
+            {
+                if (paramName.Equals("description"))
+                {
                     continue;
                 }
 
                 var paramNameTrimmed = paramName.TrimStart('#').AsLuaIdentifier();
-                if (!string.IsNullOrEmpty(paramNameTrimmed)) {
+                if (!string.IsNullOrEmpty(paramNameTrimmed))
+                {
                     impl += $"    parameters.{paramNameTrimmed} = {_skeleton.ToLua(value)}\n";
                 }
             }

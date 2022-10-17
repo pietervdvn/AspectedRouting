@@ -37,11 +37,12 @@ namespace AspectedRouting.IO.LuaSkeleton
                 , UnApply(
                     IsFunc(Funcs.StringStringToTags),
                     Assign(collectedMapping))
-            ).Invoke(bare)) {
+            ).Invoke(bare))
+            {
                 AddDep(Funcs.FirstOf.Name);
                 return "first_match_of(\n" +
                        "        " + ToLua(order.First(), key) + ",\n" +
-                       ("\n" + MappingToLua((Mapping) collectedMapping.First())).Indent().Indent() +
+                       ("\n" + MappingToLua((Mapping)collectedMapping.First())).Indent().Indent() +
                        ",\n        tags, result)";
             }
 
@@ -52,18 +53,20 @@ namespace AspectedRouting.IO.LuaSkeleton
                 , UnApply(
                     IsFunc(Funcs.StringStringToTags),
                     Assign(collectedMapping))
-            ).Invoke(bare)) {
+            ).Invoke(bare))
+            {
                 AddDep(Funcs.MustMatch.Name);
                 return "must_match(" +
                        "        " + ToLua(order.First(), key) + "," +
-                       ("\n" + MappingToLua((Mapping) collectedMapping.First())).Indent().Indent() +
+                       ("\n" + MappingToLua((Mapping)collectedMapping.First())).Indent().Indent() +
                        ",\n        tags, result)";
             }
 
             if (UnApply(
                 IsFunc(Funcs.MemberOf),
                 Any
-            ).Invoke(bare)) {
+            ).Invoke(bare))
+            {
                 AddDep("memberOf");
                 return "memberOf(funcName, parameters, tags, result)";
             }
@@ -77,7 +80,8 @@ namespace AspectedRouting.IO.LuaSkeleton
                     ).Invoke(bare))
                 {
                     var called = _context.DefinedFunctions[name.First()];
-                    if (called.ProfileInternal) {
+                    if (called.ProfileInternal)
+                    {
                         return called.Name;
                     }
 
@@ -86,9 +90,9 @@ namespace AspectedRouting.IO.LuaSkeleton
                     var usesParams = called.ExpressionImplementation.UsedParameters().Any();
                     if (usesParams)
                     {
-                        return $"{name.First().Replace(".","_")}({ToLua(arg.First())}, parameters)";
+                        return $"{name.First().Replace(".", "_")}({ToLua(arg.First())}, parameters)";
                     }
-                    return $"{name.First().Replace(".","_")}({ToLua(arg.First())})";
+                    return $"{name.First().Replace(".", "_")}({ToLua(arg.First())})";
                 }
             }
             collectedMapping.Clear();
@@ -102,9 +106,10 @@ namespace AspectedRouting.IO.LuaSkeleton
                     UnApply(
                         IsFunc(Funcs.StringStringToTags),
                         Assign(collectedMapping))).Invoke(bare)
-            ) {
-                var mapping = (Mapping) collectedMapping.First();
-                var baseFunc = (Function) dottedFunction.First();
+            )
+            {
+                var mapping = (Mapping)collectedMapping.First();
+                var baseFunc = (Function)dottedFunction.First();
                 AddDep(baseFunc.Name);
                 AddDep("table_to_list");
 
@@ -118,7 +123,8 @@ namespace AspectedRouting.IO.LuaSkeleton
             // The expression might be a function which still expects a string (the value from the tag) as argument
             if (!(bare is Mapping) &&
                 bare.Types.First() is Curry curr &&
-                curr.ArgType.Equals(Typs.String)) {
+                curr.ArgType.Equals(Typs.String))
+            {
                 var applied = new Apply(bare, new Constant(curr.ArgType, ("tags", "\"" + key + "\"")));
                 return ToLua(applied.Optimize(out _), key);
             }
@@ -126,28 +132,33 @@ namespace AspectedRouting.IO.LuaSkeleton
 
             // The expression might consist of multiple nested functions
             var fArgs = bare.DeconstructApply();
-            if (fArgs != null) {
+            if (fArgs != null)
+            {
                 var (f, args) = fArgs.Value;
-                
-                if(f is Constant constant) {
+
+                if (f is Constant constant)
+                {
                     return ConstantToLua(constant);
                 }
-                
-                if (!(f is Function baseFunc)) {
+
+                if (!(f is Function baseFunc))
+                {
                     throw new ArgumentException("Not a function: " + f);
                 }
 
-                if (baseFunc.Name.Equals(Funcs.Id.Name)) {
+                if (baseFunc.Name.Equals(Funcs.Id.Name))
+                {
                     // This is an ugly hack
                     return ToLua(args.First());
                 }
 
-                if (baseFunc.Name.Equals(Funcs.Dot.Name)) {
-                    if (args.Count == 1 )
+                if (baseFunc.Name.Equals(Funcs.Dot.Name))
+                {
+                    if (args.Count == 1)
                     {
                         return ToLua(args[0]);
                     }
-                    
+
                     if (forceFirstArgInDot)
                     {
                         return ToLua(args[0]);
@@ -163,7 +174,8 @@ namespace AspectedRouting.IO.LuaSkeleton
                 AddDep(baseFunc.Name);
 
                 var argExpressions = new List<string>();
-                foreach (var arg in args) {
+                foreach (var arg in args)
+                {
                     argExpressions.Add(ToLua(arg, key));
                 }
 
@@ -172,12 +184,14 @@ namespace AspectedRouting.IO.LuaSkeleton
 
 
             var collected = new List<IExpression>();
-            switch (bare) {
+            switch (bare)
+            {
                 case LuaLiteral lua:
                     return lua.Lua;
                 case FunctionCall fc:
                     var called = _context.DefinedFunctions[fc.CalledFunctionName];
-                    if (called.ProfileInternal) {
+                    if (called.ProfileInternal)
+                    {
                         return called.Name;
                     }
 
@@ -190,12 +204,15 @@ namespace AspectedRouting.IO.LuaSkeleton
                     return MappingToLua(m).Indent();
                 case Function f:
                     var fName = f.Name.TrimStart('$');
-                    if (Funcs.Builtins.ContainsKey(fName)) {
+                    if (Funcs.Builtins.ContainsKey(fName))
+                    {
                         AddDep(f.Name);
                     }
-                    else {
+                    else
+                    {
                         var definedFunc = _context.DefinedFunctions[fName];
-                        if (definedFunc.ProfileInternal) {
+                        if (definedFunc.ProfileInternal)
+                        {
                             return f.Name;
                         }
 
@@ -217,27 +234,31 @@ namespace AspectedRouting.IO.LuaSkeleton
         public string MappingToLua(Mapping m)
         {
             var isConstant = true;
-            var contents = m.StringToResultFunctions.Select(kv => {
-                    var (key, expr) = kv;
-                    var left = "[\"" + key + "\"]";
+            var contents = m.StringToResultFunctions.Select(kv =>
+            {
+                var (key, expr) = kv;
+                var left = "[\"" + key + "\"]";
 
-                    if (Regex.IsMatch(key, "^[a-zA-Z][_a-zA-Z-9]*$")) {
-                        left = key;
-                    }
-
-                    var luaExpr = ToLua(expr, key);
-                    if (luaExpr.Contains("tags")) {
-                        isConstant = false;
-                    }
-
-                    return left + " = " + luaExpr;
+                if (Regex.IsMatch(key, "^[a-zA-Z][_a-zA-Z-9]*$"))
+                {
+                    left = key;
                 }
+
+                var luaExpr = ToLua(expr, key);
+                if (luaExpr.Contains("tags"))
+                {
+                    isConstant = false;
+                }
+
+                return left + " = " + luaExpr;
+            }
             );
             var mapping =
                 "{\n    " +
                 string.Join(",\n    ", contents) +
                 "\n}";
-            if (_staticTables && isConstant) {
+            if (_staticTables && isConstant)
+            {
                 return AddConstant(mapping);
             }
 
@@ -252,7 +273,8 @@ namespace AspectedRouting.IO.LuaSkeleton
         private string ConstantToLua(Constant c)
         {
             var o = c.Get();
-            switch (o) {
+            switch (o)
+            {
                 case LuaLiteral lua:
                     return lua.Lua;
                 case IExpression e:
@@ -268,10 +290,12 @@ namespace AspectedRouting.IO.LuaSkeleton
                 case ValueTuple<string, string> unpack:
                     return unpack.Item1 + "[" + unpack.Item2 + "]";
                 case IEnumerable<object> ls:
-                    var t = ((ListType) c.Types.First()).InnerType;
-                    return "{" + string.Join(", ", ls.Select(obj => {
+                    var t = ((ListType)c.Types.First()).InnerType;
+                    return "{" + string.Join(", ", ls.Select(obj =>
+                    {
                         var objInConstant = new Constant(t, obj);
-                        if (obj is Constant asConstant) {
+                        if (obj is Constant asConstant)
+                        {
                             objInConstant = asConstant;
                         }
 

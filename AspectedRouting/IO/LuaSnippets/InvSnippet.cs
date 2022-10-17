@@ -10,7 +10,7 @@ namespace AspectedRouting.IO.LuaSnippets
         {
 
             var result = Snippets.Convert(lua, assignTo, args[0]);
-            result += "    "+ assignTo +" = 1 / " + assignTo;
+            result += "    " + assignTo + " = 1 / " + assignTo;
             return result;
         }
     }

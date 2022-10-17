@@ -12,7 +12,7 @@ namespace AspectedRouting.Language.Functions
                                                       "It will try the function for the first key (and it's respective value). If the function fails (it gives null), it'll try the next key.\n\n" +
                                                       "E.g. `$firstMatchOf ['maxspeed','highway'] {'maxspeed' --> $parse, 'highway' --> {residential --> 30, tertiary --> 50}}` applied on `{maxspeed=70, highway=tertiary}`" +
                                                       " will yield `70` as that is the first key in the list; `{highway=residential}` will yield `30`.";
-        public override List<string> ArgNames { get; } = new List<string> {"s"};
+        public override List<string> ArgNames { get; } = new List<string> { "s" };
 
         public FirstMatchOf() : base("first_match_of", true,
             new[]
@@ -26,7 +26,7 @@ namespace AspectedRouting.Language.Functions
                 )
             })
         {
-            Funcs.AddBuiltin( this,"firstMatchOf");
+            Funcs.AddBuiltin(this, "firstMatchOf");
         }
 
         private FirstMatchOf(IEnumerable<Type> types) : base("first_match_of", types)
@@ -46,7 +46,7 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var order = ((IEnumerable<object>) arguments[0].Evaluate(c))
+            var order = ((IEnumerable<object>)arguments[0].Evaluate(c))
                 .Select(o =>
                 {
                     if (o is string s)
@@ -55,11 +55,11 @@ namespace AspectedRouting.Language.Functions
                     }
                     else
                     {
-                        return (string) ((IExpression) o).Evaluate(c);
+                        return (string)((IExpression)o).Evaluate(c);
                     }
                 });
             var function = arguments[1];
-            var tags = (Dictionary<string, string>) arguments[2].Evaluate(c);
+            var tags = (Dictionary<string, string>)arguments[2].Evaluate(c);
 
             var singletonDict = new Dictionary<string, string>();
 
@@ -75,7 +75,7 @@ namespace AspectedRouting.Language.Functions
                     continue;
                 }
 
-                return ((List<object>) result).First();
+                return ((List<object>)result).First();
             }
 
             return null;

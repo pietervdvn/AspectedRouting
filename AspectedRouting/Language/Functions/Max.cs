@@ -11,7 +11,7 @@ namespace AspectedRouting.Language.Functions
         public override string Description { get; } =
             "Returns the biggest value in the list. For a list of booleans, this acts as 'or'";
 
-        public override List<string> ArgNames { get; } = new List<string> {"list"};
+        public override List<string> ArgNames { get; } = new List<string> { "list" };
 
         public Max() : base("max", true,
             new[]
@@ -45,7 +45,7 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var ls = ((IEnumerable<object>) arguments[0].Evaluate(c)).Where(o => o != null);
+            var ls = ((IEnumerable<object>)arguments[0].Evaluate(c)).Where(o => o != null);
 
             var expectedType = (Types.First() as Curry).ResultType;
             switch (expectedType)

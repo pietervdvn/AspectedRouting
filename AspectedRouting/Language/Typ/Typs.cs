@@ -30,16 +30,20 @@ namespace AspectedRouting.Language.Typ
             var results = new HashSet<Type>();
 
             allowedTypes = allowedTypes.ToList();
-            foreach (var t0 in types0) {
-                foreach (var allowed in allowedTypes) {
+            foreach (var t0 in types0)
+            {
+                foreach (var allowed in allowedTypes)
+                {
                     var unified = t0.Unify(allowed, reverseSuperSet);
-                    if (unified != null) {
+                    if (unified != null)
+                    {
                         results.Add(unified);
                     }
                 }
             }
 
-            if (results.Any()) {
+            if (results.Any())
+            {
                 return results;
             }
 
@@ -59,12 +63,14 @@ namespace AspectedRouting.Language.Typ
         public static Type Unify(this Type t0, Type t1, bool reverseSuperset = false)
         {
             var table = t0.UnificationTable(t1, reverseSuperset);
-            if (table == null) {
+            if (table == null)
+            {
                 return null;
             }
 
             var subbed = t0.Substitute(table);
-            if (reverseSuperset) {
+            if (reverseSuperset)
+            {
                 return SelectSmallestUnion(t1, subbed);
             }
 
@@ -79,7 +85,8 @@ namespace AspectedRouting.Language.Typ
         /// <returns></returns>
         private static Type SelectSmallestUnion(this Type wider, Type smaller)
         {
-            switch (wider) {
+            switch (wider)
+            {
                 case Var a:
                     return a;
                 case ListType l when smaller is ListType lsmaller:
@@ -93,7 +100,8 @@ namespace AspectedRouting.Language.Typ
                         cWider.ResultType.SelectSmallestUnion(cSmaller.ResultType);
                     return new Curry(arg, result);
                 default:
-                    if (wider.IsSuperSet(smaller) && !smaller.IsSuperSet(wider)) {
+                    if (wider.IsSuperSet(smaller) && !smaller.IsSuperSet(wider))
+                    {
                         return smaller;
                     }
 
@@ -111,7 +119,8 @@ namespace AspectedRouting.Language.Typ
         public static IEnumerable<Type> UnifyAll(this Type t0, IEnumerable<Type> t1)
         {
             var result = t1.Select(t => t0.Unify(t)).ToHashSet();
-            if (result.Any(x => x == null)) {
+            if (result.Any(x => x == null))
+            {
                 return null;
             }
 
@@ -121,7 +130,8 @@ namespace AspectedRouting.Language.Typ
 
         public static Type Substitute(this Type t0, Dictionary<string, Type> substitutions)
         {
-            switch (t0) {
+            switch (t0)
+            {
                 case Var a when substitutions.TryGetValue(a.Name, out var t):
                     return t;
                 case ListType l:
@@ -151,7 +161,8 @@ namespace AspectedRouting.Language.Typ
 
             bool AddSubs(string key, Type valueToAdd)
             {
-                if (substitutionsOn0.TryGetValue(key, out var oldSubs)) {
+                if (substitutionsOn0.TryGetValue(key, out var oldSubs))
+                {
                     return oldSubs.Equals(valueToAdd);
                 }
 
@@ -161,12 +172,15 @@ namespace AspectedRouting.Language.Typ
 
             bool AddAllSubs(Dictionary<string, Type> table)
             {
-                if (table == null) {
+                if (table == null)
+                {
                     return false;
                 }
 
-                foreach (var (key, tp) in table) {
-                    if (!AddSubs(key, tp)) {
+                foreach (var (key, tp) in table)
+                {
+                    if (!AddSubs(key, tp))
+                    {
                         return false;
                     }
                 }
@@ -174,45 +188,54 @@ namespace AspectedRouting.Language.Typ
                 return true;
             }
 
-            switch (t0) {
+            switch (t0)
+            {
                 case Var a:
-                    if (!AddSubs(a.Name, t1)) {
+                    if (!AddSubs(a.Name, t1))
+                    {
                         return null;
                     }
 
                     break;
-                case ListType l0 when t1 is ListType l1: {
-                    var table = l0.InnerType.UnificationTable(l1.InnerType, reverseSupersetRelation);
-                    if (!AddAllSubs(table)) {
-                        return null;
+                case ListType l0 when t1 is ListType l1:
+                    {
+                        var table = l0.InnerType.UnificationTable(l1.InnerType, reverseSupersetRelation);
+                        if (!AddAllSubs(table))
+                        {
+                            return null;
+                        }
+
+                        break;
                     }
 
-                    break;
-                }
+                case Curry curry0 when t1 is Curry curry1:
+                    {
+                        // contravariance for arguments: reversed 
+                        var tableA = curry0.ArgType.UnificationTable(curry1.ArgType, !reverseSupersetRelation);
+                        var tableB = curry0.ResultType.UnificationTable(curry1.ResultType, reverseSupersetRelation);
+                        if (!(AddAllSubs(tableA) && AddAllSubs(tableB)))
+                        {
+                            return null;
+                        }
 
-                case Curry curry0 when t1 is Curry curry1: {
-                    // contravariance for arguments: reversed 
-                    var tableA = curry0.ArgType.UnificationTable(curry1.ArgType, !reverseSupersetRelation);
-                    var tableB = curry0.ResultType.UnificationTable(curry1.ResultType, reverseSupersetRelation);
-                    if (!(AddAllSubs(tableA) && AddAllSubs(tableB))) {
-                        return null;
+                        break;
                     }
-
-                    break;
-                }
 
                 default:
 
-                    if (t1 is Var v) {
+                    if (t1 is Var v)
+                    {
                         AddSubs(v.Name, t0);
                         break;
                     }
 
-                    if (!reverseSupersetRelation && !t0.IsSuperSet(t1)) {
+                    if (!reverseSupersetRelation && !t0.IsSuperSet(t1))
+                    {
                         return null;
                     }
 
-                    if (reverseSupersetRelation && !t1.IsSuperSet(t0)) {
+                    if (reverseSupersetRelation && !t1.IsSuperSet(t0))
+                    {
                         return null;
                     }
 
@@ -227,23 +250,28 @@ namespace AspectedRouting.Language.Typ
             // We do not have to worry about overlapping names, as they should be cleaned before calling this method
 
             bool appliedTransitivity;
-            do {
+            do
+            {
                 appliedTransitivity = false;
                 var keys = substitutionsOn0.Keys.ToList();
-                foreach (var key in keys) {
+                foreach (var key in keys)
+                {
                     var val = substitutionsOn0[key];
                     var usedVars = val.UsedVariables();
                     var isContained = keys.Any(usedVars.Contains);
-                    if (!isContained) {
+                    if (!isContained)
+                    {
                         continue;
                     }
 
                     var newVal = val.Substitute(substitutionsOn0);
-                    if (newVal.Equals(val)) {
+                    if (newVal.Equals(val))
+                    {
                         continue;
                     }
 
-                    if (newVal.UsedVariables().Contains(key) && !newVal.Equals(new Var(key))) {
+                    if (newVal.UsedVariables().Contains(key) && !newVal.Equals(new Var(key)))
+                    {
                         // The substitution contains itself; and it is bigger then itself
                         // This means that $a is substituted by e.g. ($a -> $x), implying an infinite and contradictory type
                         return null;
@@ -260,20 +288,23 @@ namespace AspectedRouting.Language.Typ
         public static HashSet<string> UsedVariables(this Type t0, HashSet<string> addTo = null)
         {
             addTo ??= new HashSet<string>();
-            switch (t0) {
+            switch (t0)
+            {
                 case Var a:
                     addTo.Add(a.Name);
                     break;
-                case ListType l0: {
-                    l0.InnerType.UsedVariables(addTo);
-                    break;
-                }
+                case ListType l0:
+                    {
+                        l0.InnerType.UsedVariables(addTo);
+                        break;
+                    }
 
-                case Curry curry0: {
-                    curry0.ArgType.UsedVariables(addTo);
-                    curry0.ResultType.UsedVariables(addTo);
-                    break;
-                }
+                case Curry curry0:
+                    {
+                        curry0.ArgType.UsedVariables(addTo);
+                        curry0.ResultType.UsedVariables(addTo);
+                        break;
+                    }
             }
 
 
@@ -282,11 +313,13 @@ namespace AspectedRouting.Language.Typ
 
         public static bool IsSuperSet(this Type t0, Type t1)
         {
-            if (t0 is Var || t1 is Var) {
+            if (t0 is Var || t1 is Var)
+            {
                 return true;
             }
 
-            switch (t0) {
+            switch (t0)
+            {
                 case StringType _ when t1 is BoolType _:
                     return true;
                 case DoubleType _ when t1 is PDoubleType _:
@@ -305,10 +338,11 @@ namespace AspectedRouting.Language.Typ
                 case ListType l0 when t1 is ListType l1:
                     return l0.InnerType.IsSuperSet(l1.InnerType);
 
-                case Curry c0 when t1 is Curry c1: {
-                    return c0.ResultType.IsSuperSet(c1.ResultType) &&
-                           c1.ArgType.IsSuperSet(c0.ArgType); // contravariance for arguments: reversed order!
-                }
+                case Curry c0 when t1 is Curry c1:
+                    {
+                        return c0.ResultType.IsSuperSet(c1.ResultType) &&
+                               c1.ArgType.IsSuperSet(c0.ArgType); // contravariance for arguments: reversed order!
+                    }
             }
 
 
@@ -329,7 +363,8 @@ namespace AspectedRouting.Language.Typ
 
             // The substitution table
             var subsTable = new Dictionary<string, Type>();
-            foreach (var v in variablesToRename) {
+            foreach (var v in variablesToRename)
+            {
                 var newValue = Var.Fresh(alreadyUsed);
                 subsTable.Add(v, newValue);
                 alreadyUsed.Add(newValue.Name);
@@ -342,7 +377,8 @@ namespace AspectedRouting.Language.Typ
         public static List<Type> Uncurry(this Type t)
         {
             var args = new List<Type>();
-            while (t is Curry c) {
+            while (t is Curry c)
+            {
                 args.Add(c.ArgType);
                 t = c.ResultType;
             }
@@ -365,12 +401,16 @@ namespace AspectedRouting.Language.Typ
         {
             var widest = new HashSet<Type>();
 
-            foreach (var type0 in t0) {
-                foreach (var type1 in t1) {
+            foreach (var type0 in t0)
+            {
+                foreach (var type1 in t1)
+                {
                     var t = WidestCommonType(type0, type1);
-                    if (t != null) {
+                    if (t != null)
+                    {
                         var (type, subsTable) = t.Value;
-                        if (subsTable != null) {
+                        if (subsTable != null)
+                        {
                             type = type.Substitute(subsTable);
                         }
                         widest.Add(type);
@@ -397,44 +437,54 @@ namespace AspectedRouting.Language.Typ
         {
             // First things first: we try to unify
 
-            if (t0 is Curry c0 && t1 is Curry c1) {
+            if (t0 is Curry c0 && t1 is Curry c1)
+            {
                 var arg = SmallestCommonType(c0.ArgType, c1.ArgType);
                 var result = WidestCommonType(c0.ResultType, c1.ResultType);
-                if (arg == null) {
+                if (arg == null)
+                {
                     return null;
                 }
                 var (argT, subs0) = arg.Value;
 
-                if (result == null) {
+                if (result == null)
+                {
                     return null;
                 }
                 var (resultT, subs1) = result.Value;
                 return (new Curry(argT, resultT), MergeDicts(subs0, subs1));
             }
 
-            
-            if (t0 is Var v) {
-                if (t1 is Var vx) {
-                    if (v.Name == vx.Name) {
+
+            if (t0 is Var v)
+            {
+                if (t1 is Var vx)
+                {
+                    if (v.Name == vx.Name)
+                    {
                         return (t0, null);
                     }
                 }
-                return (t1, new Dictionary<string, Type> {{v.Name, t1}});
+                return (t1, new Dictionary<string, Type> { { v.Name, t1 } });
             }
 
-            if (t1 is Var v1) {
-                return (t0, new Dictionary<string, Type> {{v1.Name, t1}});
+            if (t1 is Var v1)
+            {
+                return (t0, new Dictionary<string, Type> { { v1.Name, t1 } });
             }
-            if (t0 == t1 || t0.Equals(t1)) {
+            if (t0 == t1 || t0.Equals(t1))
+            {
                 return (t0, null);
             }
             var t0IsSuperT1 = t0.IsSuperSet(t1);
             var t1IsSuperT0 = t1.IsSuperSet(t0);
-            if (t0IsSuperT1 && !t1IsSuperT0) {
+            if (t0IsSuperT1 && !t1IsSuperT0)
+            {
                 return (t0, null);
             }
 
-            if (t1IsSuperT0 && !t0IsSuperT1) {
+            if (t1IsSuperT0 && !t0IsSuperT1)
+            {
                 return (t1, null);
             }
 
@@ -444,20 +494,25 @@ namespace AspectedRouting.Language.Typ
         private static Dictionary<string, Type> MergeDicts(Dictionary<string, Type> subs0,
             Dictionary<string, Type> subs1)
         {
-            if (subs0 == null && subs1 == null) {
+            if (subs0 == null && subs1 == null)
+            {
                 return null;
             }
             var subsTable = new Dictionary<string, Type>();
 
             void AddSubs(Dictionary<string, Type> dict)
             {
-                if (dict == null) {
+                if (dict == null)
+                {
                     return;
                 }
-                foreach (var kv in dict) {
-                    if (subsTable.TryGetValue(kv.Key, out var t)) {
+                foreach (var kv in dict)
+                {
+                    if (subsTable.TryGetValue(kv.Key, out var t))
+                    {
                         // We have seen this variable-type-name before... We should check if it matches
-                        if (t.Equals(kv.Value)) {
+                        if (t.Equals(kv.Value))
+                        {
                             // Ok! No problem!
                             // It is already added anyway, so we continue
                             continue;
@@ -467,13 +522,15 @@ namespace AspectedRouting.Language.Typ
                         throw new Exception(t + " != " + kv.Value);
                     }
 
-                    if (kv.Value is Var v) {
-                        if (v.Name == kv.Key) {
+                    if (kv.Value is Var v)
+                    {
+                        if (v.Name == kv.Key)
+                        {
                             // Well, this is a useless substitution...
                             continue;
                         }
                     }
-                    
+
                     subsTable[kv.Key] = kv.Value;
                 }
             }
@@ -481,10 +538,11 @@ namespace AspectedRouting.Language.Typ
             AddSubs(subs0);
             AddSubs(subs1);
 
-            if (!subsTable.Any()) {
+            if (!subsTable.Any())
+            {
                 return null;
             }
-            
+
             return subsTable;
         }
 
@@ -502,41 +560,49 @@ namespace AspectedRouting.Language.Typ
         /// <returns></returns>
         public static (Type, Dictionary<string, Type> substitutionTable)? SmallestCommonType(Type t0, Type t1)
         {
-            if (t0 is Curry c0 && t1 is Curry c1) {
+            if (t0 is Curry c0 && t1 is Curry c1)
+            {
                 var arg = WidestCommonType(c0.ArgType, c1.ArgType);
                 var result = SmallestCommonType(c0.ResultType, c1.ResultType);
-                if (arg == null) {
+                if (arg == null)
+                {
                     return null;
                 }
                 var (argT, subs0) = arg.Value;
 
-                if (result == null) {
+                if (result == null)
+                {
                     return null;
                 }
                 var (resultT, subs1) = result.Value;
                 return (new Curry(argT, resultT), MergeDicts(subs0, subs1));
             }
-            
-            
-            if (t0 is Var v) {
-                return (t1, new Dictionary<string, Type> {{v.Name, t1}});
+
+
+            if (t0 is Var v)
+            {
+                return (t1, new Dictionary<string, Type> { { v.Name, t1 } });
             }
 
-            if (t1 is Var v1) {
-                return (t0, new Dictionary<string, Type> {{v1.Name, t1}});
+            if (t1 is Var v1)
+            {
+                return (t0, new Dictionary<string, Type> { { v1.Name, t1 } });
             }
 
-            if (t0 == t1 || t0.Equals(t1)) {
+            if (t0 == t1 || t0.Equals(t1))
+            {
                 return (t0, null);
             }
-            
+
             var t0IsSuperT1 = t0.IsSuperSet(t1);
             var t1IsSuperT0 = t1.IsSuperSet(t0);
-            if (t0IsSuperT1 && !t1IsSuperT0) {
+            if (t0IsSuperT1 && !t1IsSuperT0)
+            {
                 return (t0, null);
             }
 
-            if (t1IsSuperT0 && !t0IsSuperT1) {
+            if (t1IsSuperT0 && !t0IsSuperT1)
+            {
                 return (t1, null);
             }
 

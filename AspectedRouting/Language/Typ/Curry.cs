@@ -14,8 +14,8 @@ namespace AspectedRouting.Language.Typ
             ArgType = argType;
             ResultType = resultType;
         }
-        
-        
+
+
         private static string ToString(Type argType, Type resultType)
         {
             var arg = argType.ToString();

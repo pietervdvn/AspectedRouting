@@ -37,7 +37,8 @@ namespace AspectedRouting.Language.Expression
         public IExpression PruneTypes(Func<Type, bool> allowedTypes)
         {
             var passedTypes = this.Types.Where(allowedTypes);
-            if (!passedTypes.Any()) {
+            if (!passedTypes.Any())
+            {
                 return null;
             }
 
@@ -72,9 +73,9 @@ namespace AspectedRouting.Language.Expression
 
             if (ArgNames == null)
             {
-                throw new Exception("ArgNames not set for "+Name);
+                throw new Exception("ArgNames not set for " + Name);
             }
-            
+
             foreach (var n in ArgNames)
             {
                 dict[n] = new List<Type>();
@@ -101,7 +102,7 @@ namespace AspectedRouting.Language.Expression
 
             return dict;
         }
-        
+
         public bool Equals(IExpression other)
         {
             if (other is Function f)
@@ -114,7 +115,7 @@ namespace AspectedRouting.Language.Expression
 
         public string Repr()
         {
-            return "Funcs."+this.Name;
+            return "Funcs." + this.Name;
         }
     }
 }

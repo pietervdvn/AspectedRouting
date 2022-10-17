@@ -10,7 +10,7 @@ namespace AspectedRouting.Language.Functions
         public override string Description { get; } =
             "Out of a list of values, gets the smallest value. In case of a list of bools, this acts as `and`. Note that 'null'-values are ignored.";
 
-        public override List<string> ArgNames { get; } = new List<string> {"list"};
+        public override List<string> ArgNames { get; } = new List<string> { "list" };
 
         public Min() : base("min", true,
             new[]
@@ -44,8 +44,8 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var ls = ((IEnumerable<object>) arguments[0].Evaluate(c)).Where(o => o != null);
-            var expectedType = ((Curry) Types.First()).ResultType;
+            var ls = ((IEnumerable<object>)arguments[0].Evaluate(c)).Where(o => o != null);
+            var expectedType = ((Curry)Types.First()).ResultType;
 
             switch (expectedType)
             {
@@ -67,7 +67,7 @@ namespace AspectedRouting.Language.Functions
                             o = e.Evaluate(c);
                         }
 
-                        return (double) o;
+                        return (double)o;
                     }).Min();
                 default:
                     return ls.Select(o =>
@@ -77,7 +77,7 @@ namespace AspectedRouting.Language.Functions
                             o = e.Evaluate(c);
                         }
 
-                        return (int) o;
+                        return (int)o;
                     }).Min();
             }
         }

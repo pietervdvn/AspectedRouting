@@ -33,13 +33,14 @@ namespace AspectedRouting.Language.Expression
             Types = types;
         }
 
-        public FunctionCall(string name, Type type): this(name, new []{type}){
-            
-    }
-
-    public object Evaluate(Context c, params IExpression[] arguments)
+        public FunctionCall(string name, Type type) : this(name, new[] { type })
         {
-            
+
+        }
+
+        public object Evaluate(Context c, params IExpression[] arguments)
+        {
+
             var func = c.GetFunction(_name);
             c = c.WithAspectName(_name);
             return func.Evaluate(c, arguments);
@@ -59,7 +60,8 @@ namespace AspectedRouting.Language.Expression
         public IExpression PruneTypes(Func<Type, bool> allowedTypes)
         {
             var passedTypes = this.Types.Where(allowedTypes);
-            if (!passedTypes.Any()) {
+            if (!passedTypes.Any())
+            {
                 return null;
             }
 

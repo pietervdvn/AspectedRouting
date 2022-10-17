@@ -293,11 +293,11 @@ namespace AspectedRouting.Language.Functions
             if (_o is IEnumerable<IExpression> exprs)
             {
                 return "new Constant(new []{" +
-                       string.Join(",\n  ", exprs.Select(e => e.Repr().Replace("\n","\n  ")))
+                       string.Join(",\n  ", exprs.Select(e => e.Repr().Replace("\n", "\n  ")))
                        + "})";
             }
 
-            return "new Constant(" + (_o?.ToString() ?? null)+ ")";
+            return "new Constant(" + (_o?.ToString() ?? null) + ")";
         }
 
         public void EvaluateAll(Context c, HashSet<IExpression> addTo)

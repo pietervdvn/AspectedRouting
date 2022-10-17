@@ -10,7 +10,7 @@ namespace AspectedRouting.Language.Functions
         public override string Description { get; } =
             "Small utility function, which takes two arguments `a` and `b` and returns `a`. Used extensively to insert freedom";
 
-        public override List<string> ArgNames { get; } = new List<string>{"a","b"};
+        public override List<string> ArgNames { get; } = new List<string> { "a", "b" };
 
         public Const() : base("firstArg", true,
             new[]
@@ -19,7 +19,7 @@ namespace AspectedRouting.Language.Functions
             }
         )
         {
-            Funcs.AddBuiltin(this,"const");
+            Funcs.AddBuiltin(this, "const");
         }
 
         private Const(IEnumerable<Type> types) : base("firstArg", types
@@ -27,7 +27,7 @@ namespace AspectedRouting.Language.Functions
         {
         }
 
-        public override object Evaluate(Context c,params IExpression[] arguments)
+        public override object Evaluate(Context c, params IExpression[] arguments)
         {
             if (arguments.Length == 1)
             {
@@ -35,13 +35,13 @@ namespace AspectedRouting.Language.Functions
             }
 
             var f = arguments[0];
-            var args = new IExpression [arguments.Length - 2];
+            var args = new IExpression[arguments.Length - 2];
             for (var i = 2; i < arguments.Length; i++)
             {
                 args[i - 2] = arguments[i];
             }
 
-            return f.Evaluate(c,args);
+            return f.Evaluate(c, args);
         }
 
         public override IExpression Specialize(IEnumerable<Type> allowedTypes)

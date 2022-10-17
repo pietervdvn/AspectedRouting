@@ -11,7 +11,7 @@ namespace AspectedRouting.Language.Functions
     public class IsNull : Function
     {
         public override string Description { get; } = "Returns true if the given argument is null";
-        public override List<string> ArgNames { get; } = new List<string>{"a"};
+        public override List<string> ArgNames { get; } = new List<string> { "a" };
 
         public IsNull() : base("is_null", true,
             new[]
@@ -38,7 +38,7 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var arg = (string) arguments[0].Evaluate(c);
+            var arg = (string)arguments[0].Evaluate(c);
             if (arg == null)
             {
                 return "yes";

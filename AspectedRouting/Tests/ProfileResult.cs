@@ -20,32 +20,35 @@ namespace AspectedRouting.Tests
 
         private static string str(string s)
         {
-            if (s == null) {
+            if (s == null)
+            {
                 return "<null>";
             }
 
-            if (s == "") {
+            if (s == "")
+            {
                 return "<empty string>";
             }
 
             return s;
-        } 
-        
+        }
+
         public override string ToString()
         {
 
             return string.Join("\n  ",
-                "  access "+str(Access),
-                "oneway "+str(Oneway),
-                "speed "+Speed,
-                "priority "+Priority,
-                "because \n  "+str(PriorityExplanation)
+                "  access " + str(Access),
+                "oneway " + str(Oneway),
+                "speed " + Speed,
+                "priority " + Priority,
+                "because \n  " + str(PriorityExplanation)
                 );
         }
 
         public override bool Equals(object? obj)
         {
-            if (!(obj is ProfileResult other)) {
+            if (!(obj is ProfileResult other))
+            {
                 return false;
             }
             return other.Access == this.Access && other.Oneway == this.Oneway && other.Priority == this.Priority && other.Speed == this.Speed;

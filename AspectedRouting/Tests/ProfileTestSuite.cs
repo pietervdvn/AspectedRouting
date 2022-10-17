@@ -98,7 +98,7 @@ namespace AspectedRouting.Tests
                         {
                             if (i < vals.Count && !string.IsNullOrEmpty(vals[i]))
                             {
-                                tags[keys[i]] = vals[i].Trim(new []{'\"'}).Replace("\"","\\\"");
+                                tags[keys[i]] = vals[i].Trim(new[] { '\"' }).Replace("\"", "\\\"");
                             }
                         }
 
@@ -140,10 +140,10 @@ namespace AspectedRouting.Tests
 
         public bool RunTest(Context c, int i, ProfileResult expected, Dictionary<string, string> tags)
         {
-            void Err(string message, object exp, object act)
+            void Err(string message, object exp, object act, string extra = "")
             {
                 Console.WriteLine(
-                    $"[{Profile.Name}.{BehaviourName}]: Test on line {i + 1} failed: {message}; expected {exp} but got {act}\n    {{{tags.Pretty()}}}");
+                    $"[{Profile.Name}.{BehaviourName}]: Test on line {i + 1} failed: {message}: expected {exp} but got {act};\n{extra}\n    {{{tags.Pretty()}}}");
             }
 
             var actual = Profile.Run(c, BehaviourName, tags);
@@ -178,9 +178,10 @@ namespace AspectedRouting.Tests
 
             if (Math.Abs(actual.Priority - expected.Priority) > 0.0001)
             {
-                Err($"weight incorrect. Calculation is {string.Join(" + ", actual.PriorityExplanation)}",
+                Err($"weight incorrect",
                     expected.Priority,
-                    actual.Priority);
+                    actual.Priority,
+                    $"Calculation is \n{actual.PriorityExplanation}");
                 success = false;
             }
 

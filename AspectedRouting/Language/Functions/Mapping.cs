@@ -54,7 +54,7 @@ namespace AspectedRouting.Language.Functions
 
 
             var newFunctions = new Dictionary<string, IExpression>();
-            var functionType = unified.Select(c => ((Curry) c).ResultType);
+            var functionType = unified.Select(c => ((Curry)c).ResultType);
             var enumerable = functionType.ToList();
 
             foreach (var (k, expr) in StringToResultFunctions)
@@ -79,22 +79,24 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            
+
             var s = arguments[0].Evaluate(c);
             while (s is Constant constant)
             {
                 s = constant.Evaluate(c);
             }
-            
 
-            var key = (string) s;
+
+            var key = (string)s;
             var otherARgs = arguments.ToList().GetRange(1, arguments.Length - 1);
-            if (!StringToResultFunctions.ContainsKey(key)) { // This is really roundabout, but it has to be
+            if (!StringToResultFunctions.ContainsKey(key))
+            { // This is really roundabout, but it has to be
                 return null;
             }
 
             var resultFunction = StringToResultFunctions[key];
-            if (resultFunction == null) {
+            if (resultFunction == null)
+            {
                 return null;
             }
 

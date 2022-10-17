@@ -22,7 +22,7 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var arg = ((IEnumerable<object>) arguments[0].Evaluate(c)).Select(o => (string) o);
+            var arg = ((IEnumerable<object>)arguments[0].Evaluate(c)).Select(o => (string)o);
 
 
             if (arg.Any(str => str == null || str.Equals("no") || str.Equals("false")))

@@ -9,7 +9,7 @@ namespace AspectedRouting.Language.Functions
         public override string Description { get; } =
             "Given a list of values, checks if the argument is contained in the list.";
 
-        public override List<string> ArgNames { get; } = new List<string>{"list","a"};
+        public override List<string> ArgNames { get; } = new List<string> { "list", "a" };
 
         public ContainedIn() : base("containedIn", true,
             new[]
@@ -30,7 +30,7 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var list = (IEnumerable<IExpression>) arguments[0].Evaluate(c);
+            var list = (IEnumerable<IExpression>)arguments[0].Evaluate(c);
             var arg = arguments[1];
 
             var result = new List<object>();

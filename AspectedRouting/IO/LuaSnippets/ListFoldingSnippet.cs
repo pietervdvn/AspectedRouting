@@ -21,7 +21,7 @@ namespace AspectedRouting.IO.LuaSnippets
 
         public override string Convert(LuaSkeleton.LuaSkeleton lua, string assignTo, List<IExpression> args)
         {
-            
+
             // Multiply multiplies a list of values - we thus have to handle _each_ arg
             // Note: we get a single argument which is an expression resulting in a list of values
 
@@ -78,7 +78,7 @@ namespace AspectedRouting.IO.LuaSnippets
             {
                 // Print a 'listDot', assume 'tags' is the applied argument
                 var arg = new List<IExpression>();
-               
+
                 var listDotArgs = new List<IExpression>();
                 if (args.Count == 1 && UnApply(
                         UnApply(IsFunc(Funcs.ListDot),
@@ -130,13 +130,13 @@ namespace AspectedRouting.IO.LuaSnippets
                     return result;
                 }
             }
-            
-            
-            
-            
-                   {
-                       
-               
+
+
+
+
+            {
+
+
                 var constantArgs = new List<Constant>();
                 if (args.Count == 1 && IsConstant(constantArgs).Invoke(args[0]))
                 {
@@ -161,10 +161,10 @@ namespace AspectedRouting.IO.LuaSnippets
                 }
             }
 
-      
+
 
             Console.Error.WriteLine("ListFoldingSnippet encountered an unsupported expression");
-            
+
             throw new NotImplementedException();
         }
 
@@ -188,9 +188,11 @@ namespace AspectedRouting.IO.LuaSnippets
                     IsFunc(Funcs.StringStringToTags),
                     IsMapping(mappings)
                 )
-            ).Invoke(app)) {
+            ).Invoke(app))
+            {
                 var mapping = mappings.First();
-                if (mapping.StringToResultFunctions.Count == 1) {
+                if (mapping.StringToResultFunctions.Count == 1)
+                {
                     var kv = mapping.StringToResultFunctions.ToList().First();
                     return (kv.Key, kv.Value);
                 }

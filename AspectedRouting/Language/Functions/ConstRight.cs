@@ -6,10 +6,11 @@ using Type = AspectedRouting.Language.Typ.Type;
 namespace AspectedRouting.Language.Functions
 {
     public class ConstRight : Function
-    {        public override string Description { get; } =
-            "Small utility function, which takes two arguments `a` and `b` and returns `b`. Used extensively to insert freedom";
+    {
+        public override string Description { get; } =
+       "Small utility function, which takes two arguments `a` and `b` and returns `b`. Used extensively to insert freedom";
 
-        public override List<string> ArgNames { get; } = new List<string>{"a","b"};
+        public override List<string> ArgNames { get; } = new List<string> { "a", "b" };
 
         public ConstRight() : base("constRight", true,
             new[]
@@ -25,7 +26,7 @@ namespace AspectedRouting.Language.Functions
         {
         }
 
-        public override object Evaluate(Context c,params IExpression[] arguments)
+        public override object Evaluate(Context c, params IExpression[] arguments)
         {
             var argsFor1 = new IExpression[arguments.Length - 2];
             for (var i = 2; i < arguments.Length; i++)

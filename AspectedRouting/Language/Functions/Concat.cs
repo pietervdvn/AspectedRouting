@@ -7,7 +7,7 @@ namespace AspectedRouting.Language.Functions
     public class Concat : Function
     {
         public override string Description { get; } = "Concatenates two strings";
-        public override List<string> ArgNames { get; } = new List<string>{"a","b"};
+        public override List<string> ArgNames { get; } = new List<string> { "a", "b" };
         public Concat() : base("concat", true,
             new[]
             {
@@ -33,8 +33,8 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var arg0 = (string) arguments[0].Evaluate(c);
-            var arg1 = (string) arguments[1].Evaluate(c);
+            var arg0 = (string)arguments[0].Evaluate(c);
+            var arg1 = (string)arguments[1].Evaluate(c);
             return arg0 + arg1;
         }
     }

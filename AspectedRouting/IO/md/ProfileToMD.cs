@@ -19,7 +19,8 @@ namespace AspectedRouting.IO.md
         public void AddTitle(string title, int level)
         {
             var str = "";
-            for (var i = 0; i < level; i++) {
+            for (var i = 0; i < level; i++)
+            {
                 str += "#";
             }
 
@@ -53,7 +54,8 @@ namespace AspectedRouting.IO.md
             _c = c.WithAspectName(behaviour);
             _c.DefinedFunctions["speed"] = new AspectMetadata(profile.Speed, "speed", "The speed this vehicle is going",
                 "", "km/h", "", true);
-            if (!profile.Behaviours.ContainsKey(behaviour)) {
+            if (!profile.Behaviours.ContainsKey(behaviour))
+            {
                 throw new ArgumentException("Profile does not contain behaviour " + behaviour);
             }
         }
@@ -70,11 +72,13 @@ namespace AspectedRouting.IO.md
             bool nullOnSame = false)
         {
             var profile = _profile.Run(_c, _behaviour, tags);
-            if (!reference.HasValue) {
+            if (!reference.HasValue)
+            {
                 return "| " + msg + "    | " + profile.Speed + " | " + profile.Priority + " | ";
             }
 
-            if (reference.Equals(profile) && nullOnSame) {
+            if (reference.Equals(profile) && nullOnSame)
+            {
                 return null;
             }
 
@@ -90,26 +94,33 @@ namespace AspectedRouting.IO.md
             var b = _profile.Behaviours[_behaviour];
 
             var tableEntries = new List<string>();
-            foreach (var (key, vals) in usedTags) {
+            foreach (var (key, vals) in usedTags)
+            {
                 var values = vals;
-                if (values.Count == 0 && key == "maxspeed") {
+                if (values.Count == 0 && key == "maxspeed")
+                {
                     tableEntries.Add($" | {key}=* (example values below)");
                     values = new HashSet<string> {
                         "20", "30", "50", "70", "90", "120", "150"
                     };
                 }
 
-                if (values.Count == 0) {
+                if (values.Count == 0)
+                {
                     tableEntries.Add($" | {key}=*");
                 }
 
-                if (values.Count > 0) {
-                    foreach (var value in values) {
-                        var tags = new Dictionary<string, string> {
+                if (values.Count > 0)
+                {
+                    foreach (var value in values)
+                    {
+                        var tags = new Dictionary<string, string>
+                        {
                             [key] = value
                         };
                         var entry = TableEntry($"{key}={value} ", tags, reference);
-                        if (entry == null) {
+                        if (entry == null)
+                        {
                             continue;
                         }
 
@@ -125,13 +136,15 @@ namespace AspectedRouting.IO.md
 
         public Dictionary<string, IExpression> TagsWithPriorityInfluence()
         {
-          
+
             var p = _profile;
             var parameters = _profile.ParametersFor(_behaviour);
             var withInfluence = new Dictionary<string, IExpression>();
 
-            foreach (var kv in p.Priority) {
-                if (parameters[kv.Key].Equals(0.0) || parameters[kv.Key].Equals(0)) {
+            foreach (var kv in p.Priority)
+            {
+                if (parameters[kv.Key].Equals(0.0) || parameters[kv.Key].Equals(0))
+                {
                     continue;
                 }
 
@@ -149,23 +162,28 @@ namespace AspectedRouting.IO.md
 
             var overridenParams = new HashSet<string>();
             var paramValues = new Dictionary<string, object>();
-            foreach (var kv in p.DefaultParameters) {
+            foreach (var kv in p.DefaultParameters)
+            {
                 paramValues[kv.Key] = kv.Value.Evaluate(_c);
             }
 
-            foreach (var kv in b) {
+            foreach (var kv in b)
+            {
                 paramValues[kv.Key] = kv.Value.Evaluate(_c);
                 overridenParams.Add(kv.Key);
             }
 
-            var mainFormulaParts = p.Priority.Select(delegate(KeyValuePair<string, IExpression> kv) {
+            var mainFormulaParts = p.Priority.Select(delegate (KeyValuePair<string, IExpression> kv)
+            {
                 var key = kv.Key;
                 var param = paramValues[key];
-                if (param.Equals(0) || param.Equals(0.0)) {
+                if (param.Equals(0) || param.Equals(0.0))
+                {
                     return "";
                 }
 
-                if (overridenParams.Contains(key)) {
+                if (overridenParams.Contains(key))
+                {
                     param = "**" + param + "**";
                 }
 
@@ -186,14 +204,16 @@ namespace AspectedRouting.IO.md
 
             md.Add(p.Description);
 
-            if (b.ContainsKey("description")) {
+            if (b.ContainsKey("description"))
+            {
                 md.Add(b["description"].Evaluate(_c).ToString());
             }
 
 
             md.Add("This profile is calculated as following (non-default keys are bold):", MainFormula());
 
-            var residentialTags = new Dictionary<string, string> {
+            var residentialTags = new Dictionary<string, string>
+            {
                 ["highway"] = "residential"
             };
 
@@ -204,7 +224,7 @@ namespace AspectedRouting.IO.md
             md.AddTitle("Tags influencing priority", 2);
             md.Add(
                 "Priority is what influences which road to take. The routeplanner will search a way where `1/priority` is minimal.");
-            addTagsTable(reference,  TagsWithPriorityInfluence().Values.PossibleTagsRecursive(_c));
+            addTagsTable(reference, TagsWithPriorityInfluence().Values.PossibleTagsRecursive(_c));
 
             md.AddTitle("Tags influencing speed", 2);
             md.Add(

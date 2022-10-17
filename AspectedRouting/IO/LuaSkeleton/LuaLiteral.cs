@@ -34,7 +34,8 @@ namespace AspectedRouting.IO.LuaSkeleton
         public IExpression PruneTypes(System.Func<Type, bool> allowedTypes)
         {
             var passed = Types.Where(allowedTypes);
-            if (passed.Any()) {
+            if (passed.Any())
+            {
                 return new LuaLiteral(passed, Lua);
             }
 
@@ -51,7 +52,7 @@ namespace AspectedRouting.IO.LuaSkeleton
         {
             f(this);
         }
-        
+
         public bool Equals(IExpression other)
         {
             if (other is LuaLiteral ll)
@@ -66,9 +67,9 @@ namespace AspectedRouting.IO.LuaSkeleton
         {
             if (this.Types.Count() == 1 && this.Types.First() == Typs.Tags)
             {
-                 return $"new LuaLiteral(Typs.Tags, \"{this.Lua}\")";
-            } 
-            
+                return $"new LuaLiteral(Typs.Tags, \"{this.Lua}\")";
+            }
+
             return $"new LuaLiteral(\"{this.Lua}\")";
         }
     }

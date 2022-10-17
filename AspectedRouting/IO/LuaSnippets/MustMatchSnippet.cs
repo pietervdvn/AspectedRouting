@@ -17,17 +17,19 @@ namespace AspectedRouting.IO.LuaSnippets
             var result = "";
             var neededKeys = lua.FreeVar("neededKeys");
             var tags = "";
-            if (tagsExpr is LuaLiteral literal) {
+            if (tagsExpr is LuaLiteral literal)
+            {
                 tags = literal.Lua;
             }
-            else {
-               tags =  lua.FreeVar("tags");
-               result += $"local {tags}";
-               result += Snippets.Convert(lua, tags, tagsExpr);
+            else
+            {
+                tags = lua.FreeVar("tags");
+                result += $"local {tags}";
+                result += Snippets.Convert(lua, tags, tagsExpr);
 
             }
-          
-             
+
+
             result += $"local {neededKeys}\n";
             result += Snippets.Convert(lua, neededKeys, neededKeysExpr);
             var key = lua.FreeVar("key");
@@ -36,7 +38,7 @@ namespace AspectedRouting.IO.LuaSnippets
             result += $"   local {value} = {tags}[{key}]\n";
             result += $"   if ({value} == nil) then\n";
             result += $"       -- The value is nil, so mustmatch probably fails...\n";
-            
+
             throw new System.NotImplementedException();
         }
     }

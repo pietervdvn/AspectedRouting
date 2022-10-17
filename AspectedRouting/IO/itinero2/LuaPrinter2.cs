@@ -64,7 +64,7 @@ namespace AspectedRouting.IO.itinero2
                 };
 
             var testPrinter = new LuaTestPrinter(_skeleton,
-                new List<string> {"unitTestProfile2"});
+                new List<string> { "unitTestProfile2" });
             var tests = testPrinter.GenerateFullTestSuite(
                 _behaviourTestSuite.ToList(),
                 new List<AspectTestSuite>(),

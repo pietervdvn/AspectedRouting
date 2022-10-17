@@ -10,7 +10,7 @@ namespace AspectedRouting.Language.Functions
         public override string Description { get; } =
             "Multiplies all the values in a given list. On a list of booleans, this acts as 'and' or 'all', as `false` and `no` are interpreted as zero. Null values are ignored and thus considered to be `one`";
 
-        public override List<string> ArgNames { get; } = new List<string> {"list"};
+        public override List<string> ArgNames { get; } = new List<string> { "list" };
 
 
         public Multiply() : base("multiply", true,
@@ -43,8 +43,8 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var ls = ((IEnumerable<object>) arguments[0].Evaluate(c)).Where(o => o != null);
-            var expectedType = ((Curry) Types.First()).ResultType;
+            var ls = ((IEnumerable<object>)arguments[0].Evaluate(c)).Where(o => o != null);
+            var expectedType = ((Curry)Types.First()).ResultType;
 
 
             switch (expectedType)
@@ -81,7 +81,7 @@ namespace AspectedRouting.Language.Functions
                             o = e.Evaluate(c);
                         }
 
-                        mult *= (double) o;
+                        mult *= (double)o;
                     }
 
                     return mult;
@@ -95,7 +95,7 @@ namespace AspectedRouting.Language.Functions
                             o = e.Evaluate(c);
                         }
 
-                        multI *= (int) o;
+                        multI *= (int)o;
                     }
 
                     return multI;

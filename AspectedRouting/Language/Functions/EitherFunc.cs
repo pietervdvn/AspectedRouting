@@ -18,7 +18,7 @@ namespace AspectedRouting.Language.Functions
             "The type system is then able to figure out which implementation is needed an discards the unneeded implementations.\n\n" +
             "Disclaimer: _you should never ever need this in your profiles_";
 
-        public override List<string> ArgNames { get; } = new List<string>{"f","g","a"};
+        public override List<string> ArgNames { get; } = new List<string> { "f", "g", "a" };
         private static Var a = new Var("a");
         private static Var b = new Var("b");
         private static Var c = new Var("c");
@@ -53,7 +53,7 @@ namespace AspectedRouting.Language.Functions
         {
         }
 
-        public override object Evaluate(Context _,params IExpression[] arguments)
+        public override object Evaluate(Context _, params IExpression[] arguments)
         {
             throw new ArgumentException("EitherFunc not sufficiently specialized");
         }

@@ -10,7 +10,7 @@ namespace AspectedRouting.Language.Functions
             "Listdot takes a list of functions `[f, g, h]` and and an argument `a`. It applies the argument on every single function." +
             "It conveniently lifts the argument out of the list.";
 
-        public override List<string> ArgNames { get; } = new List<string>{"list","a"};
+        public override List<string> ArgNames { get; } = new List<string> { "list", "a" };
 
         public ListDot() : base("listDot", true,
             new[]
@@ -32,7 +32,7 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var listOfFuncs = (IEnumerable<IExpression>) arguments[0].Evaluate(c);
+            var listOfFuncs = (IEnumerable<IExpression>)arguments[0].Evaluate(c);
             var arg = arguments[1];
 
             var result = new List<object>();

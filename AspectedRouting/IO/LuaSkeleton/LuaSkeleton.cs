@@ -33,7 +33,7 @@ namespace AspectedRouting.IO.LuaSkeleton
 
         public Context Context => _context;
 
-        public LuaSkeleton(Context context, bool useSnippets,  bool staticTables = false)
+        public LuaSkeleton(Context context, bool useSnippets, bool staticTables = false)
         {
             _context = context;
             _useSnippets = useSnippets;
@@ -42,12 +42,14 @@ namespace AspectedRouting.IO.LuaSkeleton
 
         internal void AddDep(string name)
         {
-            if (name.StartsWith("mapping")) {
+            if (name.StartsWith("mapping"))
+            {
                 Console.Error.WriteLine(">>>");
                 throw new Exception("A mapping was added as dependency - this is a bug");
             }
 
-            if (name.Contains("stringToTags")) {
+            if (name.Contains("stringToTags"))
+            {
                 AddDep("table_to_list");
             }
             _dependencies.Add(name);
@@ -66,11 +68,14 @@ namespace AspectedRouting.IO.LuaSkeleton
         public void AddDependenciesFor(IExpression e)
         {
             var (_, functionNames) = e.InList().DirectlyAndInderectlyCalled(_context);
-            foreach (var functionName in functionNames) {
-                if (_context.DefinedFunctions.TryGetValue(functionName, out var aspectMeta)) {
+            foreach (var functionName in functionNames)
+            {
+                if (_context.DefinedFunctions.TryGetValue(functionName, out var aspectMeta))
+                {
                     AddFunction(aspectMeta);
                 }
-                else {
+                else
+                {
                     AddDep(functionName);
                 }
             }
@@ -80,12 +85,15 @@ namespace AspectedRouting.IO.LuaSkeleton
         {
             var imps = new List<string>();
 
-            foreach (var name in _dependencies) {
+            foreach (var name in _dependencies)
+            {
                 var path = $"IO/lua/{name}.lua";
-                if (File.Exists(path)) {
+                if (File.Exists(path))
+                {
                     imps.Add(File.ReadAllText(path));
                 }
-                else {
+                else
+                {
                     throw new FileNotFoundException(path);
                 }
             }
@@ -107,7 +115,8 @@ namespace AspectedRouting.IO.LuaSkeleton
         private readonly Dictionary<string, uint> counters = new Dictionary<string, uint>();
         public string FreeVar(string key)
         {
-            if (!counters.ContainsKey(key)) {
+            if (!counters.ContainsKey(key))
+            {
                 counters[key] = 0;
                 return key;
             }

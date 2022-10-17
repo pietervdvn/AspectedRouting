@@ -16,7 +16,8 @@ namespace AspectedRouting.IO.LuaSnippets
             var cond = args[0].Optimize(out _);
             var ifTrue = args[1];
             IExpression ifElse = null;
-            if (args.Count == 3) {
+            if (args.Count == 3)
+            {
                 ifElse = args[2];
             }
 
@@ -32,9 +33,9 @@ namespace AspectedRouting.IO.LuaSnippets
                     if (fa.First().ToString() == ifElse.ToString())
                     {
                         var result = "";
-                        
+
                         // We calculate the value that we need
-                        result += Snippets.Convert(lua,assignTo , ifElse)+"\n";
+                        result += Snippets.Convert(lua, assignTo, ifElse) + "\n";
                         result += "if (" + assignTo + " == nil) then\n";
                         result += "    " + Snippets.Convert(lua, assignTo, ifTrue).Indent();
                         result += "end\n";
@@ -48,14 +49,15 @@ namespace AspectedRouting.IO.LuaSnippets
             {
                 var c = lua.FreeVar("cond");
                 var result = "";
-                result += "local " + c+"\n";
-                
-                var isString = cond.Types.First().Equals(Typs.String);
-                result += Snippets.Convert(lua, c, cond)+"\n";
-                result += $"if ( {c} or {c} == \"yes\" ) then \n";
-                result += "    " + Snippets.Convert(lua, assignTo, ifTrue).Indent() ;
+                result += "local " + c + "\n";
 
-                if (ifElse != null) {
+                var isString = cond.Types.First().Equals(Typs.String);
+                result += Snippets.Convert(lua, c, cond) + "\n";
+                result += $"if ( {c} or {c} == \"yes\" ) then \n";
+                result += "    " + Snippets.Convert(lua, assignTo, ifTrue).Indent();
+
+                if (ifElse != null)
+                {
                     result += "else\n";
                     result += "    " + Snippets.Convert(lua, assignTo, ifElse).Indent();
                 }

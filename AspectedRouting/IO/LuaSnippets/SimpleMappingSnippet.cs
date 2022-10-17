@@ -26,9 +26,11 @@ namespace AspectedRouting.IO.LuaSnippets
             var vLua = new LuaLiteral(Typs.String, v);
 
             var mappings = new List<string>();
-            foreach (var kv in _mapping.StringToResultFunctions) {
+            foreach (var kv in _mapping.StringToResultFunctions)
+            {
                 var f = kv.Value;
-                if (f.Types.First() is Curry) {
+                if (f.Types.First() is Curry)
+                {
                     f = f.Apply(vLua);
                 }
                 mappings.Add("if (" + v + " == \"" + kv.Key + "\") then\n    " + assignTo + " = " + lua.ToLua(f));

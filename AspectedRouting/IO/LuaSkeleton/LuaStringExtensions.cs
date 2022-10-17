@@ -6,7 +6,7 @@ namespace AspectedRouting.IO.itinero1
 {
     public static class LuaStringExtensions
     {
-        
+
         public static string ToLuaTable(this Dictionary<string, string> tags)
         {
             var contents = tags.Select(kv =>

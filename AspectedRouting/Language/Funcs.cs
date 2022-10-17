@@ -137,7 +137,7 @@ namespace AspectedRouting.Language
                 }
             }
 
-            return e.Specialize(new[] {smallest});
+            return e.Specialize(new[] { smallest });
         }
 
         public static IExpression Apply(this IExpression function, IEnumerable<IExpression> args)

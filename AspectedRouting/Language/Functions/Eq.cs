@@ -5,8 +5,9 @@ using AspectedRouting.Language.Typ;
 namespace AspectedRouting.Language.Functions
 {
     public class Eq : Function
-    {  public override string Description { get; } = "Returns 'yes' if both values _are_ the same";
-        public override List<string> ArgNames { get; } = new List<string>{"a","b"};
+    {
+        public override string Description { get; } = "Returns 'yes' if both values _are_ the same";
+        public override List<string> ArgNames { get; } = new List<string> { "a", "b" };
         public Eq() : base("eq", true,
             new[]
             {

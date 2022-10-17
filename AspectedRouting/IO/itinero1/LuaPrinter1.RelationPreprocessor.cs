@@ -7,7 +7,7 @@ namespace AspectedRouting.IO.itinero1
 {
     public partial class LuaPrinter1
     {
-        
+
         private (string implementation, HashSet<string> extraKeys) GenerateMembershipPreprocessor()
         {
             // Extra keys are the names of introduced tag-keys, e.g. '_relation:bicycle_fastest:cycle_highway'
@@ -44,7 +44,7 @@ namespace AspectedRouting.IO.itinero1
                 "    legacy_relation_preprocessor(relation_tags, result)"
             };
             _skeleton.AddDep("legacy");
-            
+
             foreach (var (calledInFunction, expr) in memberships)
             {
                 func.Add($"\n\n  -- {calledInFunction} ---");

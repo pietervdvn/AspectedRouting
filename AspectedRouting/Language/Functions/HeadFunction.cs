@@ -15,32 +15,38 @@ namespace AspectedRouting.Language.Functions
                     new Curry(new Var("b"), new ListType(new Var("a"))),
                     new Curry(new Var("b"), new Var("a")))
             }
-        ) { }
+        )
+        { }
 
         private HeadFunction(IEnumerable<Type> unified) : base("head", unified) { }
 
         public override string Description { get; } =
             "Select the first non-null value of a list; returns 'null' on empty list or on null";
 
-        public override List<string> ArgNames { get; } = new List<string> {"ls"};
+        public override List<string> ArgNames { get; } = new List<string> { "ls" };
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
             object o = arguments[0];
-            if (o is Apply app) {
+            if (o is Apply app)
+            {
                 o = app.Evaluate(c, arguments.SubArray(1));
             }
 
-            while (o is IExpression e) {
+            while (o is IExpression e)
+            {
                 o = e.Evaluate(c);
             }
 
-            if (!(o is IEnumerable<object> ls)) {
+            if (!(o is IEnumerable<object> ls))
+            {
                 return null;
             }
 
-            foreach (var v in ls) {
-                if (v != null) {
+            foreach (var v in ls)
+            {
+                if (v != null)
+                {
                     return v;
                 }
             }
@@ -51,7 +57,8 @@ namespace AspectedRouting.Language.Functions
         public override IExpression Specialize(IEnumerable<Type> allowedTypes)
         {
             var unified = Types.SpecializeTo(allowedTypes);
-            if (unified == null) {
+            if (unified == null)
+            {
                 return null;
             }
 

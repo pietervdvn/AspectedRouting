@@ -10,7 +10,7 @@ namespace AspectedRouting.Language.Typ
                 Typs.AddBuiltin(this);
 
             }
-            
+
         }
 
         public string Name { get; }

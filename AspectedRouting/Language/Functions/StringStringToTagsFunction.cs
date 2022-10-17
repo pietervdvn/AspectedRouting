@@ -10,7 +10,7 @@ namespace AspectedRouting.Language.Functions
             "*stringToTags* converts a function `string -> string -> a` into a function `tags -> [a]`. " +
             "It is used internally to convert a hash of functions. `stringToTags` shouldn't be needed when implementing profiles.";
 
-        public override List<string> ArgNames { get; } = new List<string> {"f", "tags"};
+        public override List<string> ArgNames { get; } = new List<string> { "f", "tags" };
 
         private static readonly Type _baseFunction =
             Curry.ConstructFrom(new Var("a"), Typs.String, Typs.String);
@@ -33,8 +33,9 @@ namespace AspectedRouting.Language.Functions
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
             var f = arguments[0];
-            var tags = (Dictionary<string, string>) arguments[1].Evaluate(c);
-            if (tags == null) {
+            var tags = (Dictionary<string, string>)arguments[1].Evaluate(c);
+            if (tags == null)
+            {
                 return null;
             }
             var result = new List<object>();

@@ -42,7 +42,8 @@ namespace AspectedRouting.Language.Functions
         public override IExpression Specialize(IEnumerable<Type> allowedTypes)
         {
             var unified = Types.SpecializeTo(allowedTypes);
-            if (unified == null) {
+            if (unified == null)
+            {
                 return null;
             }
 
@@ -51,43 +52,50 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var neededKeys = (IEnumerable<object>) arguments[0].Evaluate(c);
+            var neededKeys = (IEnumerable<object>)arguments[0].Evaluate(c);
             var function = arguments[1];
 
-            var tags = (Dictionary<string, string>) arguments[2].Evaluate(c);
+            var tags = (Dictionary<string, string>)arguments[2].Evaluate(c);
 
-            foreach (var oo in neededKeys) {
+            foreach (var oo in neededKeys)
+            {
                 var o = oo;
-                while (o is IExpression e) {
+                while (o is IExpression e)
+                {
                     o = e.Evaluate(c);
                 }
 
-                if (!(o is string tagKey)) {
+                if (!(o is string tagKey))
+                {
                     continue;
                 }
 
-                if (!tags.ContainsKey(tagKey)) {
+                if (!tags.ContainsKey(tagKey))
+                {
                     // A required key is missing
                     // Normally, we return no; but there is a second chance
                     // IF the mapping returns 'yes' on null, we make an exception and ignore it
                     var applied = function.Evaluate(c, new Constant(new Dictionary<string, string> {
                         {tagKey, ""}
                     }));
-                    if (applied == null) {
+                    if (applied == null)
+                    {
                         return "no";
                     }
-                    if (applied.Equals("yes") || (applied is IEnumerable<object> l && l.Count() > 0 && l.ToList()[0].Equals("yes")) ) {
+                    if (applied.Equals("yes") || (applied is IEnumerable<object> l && l.Count() > 0 && l.ToList()[0].Equals("yes")))
+                    {
                         continue; // We ignore the absence of the key
                     }
                     return "no";
                 }
             }
 
-            var result = (IEnumerable<object>) function.Evaluate(c, new Constant(tags));
+            var result = (IEnumerable<object>)function.Evaluate(c, new Constant(tags));
 
             if (result.Any(o =>
                 o == null ||
-                o is string s && (s.Equals("no") || s.Equals("false")))) {
+                o is string s && (s.Equals("no") || s.Equals("false"))))
+            {
                 // The mapped function is executed. If the mapped function gives 'no', null or 'false' for any value, "no" is returned
                 return "no";
             }

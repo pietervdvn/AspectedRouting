@@ -11,7 +11,7 @@ namespace AspectedRouting.Language.Functions
         public override string Description { get; } =
             "Returns 'yes' if the second argument is bigger then the first argument. (Works great in combination with $dot)";
 
-        public override List<string> ArgNames { get; } = new List<string> {"minimum", "f", "then","else"};
+        public override List<string> ArgNames { get; } = new List<string> { "minimum", "f", "then", "else" };
 
         private static Type a = new Var("a");
         private static Type b = new Var("b");
@@ -20,7 +20,7 @@ namespace AspectedRouting.Language.Functions
             new[]
             {
                 Curry.ConstructFrom(a,
-                    Typs.Double, 
+                    Typs.Double,
                     new Curry(b,Typs.Double),
                     a, a, b),
             })
@@ -50,7 +50,7 @@ namespace AspectedRouting.Language.Functions
             var x = arguments[4];
 
             var arg1 = arguments[1].Evaluate(c, x);
-            
+
             if (minimum == null || arg1 == null)
             {
                 return null;
@@ -60,7 +60,7 @@ namespace AspectedRouting.Language.Functions
             {
                 minimum = e.Evaluate(c);
             }
-            
+
             if (arg1 is IExpression e1)
             {
                 arg1 = e1.Evaluate(c);
@@ -68,12 +68,12 @@ namespace AspectedRouting.Language.Functions
 
             if (minimum is int i0)
             {
-                minimum = (double) i0;
+                minimum = (double)i0;
             }
-            
+
             if (arg1 is int i1)
             {
-                arg1 = (double) i1;
+                arg1 = (double)i1;
             }
 
             if (minimum is double d0 && arg1 is double d1)
@@ -86,7 +86,7 @@ namespace AspectedRouting.Language.Functions
                 return @else;
             }
 
-            throw new InvalidCastException("One of the arguments is not a number: "+minimum+", "+arg1);
+            throw new InvalidCastException("One of the arguments is not a number: " + minimum + ", " + arg1);
 
         }
     }

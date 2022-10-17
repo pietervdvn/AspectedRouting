@@ -17,7 +17,8 @@ namespace AspectedRouting.Language
         /// <returns></returns>
         public static (IExpression f, List<IExpression> args)? DeconstructApply(this IExpression e)
         {
-            if (!(e is Apply _)) {
+            if (!(e is Apply _))
+            {
                 return null;
             }
 
@@ -25,7 +26,8 @@ namespace AspectedRouting.Language
 
             var fs = new List<IExpression>();
 
-            while (UnApply(Assign(fs), Assign(argss)).Invoke(e)) {
+            while (UnApply(Assign(fs), Assign(argss)).Invoke(e))
+            {
                 e = fs.First();
                 fs.Clear();
             }
@@ -37,8 +39,10 @@ namespace AspectedRouting.Language
 
         public static Func<IExpression, bool> IsMapping(List<Mapping> collect)
         {
-            return e => {
-                if (e is Mapping m) {
+            return e =>
+            {
+                if (e is Mapping m)
+                {
                     collect.Add(m);
                     return true;
                 }
@@ -63,7 +67,8 @@ namespace AspectedRouting.Language
 
         public static Func<IExpression, bool> Assign(List<IExpression> collect)
         {
-            return e => {
+            return e =>
+            {
                 collect.Add(e);
                 return true;
             };
@@ -71,20 +76,24 @@ namespace AspectedRouting.Language
 
         public static Func<IExpression, bool> IsFunc(Function f)
         {
-            return e => {
-                if (!(e is Function fe)) {
+            return e =>
+            {
+                if (!(e is Function fe))
+                {
                     return false;
                 }
 
                 return f.Name.Equals(fe.Name);
             };
         }
-        
-        
+
+
         public static Func<IExpression, bool> IsFunctionCall(List<string> names)
         {
-            return e => {
-                if (!(e is FunctionCall fc)) {
+            return e =>
+            {
+                if (!(e is FunctionCall fc))
+                {
                     return false;
                 }
 
@@ -105,20 +114,27 @@ namespace AspectedRouting.Language
             Func<IExpression, bool> matchArg,
             bool matchAny = false)
         {
-            return e => {
-                if (!(e is Apply apply)) {
+            return e =>
+            {
+                if (!(e is Apply apply))
+                {
                     return false;
                 }
 
-                foreach (var (_, (f, a)) in apply.FunctionApplications) {
+                foreach (var (_, (f, a)) in apply.FunctionApplications)
+                {
                     var doesMatch = matchFunc.Invoke(f) && matchArg.Invoke(a);
-                    if (matchAny) {
-                        if (doesMatch) {
+                    if (matchAny)
+                    {
+                        if (doesMatch)
+                        {
                             return true;
                         }
                     }
-                    else {
-                        if (!doesMatch) {
+                    else
+                    {
+                        if (!doesMatch)
+                        {
                             // All must match - otherwise we might have registered a wrong collection
                             return false;
                         }

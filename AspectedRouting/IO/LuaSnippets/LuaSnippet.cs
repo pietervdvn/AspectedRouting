@@ -17,7 +17,7 @@ namespace AspectedRouting.IO.LuaSnippets
         /// </summary>
         public readonly Function ImplementsFunction;
 
-        protected  LuaSnippet(Function implements)
+        protected LuaSnippet(Function implements)
         {
             ImplementsFunction = implements;
         }

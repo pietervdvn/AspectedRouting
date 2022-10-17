@@ -13,13 +13,13 @@ namespace AspectedRouting.IO.LuaSnippets
             var defaultValue = args[0];
             var func = args[1];
             var funcArg = args[2];
-            
+
             return Snippets.Convert(lua, assignTo, func.Apply(funcArg))
                    + "\n"
-                   +"if ("+assignTo+" == nil) then\n"
-                   + "    " + assignTo + " = " + lua.ToLua(defaultValue)+"\n"
-                   +"end";
-            
+                   + "if (" + assignTo + " == nil) then\n"
+                   + "    " + assignTo + " = " + lua.ToLua(defaultValue) + "\n"
+                   + "end";
+
         }
     }
 }

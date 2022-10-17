@@ -19,10 +19,12 @@ namespace AspectedRouting.IO.LuaSnippets
 
             var tags = "";
             var result = "";
-            if (tagsToken is LuaLiteral lit) {
+            if (tagsToken is LuaLiteral lit)
+            {
                 tags = lit.Lua;
             }
-            else {
+            else
+            {
                 tags = lua.FreeVar("tags");
                 result += "local " + tags + "\n";
                 result += Snippets.Convert(lua, tags, tagsToken);

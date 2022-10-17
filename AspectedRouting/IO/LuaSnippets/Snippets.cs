@@ -33,37 +33,44 @@ namespace AspectedRouting.IO.LuaSnippets
         public static string Convert(LuaSkeleton.LuaSkeleton lua, string assignTo, IExpression e)
         {
 
-            var opt  = e.Optimize(out _);
+            var opt = e.Optimize(out _);
             // Note that optimization might optimize to a _subtype_ of the original expresion - which is fine!
             var origType = e.Types.First();
             var optType = opt.Types.First();
-            if (!origType.Equals(optType) && !origType.IsSuperSet(optType)) {
+            if (!origType.Equals(optType) && !origType.IsSuperSet(optType))
+            {
                 throw new Exception("Optimization went wrong!");
             }
             e = opt;
             var deconstructed = e.DeconstructApply();
-            
-            if (deconstructed != null){
 
-                if (deconstructed.Value.f is Mapping m) {
+            if (deconstructed != null)
+            {
+
+                if (deconstructed.Value.f is Mapping m)
+                {
                     return new SimpleMappingSnippet(m).Convert(lua, assignTo, deconstructed.Value.args);
                 }
-                
+
                 if (deconstructed.Value.f is Function f
-                    && SnippetsIndex.TryGetValue(f.Name, out var snippet)) {
+                    && SnippetsIndex.TryGetValue(f.Name, out var snippet))
+                {
                     var optimized = snippet.Convert(lua, assignTo, deconstructed.Value.args);
-                    if (optimized != null) {
+                    if (optimized != null)
+                    {
                         return optimized + "\n";
                     }
                 }
             }
 
-            try {
+            try
+            {
 
 
-                return assignTo + " = " + lua.ToLua(e)+"\n";
+                return assignTo + " = " + lua.ToLua(e) + "\n";
             }
-            catch (Exception err) {
+            catch (Exception)
+            {
                 return "print(\"ERROR COMPILER BUG\");\n";
             }
         }

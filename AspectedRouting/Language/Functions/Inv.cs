@@ -7,7 +7,7 @@ namespace AspectedRouting.Language.Functions
     public class Inv : Function
     {
         public override string Description { get; } = "Calculates `1/d`";
-        public override List<string> ArgNames { get; } = new List<string> {"d"};
+        public override List<string> ArgNames { get; } = new List<string> { "d" };
 
         public Inv() : base("inv", true, new[]
         {
@@ -23,7 +23,7 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var arg = (double) arguments[0].Evaluate(c);
+            var arg = (double)arguments[0].Evaluate(c);
             return 1 / arg;
         }
 

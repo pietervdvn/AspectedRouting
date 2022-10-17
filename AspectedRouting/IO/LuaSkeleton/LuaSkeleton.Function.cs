@@ -13,7 +13,8 @@ namespace AspectedRouting.IO.LuaSkeleton
     {
         public void AddFunction(AspectMetadata meta)
         {
-            if (_alreadyAddedFunctions.Contains(meta.Name)) {
+            if (_alreadyAddedFunctions.Contains(meta.Name))
+            {
                 // already added
                 return;
             }
@@ -28,8 +29,10 @@ namespace AspectedRouting.IO.LuaSkeleton
 
             var funcNameDeclaration = "";
 
-            meta.Visit(e => {
-                if (e is Function f && f.Name.Equals(Funcs.MemberOf.Name)) {
+            meta.Visit(e =>
+            {
+                if (e is Function f && f.Name.Equals(Funcs.MemberOf.Name))
+                {
                     funcNameDeclaration = $"\n    local funcName = \"{meta.Name.AsLuaIdentifier()}\"";
                 }
 
@@ -50,14 +53,16 @@ namespace AspectedRouting.IO.LuaSkeleton
             _context = _context.WithAspectName(meta.Name);
 
             var body = "";
-            if (_useSnippets) {
+            if (_useSnippets)
+            {
                 body = Utils.Lines(
                     "    local r = nil",
                     "    " + Snippets.Convert(this, "r", expression).Indent(),
                     "    return r"
                 );
             }
-            else {
+            else
+            {
                 body = "    return " + ToLua(expression);
             }
 

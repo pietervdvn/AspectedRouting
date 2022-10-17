@@ -15,21 +15,23 @@ namespace AspectedRouting.IO.LuaSnippets
             var fValue = args[1];
             IExpression fElse = null;
             var arg = args[2];
-            if (args.Count == 4) {
+            if (args.Count == 4)
+            {
                 arg = args[3];
                 fElse = args[2];
             }
 
             var c = lua.FreeVar("cond");
             var result = "";
-            result += "local " + c+"\n";
+            result += "local " + c + "\n";
             var condApplied = fCond.Apply(arg);
             var isString = condApplied.Types.First().Equals(Typs.String);
-            result += Snippets.Convert(lua, c, condApplied)+"\n";
+            result += Snippets.Convert(lua, c, condApplied) + "\n";
             result += $"if ( {c} or {c} == \"yes\" ) then \n";
-            result += "    " + Snippets.Convert(lua, assignTo, fValue.Apply(arg)).Indent() ;
+            result += "    " + Snippets.Convert(lua, assignTo, fValue.Apply(arg)).Indent();
 
-            if (fElse != null) {
+            if (fElse != null)
+            {
                 result += "else\n";
                 result += "    " + Snippets.Convert(lua, assignTo, fElse.Apply(arg)).Indent();
             }

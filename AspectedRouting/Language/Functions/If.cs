@@ -13,7 +13,7 @@ namespace AspectedRouting.Language.Functions
                                                       " The 'then' branch is returned if the condition returns the string `yes` or `true`." +
                                                       " Otherwise, the `else` branch is taken (including if the condition returns `null`)" +
                                                       "If the `else` branch is not set, `null` is returned if the condition evaluates to false.";
-        public override List<string> ArgNames { get; } = new List<string> {"condition", "then", "else"};
+        public override List<string> ArgNames { get; } = new List<string> { "condition", "then", "else" };
 
         public If() : base("if_then_else", true,
             new[]
@@ -34,7 +34,7 @@ namespace AspectedRouting.Language.Functions
 
         public override object Evaluate(Context c, params IExpression[] arguments)
         {
-            var condition =  arguments[0].Evaluate(c);
+            var condition = arguments[0].Evaluate(c);
             var then = arguments[1];
             IExpression @else = null;
             if (arguments.Length > 2)
