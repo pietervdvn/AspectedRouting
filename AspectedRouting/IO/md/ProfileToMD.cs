@@ -11,7 +11,7 @@ namespace AspectedRouting.IO.md
     {
         private readonly List<string> parts = new List<string>();
 
-        public string ToString()
+        public override string ToString()
         {
             return string.Join("\n\n", parts);
         }

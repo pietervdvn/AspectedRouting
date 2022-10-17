@@ -156,7 +156,7 @@ namespace AspectedRouting.Language.Expression
 
         internal IExpression OptimizeInternal(out bool somethingChanged)
         {
-            if (Types.Count() == 0)
+            if (!Types.Any())
             {
                 throw new ArgumentException("This application contain no valid types, so cannot be optimized" + this);
             }

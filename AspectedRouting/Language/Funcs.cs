@@ -88,15 +88,14 @@ namespace AspectedRouting.Language
             }
 
             var eSmallest = e.SpecializeToSmallestType();
-            if (eSmallest == null || eSmallest.Types.Count() == 0)
+            if (eSmallest == null || !eSmallest.Types.Any())
             {
                 throw new Exception("Could not specialize " + e);
             }
 
-            // TODO FIX THIS so that it works
             // An argument 'optimizes' it's types from 'string -> bool' to 'string -> string'
             var eOpt = eSmallest.Optimize(out _);
-            if (eOpt == null || eOpt.Types.Count() == 0)
+            if (eOpt == null || !eOpt.Types.Any())
             {
                 throw new Exception("Could not optimize " + eSmallest);
             }
