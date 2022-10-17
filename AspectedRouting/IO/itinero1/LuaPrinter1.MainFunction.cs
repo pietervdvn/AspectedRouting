@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AspectedRouting.IO.LuaSkeleton;
+using AspectedRouting.IO.LuaSnippets;
 using AspectedRouting.Language;
 using AspectedRouting.Language.Functions;
 using AspectedRouting.Language.Typ;
@@ -18,7 +18,7 @@ namespace AspectedRouting.IO.itinero1
             var access = _skeleton.ToLuaWithTags(_profile.Access);
             var oneway = _skeleton.ToLuaWithTags(_profile.Oneway);
             var speed = _skeleton.ToLuaWithTags(_profile.Speed);
-            
+
             var impl = string.Join("\n",
                 "",
                 "",
@@ -54,16 +54,17 @@ namespace AspectedRouting.IO.itinero1
             impl +=
                 "\n    local priority = 0\n        ";
 
+            var tags = new LuaLiteral(Typs.Tags, "tags");
             foreach (var (parameterName, expression) in _profile.Priority)
             {
                 var paramInLua = _skeleton.ToLua(new Parameter(parameterName));
 
 
-                var expr = Funcs.Either(Funcs.Id, Funcs.Const, expression).Apply(new LuaLiteral(Typs.Tags, "tags"))
+                var expr = Funcs.Either(Funcs.Id, Funcs.Const, expression).Apply(tags)
                     .SpecializeToSmallestType()
                     .PruneTypes(t => !(t is Curry))
                     .Optimize(out _);
-                
+
                 if (expr.Types.Any(t => t.Name.Equals(Typs.Bool.Name)))
                 {
                     expr = Funcs.Parse.Apply(expr).SpecializeToSmallestType();
@@ -77,8 +78,14 @@ namespace AspectedRouting.IO.itinero1
                         );
             }
 
+            var scalingFactor = Funcs.Default.Apply(new Constant(Typs.Double, 1.0), _profile.ScalingFactor, tags);
 
             impl += string.Join("\n",
+                "  -- Calculate the scaling factor",
+                "  local scalingfactor",
+                Snippets.Convert(_skeleton, "scalingfactor", scalingFactor.SpecializeToSmallestType()),
+                "",
+                "priority = priority * scalingfactor",
                 "",
                 "",
                 "    if (priority <= 0) then",
@@ -100,10 +107,10 @@ namespace AspectedRouting.IO.itinero1
                 "end"
             );
 
-           return impl;
+            return impl;
         }
-        
-        
+
+
         private (string functionName, string implementation) GenerateBehaviourFunction(
             string behaviourName,
             Dictionary<string, IExpression> behaviourParameters)
@@ -115,12 +122,12 @@ namespace AspectedRouting.IO.itinero1
             _skeleton.AddDep("copy_tags");
             var usedkeys = _profile.AllExpressionsFor(behaviourName, _context)
                 .PossibleTagsRecursive(_context)
-                .Select(t => "\""+ t.Key+"\"")
+                .Select(t => "\"" + t.Key + "\"")
                 .ToHashSet();
 
             _skeleton.AddDep("remove_relation_prefix");
             var impl = string.Join("\n",
-                "behaviour_"+functionName+"_used_keys = create_set({"+ string.Join(", " , usedkeys) + "})",
+                "behaviour_" + functionName + "_used_keys = create_set({" + string.Join(", ", usedkeys) + "})",
                 "--[[",
                 description,
                 "]]",

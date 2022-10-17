@@ -34,6 +34,7 @@ namespace AspectedRouting.Language.Expression
 
         public Dictionary<string, IExpression> Priority { get; }
 
+        public IExpression ScalingFactor { get; }
 
         /**
          * Moment of last change of any upstream file
@@ -45,7 +46,7 @@ namespace AspectedRouting.Language.Expression
             Dictionary<string, Dictionary<string, IExpression>> behaviours,
             IExpression access, IExpression oneway, IExpression speed,
             IExpression obstacleAccess, IExpression obstacleCost,
-            Dictionary<string, IExpression> priority, List<string> metadata, DateTime lastChange)
+            Dictionary<string, IExpression> priority, IExpression scalingFactor, List<string> metadata, DateTime lastChange)
         {
             Name = name;
             Description = description;
@@ -58,6 +59,7 @@ namespace AspectedRouting.Language.Expression
             ObstacleAccess = obstacleAccess.Optimize(out _);
             ObstacleCost = obstacleCost.Optimize(out _);
             Priority = priority;
+            ScalingFactor = scalingFactor;
             Metadata = metadata;
             LastChange = lastChange;
             DefaultParameters = defaultParameters;
@@ -74,7 +76,7 @@ namespace AspectedRouting.Language.Expression
         {
             if (e == null)
             {
-                throw new Exception("No expression given for " +name);
+                throw new Exception("No expression given for " + name);
             }
             if (e.Types.Count() == 1)
             {
@@ -91,7 +93,7 @@ namespace AspectedRouting.Language.Expression
             l.AddRange(DefaultParameters.Values);
             l.AddRange(Behaviours.Values.SelectMany(b => b.Values));
             l.AddRange(Priority.Values);
-            
+
 
             var allExpr = new List<IExpression>();
             allExpr.AddRange(l);
@@ -207,43 +209,18 @@ namespace AspectedRouting.Language.Expression
                 }
 
 
-                var aspectWeightObj = new Apply(
+                var aspectWeight = new Apply(
                     Funcs.EitherFunc.Apply(Funcs.Id, Funcs.Const, expression)
-                    , new Constant(tags)).Evaluate(c);
+                    , new Constant(tags)).EvaluateDouble(paramName, c);
 
-                double aspectWeight;
-                switch (aspectWeightObj)
-                {
-                    case bool b:
-                        aspectWeight = b ? 1.0 : 0.0;
-                        break;
-                    case double d:
-                        aspectWeight = d;
-                        break;
-                    case int j:
-                        aspectWeight = j;
-                        break;
-                    case string s:
-                        if (s.Equals("yes"))
-                        {
-                            aspectWeight = 1.0;
-                            break;
-                        }
-                        else if (s.Equals("no"))
-                        {
-                            aspectWeight = 0.0;
-                            break;
-                        }
-
-                        throw new Exception($"Invalid value as result for {paramName}: got string {s}");
-                    default:
-                        throw new Exception($"Invalid value as result for {paramName}: got object {aspectWeightObj}");
-                }
 
                 weightExplanation.Add($"({paramName} = {aspectInfluence}) * {aspectWeight}");
                 priority += aspectInfluence * aspectWeight;
             }
 
+            var scalingFactor = Utils.AsDouble(ScalingFactor.Run(c, tags) ?? 1.0, "scalingfactor");
+            weightExplanation.Add("Scaling factor: " + scalingFactor);
+            priority *= scalingFactor;
             if (priority <= 0)
             {
                 canAccess = "no";
@@ -257,7 +234,7 @@ namespace AspectedRouting.Language.Expression
             }
             else
             {
-                throw new Exception("CanAccess or oneway are not strings but " + canAccess.GetType().ToString() +
+                throw new Exception("CanAccess or oneway are not strings but " + canAccess.GetType() +
                                     " and " + (oneway?.GetType()?.ToString() ?? "<null>"));
             }
         }

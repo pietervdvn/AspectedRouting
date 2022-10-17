@@ -24,10 +24,10 @@ namespace AspectedRouting.IO.jsonParser
                     return null;
                 }
 
-                Console.Write("Parsing " + fileName+"... ");
+                Console.Write("Parsing " + fileName + "... ");
 
-                var aspect= doc.RootElement.ParseAspect(fileName, c);
-                
+                var aspect = doc.RootElement.ParseAspect(fileName, c);
+
                 Console.WriteLine($"\rAspect {aspect.Name} has type {string.Join(",", aspect.ExpressionImplementation.Types)}");
                 return aspect;
             }
@@ -113,6 +113,7 @@ namespace AspectedRouting.IO.jsonParser
             var access = ParseProfileProperty(e, contextWithParameters, "access").Finalize();
             var oneway = ParseProfileProperty(e, contextWithParameters, "oneway").Finalize();
             var speed = ParseProfileProperty(e, contextWithParameters, "speed").Finalize();
+            var scalingFactor = ParseProfileProperty(e, contextWithParameters, "scalingfactor", Funcs.Const.Apply(new Constant(1))).Finalize();
             var obstacle_access = ParseProfileProperty(e, contextWithParameters, "obstacleaccess", Funcs.Const.Apply(new Constant(new Var("any"), null))).Finalize();
             var obstacle_cost = ParseProfileProperty(e, contextWithParameters, "obstaclecost", Funcs.Const.Apply(new Constant(new Var("any0"), null))).Finalize();
 
@@ -174,14 +175,15 @@ namespace AspectedRouting.IO.jsonParser
                 speed,
                 obstacle_access, obstacle_cost,
                 weights,
+                scalingFactor,
                 metadata,
                 lastChange
             );
         }
 
-        private static readonly IExpression _mconst = Funcs.EitherFunc.Apply( Funcs.Id, Funcs.Const);
+        private static readonly IExpression _mconst = Funcs.EitherFunc.Apply(Funcs.Id, Funcs.Const);
 
-        private static readonly IExpression _mappingWrapper = Funcs.EitherFunc.Apply( Funcs.Id, Funcs.StringStringToTags);
+        private static readonly IExpression _mappingWrapper = Funcs.EitherFunc.Apply(Funcs.Id, Funcs.StringStringToTags);
 
         private static IExpression ParseMapping(IEnumerable<JsonProperty> allArgs, Context context)
         {
@@ -262,7 +264,7 @@ namespace AspectedRouting.IO.jsonParser
                 var exprs = e.EnumerateArray().Select(json =>
                         Funcs.Either(Funcs.Id, Funcs.Const, json.ParseExpression(context)))
                     .ToList();
-                
+
                 var list = new Constant(exprs);
                 return Funcs.Either(Funcs.Id, Funcs.ListDot, list);
             }
@@ -310,18 +312,19 @@ namespace AspectedRouting.IO.jsonParser
                 {
                     // This is a parameter, the type of it is free
                     if (context.Parameters.TryGetValue(s.Substring(1), out var param))
-                    {  
+                    {
                         return new Parameter(s).Specialize(param.Types);
-                        
+
                     }
-                    
+
                     return new Parameter(s);
                 }
 
                 return new Constant(s);
             }
 
-            if (e.ValueKind == JsonValueKind.Null) {
+            if (e.ValueKind == JsonValueKind.Null)
+            {
                 return new Constant(new Var("a"), null);
             }
 
@@ -375,7 +378,7 @@ namespace AspectedRouting.IO.jsonParser
 
 
                 foreach (var argName in func.ArgNames.GetRange(1, func.ArgNames.Count - 1))
-                    // We skip the first argument, that one is already added
+                // We skip the first argument, that one is already added
                 {
                     args.Add(allExprs[argName]);
                 }
@@ -405,7 +408,7 @@ namespace AspectedRouting.IO.jsonParser
                 if (!prop.Name.StartsWith("$")) continue;
 
 
-                var f = (IExpression) Funcs.BuiltinByName(prop.Name);
+                var f = (IExpression)Funcs.BuiltinByName(prop.Name);
                 if (f == null || f.Types.Count() == 0)
                 {
                     throw new KeyNotFoundException($"The builtin function {prop.Name} was not found");
@@ -434,7 +437,7 @@ namespace AspectedRouting.IO.jsonParser
                     // It gets an extra argument injected
                     var neededKeys = fArg.PossibleTags().Keys.ToList();
                     var neededKeysArg = new Constant(new ListType(Typs.String), neededKeys);
-                    f = f.Apply(new[] {neededKeysArg});
+                    f = f.Apply(new[] { neededKeysArg });
                 }
 
                 var appliedDot = new Apply(new Apply(Funcs.Dot, f), fArg);
@@ -524,7 +527,7 @@ namespace AspectedRouting.IO.jsonParser
                                             $"filename is {filepath}, declared name is {name}");
             }
 
-            var keys = (IEnumerable<string>) expr.PossibleTags()?.Keys ?? new List<string>();
+            var keys = (IEnumerable<string>)expr.PossibleTags()?.Keys ?? new List<string>();
             foreach (var key in keys)
             {
                 if (!key.Trim().Equals(key))

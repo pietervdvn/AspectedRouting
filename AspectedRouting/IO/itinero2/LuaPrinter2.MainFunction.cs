@@ -20,7 +20,7 @@ namespace AspectedRouting.IO.itinero2
 
 
             var aspects = new List<string>();
-
+            var tags = new LuaLiteral(Typs.Tags, "tags");
             foreach (var (paramName, expr) in _profile.Priority)
             {
                 var weightExpr = parameters[paramName].Evaluate(_context);
@@ -31,7 +31,7 @@ namespace AspectedRouting.IO.itinero2
                 // The expression might still have multiple typings,
                 // which take inputs different from 'Tags', so we specialize the expr first
                 var appliedExpr = Funcs.Either(Funcs.Id, Funcs.Const, expr)
-                    .Apply(new LuaLiteral(Typs.Tags, "tags").SpecializeToSmallestType())
+                    .Apply(tags)
                     .PruneTypes(tp => !(tp is Curry));
                 var exprSpecialized = appliedExpr.Optimize(out _);
 
@@ -48,7 +48,8 @@ namespace AspectedRouting.IO.itinero2
                 aspects.Add(weight + " * " + exprInLua);
             }
 
-            Console.WriteLine(aspects.Lined());
+            var scalingFactor = Funcs.Default.Apply(new Constant(Typs.Double, 1.0), _profile.ScalingFactor, tags)
+                .SpecializeToSmallestType();
             var code = new List<string>
             {
                 "--[[",
@@ -58,7 +59,10 @@ namespace AspectedRouting.IO.itinero2
                 "function calculate_priority(parameters, tags, result, access, oneway, speed)",
                 "    local distance = 1",
                 "    local priority = \n        " + string.Join(" +\n       ", aspects),
-                "    return priority",
+                "",
+                "local scalingfactor",
+                Snippets.Convert(_skeleton, "scalingfactor", scalingFactor),
+                "    return priority * scalingfactor",
                 "end"
             };
             return code.Lined();
