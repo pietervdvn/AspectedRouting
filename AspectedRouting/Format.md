@@ -1,23 +1,13 @@
+# Building a profile
 
-# Functions
-
-- `$funcName` indicates a builtin function
-- `#parameter` indicates a configurable parameter
-
-A profile is a function which maps a set of tags onto a value. It is basically Haskell, except that functions can have _multiple_ types. During typechecking, some types will turn out not to be possible and they will dissappear, potentially fixing the implementation of the function itself.
-
-# Injected tags
-
-Aspects can use the following (extra) tags:
-
-- `_direction` is the value to indicate if the traveller goes forward or backwards. It is not available when calculating the 'oneway' field
-- `access` will become the value calculated in the field `access` (not available to calculate access)
-- `oneway` will become the value calculated in the field `oneway` (not available to calculate access and speed)
+A profile is a .json-file, which consists of a few metadatafields (which are simple strings),
+some expressions to calculate values based on tags, a list of parameters with their default values and
+a list of profiles containing the actual parameter value for that profile.
 
 
 # Vehicle.json
 
-- Metdata: these tags will be copied to the routerdb, but can not be used for routeplanning. A prime example is `name` (the streetname), as it is useful for routeplanning but very useful for navigation afterwards
+- Metadata: these tags will be copied to the routerdb, but can not be used for routeplanning. A prime example is `name` (the streetname), as it is useful for routeplanning but very useful for navigation afterwards
 - vehicletypes: used for turn restrictions, legacy for use with itinero 1.0
 - defaults: a dictionary of `{"#paramName": "value"}`, used in determining the weight of an edge. note: the `#` has to be included
 - `access` is a field in the vehicle file. It should be an expression returning a string. If (and only if) this string is `no`, the way will be marked as not accessible and no more values will be calculated. All other values are regarded as being accessible. When calculated, the tag `access` with the calculated value is written into the tag table for the other aspects to use.
@@ -27,11 +17,7 @@ Aspects can use the following (extra) tags:
 - `obstacleaccess` and `obstaclecost` are two (optional) expressions that calculate whether an obstacle can be passed and if so, if there is a penalty for this. See detailed explanations below
  
 - `priorities`: a table of `{'#paramName', expression}` determining the priority (1/cost) of a way, per meter. The formula used is `paramName * expression + paramName0 * expression0 + ...` (`speed`, `access` and `oneway` can be used here as tags indicate the earlier defined respective aspects). Use a weight == 1 to get the shortest route or `$speed` to get the fastest route
-
-## Why is `access`, `oneway` and `speed` copied onto the tags?
-
-`speed` is copied in order for the profile to be able to make a `fast` profile (and accessible as `$speed`).
-Access is copied so that `highway=cycleway` and `highway=cycleway;bicycle=designated` will render the same result.
+- `scalingfactor` works in tandem with priority. The _total_ resistance of a link is `priority * scalingfactor`. If this function returns `null`, this will be defaulted to 1.
 
 
 # Calculating oneway and forward/backward speeds
@@ -62,6 +48,28 @@ If `obstacleaccess` is not `no` or `false`, then `obstaclecost` will be triggere
 - null: this profile has no knowledge of a cost. Use the default implementation to check for turn restrictions
 
 If the resulting cost is null, the default implementation will be used.
+
+# Functions
+
+- `$funcName` indicates a builtin function
+- `#parameter` indicates a configurable parameter
+
+A profile is a function which maps a set of tags onto a value. It is basically Haskell, except that functions can have _multiple_ types. During typechecking, some types will turn out not to be possible and they will dissappear, potentially fixing the implementation of the function itself.
+
+# Injected tags
+
+Aspects can use the following (extra) tags:
+
+- `_direction` is the value to indicate if the traveller goes forward or backwards. It is not available when calculating the 'oneway' field
+- `access` will become the value calculated in the field `access` (not available to calculate access)
+- `oneway` will become the value calculated in the field `oneway` (not available to calculate access and speed)
+
+## Why is `access`, `oneway` and `speed` copied onto the tags?
+
+`speed` is copied in order for the profile to be able to make a `fast` profile (and accessible as `$speed`).
+Access is copied so that `highway=cycleway` and `highway=cycleway;bicycle=designated` will render the same result.
+
+
 
 # Pitfalls
 

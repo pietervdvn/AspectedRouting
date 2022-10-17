@@ -14,7 +14,8 @@ namespace AspectedRouting.IO
     {
         public static void GenerateHelpText(string saveTo = null)
         {
-            var helpText = TypeOverview +
+            var format = File.ReadAllText("Format.md");
+            var helpText =format +"\n\n" + TypeOverview +
                            FunctionOverview;
 
             if (saveTo == null)
