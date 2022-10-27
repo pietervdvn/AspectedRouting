@@ -90,14 +90,15 @@ If result.factor is positive, that is the cost.
 
 There is no forward or backward, so this should always be the same for the same attributes
              */
-
+            var parameters = _profile.Behaviours[_behaviourName];
             var tags = new LuaLiteral(Typs.Tags, "attributes");
             var hasAccess = _profile.ObstacleAccess.Apply(tags).SpecializeToSmallestType().Optimize(out _);
             var code = new List<string>
             {
                 "--[[ Function called by itinero2 on every turn restriction relation", " ]]",
                 "function turn_cost_factor(attributes, result)",
-
+                "    local parameters = default_parameters()",
+                _parameterPrinter.DeclareParametersFor(parameters),
                 "local has_access",
                 Snippets.Convert(_skeleton, "has_access", hasAccess),
                 "if ( has_access == \"no\" or has_access == \"false\") then",
