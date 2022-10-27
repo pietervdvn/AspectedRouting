@@ -258,7 +258,7 @@ namespace AspectedRouting
 
         private static void WriteOutputFiles(Context context,
             List<(AspectMetadata aspect, AspectTestSuite tests)> aspects, string outputDir,
-            List<(ProfileMetaData profile, List<BehaviourTestSuite> profileTests)> profiles, DateTime lastChange)
+            List<(ProfileMetaData profile, List<BehaviourTestSuite> profileTests)> profiles, bool includeTests)
         {
             if (!Directory.Exists($"{outputDir}/profile-documentation/"))
             {
@@ -315,7 +315,7 @@ namespace AspectedRouting
                         context,
                         aspectTests,
                         profileTests.Where(testsSuite => testsSuite.BehaviourName == behaviourName),
-                        lastChange
+                        includeTests
                     ).ToLua();
 
                     var itinero2ProfileFile = Path.Combine($"{outputDir}/itinero2/{profile.Name}.{behaviourName}.lua");
@@ -351,12 +351,15 @@ namespace AspectedRouting
         {
             if (args.Length < 2)
             {
-                return "Usage: <directory where all aspects and profiles can be found> <outputdirectory>";
+                return "Usage: <directory where all aspects and profiles can be found> <outputdirectory> [--include-tests]\n" +
+                       "The flag '--include-tests' will append some self-tests in the lua files";
             }
 
             var inputDir = args[0];
             var outputDir = args[1];
-
+            var includeTests = args.Contains("--include-tests");
+            var runRepl = !args.Contains("--no-repl");
+            
             if (!Directory.Exists(outputDir))
             {
                 Directory.CreateDirectory(outputDir);
@@ -429,11 +432,11 @@ namespace AspectedRouting
 
             if (testsOk)
             {
-                WriteOutputFiles(context, aspects, outputDir, profiles, lastChange);
+                WriteOutputFiles(context, aspects, outputDir, profiles, includeTests);
             }
 
 
-            if (!args.Contains("--no-repl"))
+            if (runRepl)
             {
                 Repl(context, profiles
                     .Select(p => p.profile)
