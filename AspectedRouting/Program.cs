@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using AspectedRouting.IO;
-using AspectedRouting.IO.itinero2;
 using AspectedRouting.IO.jsonParser;
-using AspectedRouting.IO.md;
 using AspectedRouting.Language;
 using AspectedRouting.Language.Expression;
 using AspectedRouting.Tests;
@@ -230,6 +230,7 @@ namespace AspectedRouting
 
         public static string MainWithError(string[] args)
         {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US", false); 
             if (args.Length < 2) {
                 return
                     "Usage: <directory where all aspects and profiles can be found> <outputdirectory> [--include-tests]\n" +
