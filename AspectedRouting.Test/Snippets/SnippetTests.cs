@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using AspectedRouting.IO.LuaSkeleton;
 using AspectedRouting.IO.LuaSnippets;
@@ -94,4 +95,26 @@ public class SnippetTests
     }
 
 
+    [Fact]
+    public void ListDotWithHead_GeneratesLua()
+    {
+        // (dot head) (stringToTags (mapping speed $ parse))
+        var eSub = Funcs.Dot.Apply(Funcs.Head,
+            new Constant(new[]
+            {
+                Funcs.Head.Apply(Funcs.StringStringToTags.Apply(
+                    new Mapping(new List<string> { "_speed" }, new[] { Funcs.Parse }))),
+                Funcs.Const.Apply(new Constant(Typs.Double, 42))
+            })
+        );
+        var condition = Funcs.Dot.Apply(Funcs.Head, Funcs.StringStringToTags.Apply(
+            new Mapping(new[] { "route" }, new[] { Funcs.Eq.Apply(new Constant("ferry")) })));
+        var e =
+            Funcs.IfDotted.Apply(condition, eSub);
+        e = e.Apply(new LuaLiteral(Typs.Tags, "tags")).Finalize().Optimize(out _);
+        var ctx = new Context();
+        var lua = new LuaSkeleton(ctx, true);
+        var code = IO.LuaSnippets.Snippets.Convert(lua, "varname", e);
+        Console.WriteLine(code);
+    }
 }

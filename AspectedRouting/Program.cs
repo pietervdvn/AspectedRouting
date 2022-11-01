@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AspectedRouting.IO;
-using AspectedRouting.IO.itinero1;
 using AspectedRouting.IO.itinero2;
 using AspectedRouting.IO.jsonParser;
 using AspectedRouting.IO.md;
@@ -19,13 +18,11 @@ namespace AspectedRouting
             this IEnumerable<string> jsonFileNames, List<string> testFileNames, Context context)
         {
             var aspects = new List<(AspectMetadata aspect, AspectTestSuite tests)>();
-            foreach (var file in jsonFileNames)
-            {
+            foreach (var file in jsonFileNames) {
                 var fi = new FileInfo(file);
 
                 var aspect = JsonParser.AspectFromJson(context, File.ReadAllText(file), fi.Name);
-                if (aspect == null)
-                {
+                if (aspect == null) {
                     continue;
                 }
 
@@ -33,8 +30,7 @@ namespace AspectedRouting
                 var testName = aspect.Name + ".test.csv";
                 var testPath = testFileNames.FindTest(testName);
                 AspectTestSuite tests = null;
-                if (!string.IsNullOrEmpty(testPath) && File.Exists(testPath))
-                {
+                if (!string.IsNullOrEmpty(testPath) && File.Exists(testPath)) {
                     tests = AspectTestSuite.FromString(aspect, File.ReadAllText(testPath));
                 }
 
@@ -47,13 +43,11 @@ namespace AspectedRouting
         private static string FindTest(this IEnumerable<string> testFileNames, string testName)
         {
             var testPaths = testFileNames.Where(nm => nm.EndsWith(testName)).ToList();
-            if (testPaths.Count > 1)
-            {
+            if (testPaths.Count > 1) {
                 Console.WriteLine("[WARNING] Multiple tests found for " + testName + ", using only one arbitrarily");
             }
 
-            if (testPaths.Count > 0)
-            {
+            if (testPaths.Count > 0) {
                 return testPaths.First();
             }
 
@@ -66,43 +60,35 @@ namespace AspectedRouting
         {
             var result = new List<(ProfileMetaData profile, List<BehaviourTestSuite> profileTests)>();
             foreach (var jsonFile in jsonFiles)
-            {
-                try
-                {
+                try {
                     var profile =
                         JsonParser.ProfileFromJson(context, File.ReadAllText(jsonFile), new FileInfo(jsonFile),
                             lastChange);
-                    if (profile == null)
-                    {
+                    if (profile == null) {
                         continue;
                     }
 
                     profile.SanityCheckProfile(context);
 
                     var profileTests = new List<BehaviourTestSuite>();
-                    foreach (var behaviourName in profile.Behaviours.Keys)
-                    {
+                    foreach (var behaviourName in profile.Behaviours.Keys) {
                         var path = testFiles.FindTest($"{profile.Name}.{behaviourName}.behaviour_test.csv");
-                        if (path != null && File.Exists(path))
-                        {
+                        if (path != null && File.Exists(path)) {
                             var test = BehaviourTestSuite.FromString(context, profile, behaviourName,
                                 File.ReadAllText(path));
                             profileTests.Add(test);
                         }
-                        else
-                        {
+                        else {
                             Console.WriteLine($"[{profile.Name}] WARNING: no test found for behaviour {behaviourName}");
                         }
                     }
 
                     result.Add((profile, profileTests));
                 }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     // PrintError(jsonFile, e);
                     throw new Exception("In the file " + jsonFile, e);
                 }
-            }
 
             return result;
         }
@@ -111,28 +97,23 @@ namespace AspectedRouting
         {
             var profile = profiles["emergency_vehicle"];
             var behaviour = profile.Behaviours.Keys.First();
-            do
-            {
+            do {
                 Console.Write(profile.Name + "." + behaviour + " > ");
                 var read = Console.ReadLine();
-                if (read == null)
-                {
+                if (read == null) {
                     return; // End of stream has been reached
                 }
 
-                if (read == "")
-                {
+                if (read == "") {
                     Console.WriteLine("looƆ sᴉ dɐWʇǝǝɹʇSuǝdO");
                     continue;
                 }
 
-                if (read.Equals("quit"))
-                {
+                if (read.Equals("quit")) {
                     return;
                 }
 
-                if (read.Equals("help"))
-                {
+                if (read.Equals("help")) {
                     Console.WriteLine(
                         Utils.Lines(
                             "select <behaviourName> to change behaviour or <vehicle.behaviourName> to change vehicle",
@@ -140,40 +121,31 @@ namespace AspectedRouting
                     continue;
                 }
 
-                if (read.Equals("clear"))
-                {
-                    for (var i = 0; i < 80; i++)
-                    {
-                        Console.WriteLine();
-                    }
+                if (read.Equals("clear")) {
+                    for (var i = 0; i < 80; i++) Console.WriteLine();
 
                     continue;
                 }
 
-                if (read.StartsWith("select"))
-                {
+                if (read.StartsWith("select")) {
                     var beh = read.Substring("select".Length + 1).Trim();
 
-                    if (beh.Contains("."))
-                    {
+                    if (beh.Contains(".")) {
                         var profileName = beh.Split(".")[0];
-                        if (!profiles.TryGetValue(profileName, out var newProfile))
-                        {
+                        if (!profiles.TryGetValue(profileName, out var newProfile)) {
                             Console.Error.WriteLine("Profile " + profileName + " not found, ignoring");
                             continue;
                         }
 
                         profile = newProfile;
-                        beh = beh.Substring(beh.IndexOf(".") + 1);
+                        beh = beh.Substring(beh.IndexOf(".", StringComparison.Ordinal) + 1);
                     }
 
-                    if (profile.Behaviours.ContainsKey(beh))
-                    {
+                    if (profile.Behaviours.ContainsKey(beh)) {
                         behaviour = beh;
                         Console.WriteLine("Switched to " + beh);
                     }
-                    else
-                    {
+                    else {
                         Console.WriteLine("Behaviour not found. Known behaviours are:\n   " +
                                           string.Join("\n   ", profile.Behaviours.Keys));
                     }
@@ -184,34 +156,27 @@ namespace AspectedRouting
 
                 var tagsRaw = read.Split(";").Select(s => s.Trim());
                 var tags = new Dictionary<string, string>();
-                foreach (var str in tagsRaw)
-                {
-                    if (str == "")
-                    {
+                foreach (var str in tagsRaw) {
+                    if (str == "") {
                         continue;
                     }
 
-                    try
-                    {
-
+                    try {
                         var strSplit = str.Split("=");
                         var k = strSplit[0].Trim();
                         var v = strSplit[1].Trim();
                         tags[k] = v;
                     }
-                    catch (Exception)
-                    {
+                    catch (Exception) {
                         Console.Error.WriteLine("Could not parse tag: " + str);
                     }
                 }
 
-                try
-                {
+                try {
                     var result = profile.Run(c, behaviour, tags);
                     Console.WriteLine(result);
                 }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     Console.WriteLine(e);
                     Console.WriteLine(e.Message);
                 }
@@ -221,8 +186,7 @@ namespace AspectedRouting
         private static void PrintError(string file, Exception exception)
         {
             var msg = exception.Message;
-            while (exception.InnerException != null)
-            {
+            while (exception.InnerException != null) {
                 exception = exception.InnerException;
                 msg += "\n    " + exception.Message;
             }
@@ -230,113 +194,30 @@ namespace AspectedRouting
             Console.WriteLine($"Error in the file {file}:\n    {msg}");
         }
 
-        private static void PrintUsedTags(ProfileMetaData profile, Context context)
-        {
-            Console.WriteLine("\n\n\n---------- " + profile.Name + " : used tags and corresponding values --------------");
-            foreach (var (key, values) in profile.AllExpressions(context).PossibleTags())
-            {
-                var vs = "*";
-                if (values.Any())
-                {
-                    vs = string.Join(", ", values);
-                }
-
-                Console.WriteLine(key + ": " + vs);
-            }
-
-            Console.WriteLine("\n\n\n------------------------");
-        }
 
         private static int Main(string[] args)
         {
             var errMessage = MainWithError(args);
-            if (errMessage == null) return 0;
+            if (errMessage == null) {
+                return 0;
+            }
 
             Console.WriteLine(errMessage);
             return 1;
         }
 
+
         private static void WriteOutputFiles(Context context,
             List<(AspectMetadata aspect, AspectTestSuite tests)> aspects, string outputDir,
             List<(ProfileMetaData profile, List<BehaviourTestSuite> profileTests)> profiles, bool includeTests)
         {
-            if (!Directory.Exists($"{outputDir}/profile-documentation/"))
-            {
-                Directory.CreateDirectory($"{outputDir}/profile-documentation/");
-            }
-
-            if (!Directory.Exists($"{outputDir}/itinero1/"))
-            {
-                Directory.CreateDirectory($"{outputDir}/itinero1/");
-            }
-
-            if (!Directory.Exists($"{outputDir}/itinero2/"))
-            {
-                Directory.CreateDirectory($"{outputDir}/itinero2/");
-            }
-
-            foreach (var (profile, profileTests) in profiles)
-            {
-                PrintUsedTags(profile, context);
-
-                var aspectTests = aspects.Select(a => a.tests).ToList();
-                var luaProfile = new LuaPrinter1(profile, context,
-                    aspectTests,
-                    profileTests
-                ).ToLua();
-
-                var itinero1ProfileFile = Path.Combine($"{outputDir}/itinero1/" + profile.Name + ".lua");
-                File.WriteAllText(itinero1ProfileFile, luaProfile);
-                Console.WriteLine($"Written {(new FileInfo(itinero1ProfileFile)).FullName}");
-
-                var profileMd = new MarkDownSection();
-                profileMd.AddTitle(profile.Name, 1);
-
-                profileMd.Add(profile.Description);
-                profileMd.AddTitle("Default parameters", 4);
-                profileMd.Add("| name | value | ", "| ---- | ---- | ",
-                    string.Join("\n",
-                      profile.DefaultParameters.Select(delegate (KeyValuePair<string, IExpression> kv)
-                      {
-                          var v = kv.Value.Evaluate(context);
-                          if (!(v is string || v is int || v is double))
-                          {
-                              v = "_special value_";
-                          }
-                          return $" | {kv.Key} | {v} |";
-                      }))
-                );
-
-                foreach (var (behaviourName, vars) in profile.Behaviours)
-                {
-                    var lua2behaviour = new LuaPrinter2(
-                        profile,
-                        behaviourName,
-                        context,
-                        aspectTests,
-                        profileTests.Where(testsSuite => testsSuite.BehaviourName == behaviourName),
-                        includeTests
-                    ).ToLua();
-
-                    var itinero2ProfileFile = Path.Combine($"{outputDir}/itinero2/{profile.Name}.{behaviourName}.lua");
-                    File.WriteAllText(
-                        itinero2ProfileFile,
-                        lua2behaviour);
-                    Console.WriteLine($"Written {(new FileInfo(itinero2ProfileFile)).FullName}");
-
-                    var behaviourMd = new ProfileToMD(profile, behaviourName, context);
-
-                    File.WriteAllText(
-                        $"{outputDir}/profile-documentation/{profile.Name}.{behaviourName}.md",
-                        behaviourMd.ToString());
-                    profileMd.AddTitle($"[{behaviourName}](./{profile.Name}.{behaviourName}.md)", 2);
-                    profileMd.Add(vars["description"].Evaluate(context).ToString());
-                    profileMd.Add(behaviourMd.MainFormula());
-                }
-
-                File.WriteAllText(
-                    $"{outputDir}/profile-documentation/{profile.Name}.md",
-                    profileMd.ToString());
+            foreach (var (profile, profileTests) in profiles) {
+                var printer = new Printer(outputDir, profile, context, aspects, profileTests, includeTests);
+                printer.PrintUsedTags();
+                printer.WriteProfile1();
+                printer.PrintMdInfo();
+                printer.WriteAllProfile2();
+                printer.WriteProfile2("short");
             }
 
             File.WriteAllText($"{outputDir}/ProfileMetadata.json",
@@ -349,19 +230,18 @@ namespace AspectedRouting
 
         public static string MainWithError(string[] args)
         {
-            if (args.Length < 2)
-            {
-                return "Usage: <directory where all aspects and profiles can be found> <outputdirectory> [--include-tests]\n" +
-                       "The flag '--include-tests' will append some self-tests in the lua files";
+            if (args.Length < 2) {
+                return
+                    "Usage: <directory where all aspects and profiles can be found> <outputdirectory> [--include-tests]\n" +
+                    "The flag '--include-tests' will append some self-tests in the lua files";
             }
 
             var inputDir = args[0];
             var outputDir = args[1];
             var includeTests = args.Contains("--include-tests");
             var runRepl = !args.Contains("--no-repl");
-            
-            if (!Directory.Exists(outputDir))
-            {
+
+            if (!Directory.Exists(outputDir)) {
                 Directory.CreateDirectory(outputDir);
             }
 
@@ -376,10 +256,8 @@ namespace AspectedRouting
                 .ToList();
             tests.Sort();
 
-            foreach (var test in tests)
-            {
-                if (test.EndsWith(".test.csv") || test.EndsWith(".behaviour_test.csv"))
-                {
+            foreach (var test in tests) {
+                if (test.EndsWith(".test.csv") || test.EndsWith(".behaviour_test.csv")) {
                     continue;
                 }
 
@@ -391,17 +269,12 @@ namespace AspectedRouting
 
             var aspects = ParseAspects(files, tests, context);
 
-            foreach (var (aspect, _) in aspects)
-            {
-                context.AddFunction(aspect.Name, aspect);
-            }
+            foreach (var (aspect, _) in aspects) context.AddFunction(aspect.Name, aspect);
 
             var lastChange = DateTime.UnixEpoch;
-            foreach (var file in files)
-            {
+            foreach (var file in files) {
                 var time = new FileInfo(file).LastWriteTimeUtc;
-                if (lastChange < time)
-                {
+                if (lastChange < time) {
                     lastChange = time;
                 }
             }
@@ -412,40 +285,32 @@ namespace AspectedRouting
             // With everything parsed and typechecked, time for tests
             var testsOk = true;
             foreach (var (aspect, t) in aspects)
-            {
-                if (t == null)
-                {
+                if (t == null) {
                     Console.WriteLine($"[{aspect.Name}] WARNING: no tests found: please add {aspect.Name}.test.csv");
                 }
-                else
-                {
+                else {
                     testsOk &= t.Run();
                 }
-            }
 
 
             foreach (var (profile, profileTests) in profiles)
-                foreach (var test in profileTests)
-                {
-                    testsOk &= test.Run(context);
-                }
+            foreach (var test in profileTests)
+                testsOk &= test.Run(context);
 
-            if (testsOk)
-            {
+            if (testsOk) {
                 WriteOutputFiles(context, aspects, outputDir, profiles, includeTests);
             }
 
 
-            if (runRepl)
-            {
+            if (runRepl) {
                 Repl(context, profiles
                     .Select(p => p.profile)
                     .ToDictionary(p => p.Name, p => p));
             }
-            else
-            {
+            else {
                 Console.WriteLine("Not starting REPL as --no-repl is specified");
             }
+
             return !testsOk ? "Some tests failed, quitting now without generating output" : null;
         }
     }
