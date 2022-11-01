@@ -217,7 +217,6 @@ namespace AspectedRouting
                 printer.WriteProfile1();
                 printer.PrintMdInfo();
                 printer.WriteAllProfile2();
-                printer.WriteProfile2("short");
             }
 
             File.WriteAllText($"{outputDir}/ProfileMetadata.json",
