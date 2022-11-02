@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using AspectedRouting.IO.LuaSkeleton;
 using AspectedRouting.IO.LuaSnippets;
@@ -45,7 +46,7 @@ namespace AspectedRouting.IO.itinero2
                 var exprInLua = _skeleton.ToLua(exprSpecialized);
                 if (exprInLua.Contains("constRight") || exprInLua.Contains("firstArg"))
                     throw new Exception("Not optimized properly:" + exprSpecialized.Repr());
-                aspects.Add(weight + " * " + exprInLua);
+                aspects.Add(weight.ToString(CultureInfo.InvariantCulture) + " * " + exprInLua.ToString(CultureInfo.InvariantCulture));
             }
 
             var scalingFactor = Funcs.Default.Apply(new Constant(Typs.Double, 1.0), _profile.ScalingFactor, tags)
