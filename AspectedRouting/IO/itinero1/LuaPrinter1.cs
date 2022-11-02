@@ -151,6 +151,8 @@ namespace AspectedRouting.IO.itinero1
                 "test_all()",
                 "if (not failed_tests and not failed_profile_tests) then",
                 "    print(\"Tests OK\")",
+                "else",
+                "    error(\"Some tests failed\")",
                 "end"
             );
         }

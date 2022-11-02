@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using AspectedRouting.Tests;
 
@@ -94,10 +95,10 @@ namespace AspectedRouting.IO.itinero1
                 tags.Remove("#" + paramName);
             }
 
-            var expectedPriority = "" + expected.Priority;
+            var expectedPriority = expected.Priority.ToString(CultureInfo.InvariantCulture);
             if (invertPriority)
             {
-                expectedPriority = $"inv({expectedPriority})";
+                expectedPriority = $"inv({expectedPriority.ToString(CultureInfo.InvariantCulture)})";
             }
 
             // Generates something like:
@@ -106,7 +107,7 @@ namespace AspectedRouting.IO.itinero1
                 $"unit_test_profile(behaviour_{testSuite.Profile.Name.AsLuaIdentifier()}_{testSuite.BehaviourName.AsLuaIdentifier()}, " +
                 $"\"{testSuite.BehaviourName}\", " +
                 $"{index}, " +
-                $"{{access = \"{D(expected.Access)}\", speed = {expected.Speed}, oneway = \"{D(expected.Oneway)}\", priority = {expectedPriority} }}, " +
+                $"{{access = \"{D(expected.Access)}\", speed = {expected.Speed.ToString(CultureInfo.InvariantCulture)}, oneway = \"{D(expected.Oneway)}\", priority = {expectedPriority} }}, " +
                 tags.ToLuaTable() +
                 ")";
         }
@@ -151,8 +152,7 @@ namespace AspectedRouting.IO.itinero1
 
             _skeleton.AddDep("unitTest");
             _skeleton.AddDep("debug_table");
-            return
-                $"unit_test({functionToApplyName.AsLuaIdentifier()}, \"{functionToApplyName}\", {index}, \"{expected}\", {parameters.ToLuaTable()}, {tags.ToLuaTable()})";
+            return $"unit_test({functionToApplyName.AsLuaIdentifier()}, \"{functionToApplyName}\", {index.ToString(CultureInfo.InvariantCulture)}, \"{expected.ToString(CultureInfo.InvariantCulture)}\", {parameters.ToLuaTable()}, {tags.ToLuaTable()})";
         }
 
 

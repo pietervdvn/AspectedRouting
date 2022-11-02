@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AspectedRouting.IO.itinero1;
@@ -29,7 +28,7 @@ namespace AspectedRouting.IO.itinero2
         private readonly string _behaviourName;
         private readonly IEnumerable<BehaviourTestSuite> _behaviourTestSuite;
         private readonly Context _context;
-        private readonly DateTime _lastChangeTime;
+        private readonly bool _includeTests;
         private readonly LuaParameterPrinter _parameterPrinter;
         private readonly ProfileMetaData _profile;
 
@@ -39,7 +38,7 @@ namespace AspectedRouting.IO.itinero2
         public LuaPrinter2(ProfileMetaData profile, string behaviourName,
             Context context,
             List<AspectTestSuite> aspectTests, IEnumerable<BehaviourTestSuite> behaviourTestSuite,
-            DateTime lastChangeTime)
+            bool includeTests = true)
         {
             _skeleton = new LuaSkeleton.LuaSkeleton(context, true);
             _profile = profile;
@@ -47,29 +46,61 @@ namespace AspectedRouting.IO.itinero2
             _context = context;
             _aspectTests = aspectTests;
             _behaviourTestSuite = behaviourTestSuite;
-            _lastChangeTime = lastChangeTime;
+            _includeTests = includeTests;
             _parameterPrinter = new LuaParameterPrinter(_profile, _skeleton);
+        }
+
+        private string TestRunner()
+        {
+            return new List<string>
+            {
+                "if (itinero == nil) then",
+                "    itinero = {}",
+                "    itinero.log = print",
+                "",
+                "    -- Itinero is not defined -> we are running from a lua interpreter -> the tests are intended",
+                "    runTests = true",
+                "",
+                "",
+                "else",
+                "    print = itinero.log",
+                "end",
+                "",
+                "test_all()",
+                "if (not failed_tests and not failed_profile_tests and print ~= nil) then",
+                $"    print(\"Tests OK ({_profile.Name}.{_behaviourName})\")",
+                "else",
+                "    error(\"Some tests failed\")",
+                "end"
+            }.Lined();
         }
 
         public string ToLua()
         {
             var profileDescr = _profile.Behaviours[_behaviourName]["description"].Evaluate(_context).ToString();
             var header =
-                new List<string> {
+                new List<string>
+                {
                     $"name = \"{_profile.Name}.{_behaviourName}\"",
                     $"description = \"{profileDescr} ({_profile.Description})\"",
                     "",
                     "-- The hierarchy of types that this vehicle is; mostly used to check access restrictions",
-                    $"vehicle_types = "+_skeleton.ToLua(new Constant( _profile.VehicleTyps.Select(v => new Constant(v)).ToArray()))
+                    "vehicle_types = " +
+                    _skeleton.ToLua(new Constant(_profile.VehicleTyps.Select(v => new Constant(v)).ToArray()))
                 };
 
-            var testPrinter = new LuaTestPrinter(_skeleton,
-                new List<string> { "unitTestProfile2" });
-            var tests = testPrinter.GenerateFullTestSuite(
-                _behaviourTestSuite.ToList(),
-                new List<AspectTestSuite>(),
-                true);
-            var all = new List<string> {
+            var tests = "";
+            if (_includeTests) {
+                var testPrinter = new LuaTestPrinter(_skeleton,
+                    new List<string> { "unitTestProfile2" });
+                tests = testPrinter.GenerateFullTestSuite(
+                    _behaviourTestSuite.ToList(),
+                    new List<AspectTestSuite>(),
+                    true) + "\n\n" + TestRunner();
+            }
+
+            var all = new List<string>
+            {
                 header.Lined(),
                 "",
                 GenerateMainFunction(),
@@ -87,25 +118,7 @@ namespace AspectedRouting.IO.itinero2
                 "",
                 string.Join("\n\n", _skeleton.GenerateConstants()),
                 "",
-                tests,
-                "",
-
-                "if (itinero == nil) then",
-                "    itinero = {}",
-                "    itinero.log = print",
-                "",
-                "    -- Itinero is not defined -> we are running from a lua interpreter -> the tests are intended",
-                "    runTests = true",
-                "",
-                "",
-                "else",
-                "    print = itinero.log",
-                "end",
-                "",
-                "test_all()",
-                "if (not failed_tests and not failed_profile_tests and print ~= nil) then",
-                $"    print(\"Tests OK ({_profile.Name}.{_behaviourName})\")",
-                "end"
+                tests
             };
 
             return all.Lined();

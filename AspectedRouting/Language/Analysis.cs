@@ -45,6 +45,8 @@ namespace AspectedRouting.Language
             AddParams(profile.Access, "profile definition for " + profile.Name + ".access");
             AddParams(profile.Oneway, "profile definition for " + profile.Name + ".oneway");
             AddParams(profile.Speed, "profile definition for " + profile.Name + ".speed");
+            AddParams(profile.ObstacleAccess, "profile definition for " + profile.Name + ".obstacleaccess");
+            AddParams(profile.ObstacleCost, "profile definition for " + profile.Name + ".obstaclecost");
 
             foreach (var (key, expr) in profile.Priority)
             {

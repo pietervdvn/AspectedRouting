@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using AspectedRouting.IO.itinero1;
@@ -280,9 +281,9 @@ namespace AspectedRouting.IO.LuaSkeleton
                 case IExpression e:
                     return ToLua(e);
                 case int i:
-                    return "" + i;
+                    return i.ToString(CultureInfo.InvariantCulture);
                 case double d:
-                    return "" + d;
+                    return d.ToString(CultureInfo.InvariantCulture);
                 case string s:
                     return '"' + s.Replace("\"", "\\\"") + '"';
                 case null:

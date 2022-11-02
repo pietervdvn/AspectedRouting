@@ -53,7 +53,7 @@ namespace AspectedRouting.IO.LuaSnippets
 
                 var isString = cond.Types.First().Equals(Typs.String);
                 result += Snippets.Convert(lua, c, cond) + "\n";
-                result += $"if ( {c} or {c} == \"yes\" ) then \n";
+                result += $"if ( {c} == true or {c} == \"yes\" ) then \n";
                 result += "    " + Snippets.Convert(lua, assignTo, ifTrue).Indent();
 
                 if (ifElse != null)
